@@ -1,9 +1,9 @@
 const logos = [
+  { src: "/lgoo.png", alt: "Integrated Value Solutions" },
   { src: "/vercel.svg", alt: "Vercel" },
   { src: "/next.svg", alt: "Next.js" },
   { src: "/globe.svg", alt: "Global" },
   { src: "/window.svg", alt: "Window" },
-  { src: "/file.svg", alt: "File" },
 ];
 
 export default function LogoStrip() {
