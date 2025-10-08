@@ -1,10 +1,10 @@
 type Stat = { label: string; value: string };
 
 const stats: Stat[] = [
-  { label: "Projects delivered", value: "120+" },
-  { label: "Avg. performance uplift", value: "2.4x" },
-  { label: "Availability SLO", value: "99.9%" },
-  { label: "Client NPS", value: "+72" },
+  { label: "Years of ERP Experience", value: "20+" },
+  { label: "Successful Implementations", value: "150+" },
+  { label: "Client Satisfaction Rate", value: "98%" },
+  { label: "Average ROI Improvement", value: "35%" },
 ];
 
 export default function StatsBand() {

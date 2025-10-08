@@ -7,25 +7,43 @@ export default function About() {
         <div>
           <SectionHeading
             eyebrow="Who we are"
-            title="About Us"
+            title="About Integrated Value Solutions"
             subtitle={
-              "We are a senior team of engineers and architects with deep expertise in cloud-native platforms, modern web, and data engineering."
+              "Your trusted partner for Microsoft Dynamics 365 Business Central success with over 20 years of ERP implementation experience."
             }
           />
           <p className="mt-6 text-gray-600">
-            We are a senior team of engineers and architects with deep expertise
-            in cloud-native platforms, modern web, and data engineering. We
-            partner with startups and enterprises to deliver reliable, secure,
-            and scalable systems.
+            We specialize in delivering end-to-end Microsoft Dynamics 365 Business Central solutions that drive operational excellence and business transformation. 
+            As your trusted technology partner, we combine deep industry expertise with cutting-edge implementation methodologies to help organizations streamline their business processes, enhance productivity, and achieve sustainable growth.
           </p>
         </div>
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <ul className="grid gap-2 text-sm text-gray-700">
-            <li>• 10+ years average team experience</li>
-            <li>• Cloud: AWS, Azure, GCP</li>
-            <li>• Web: Next.js, React, Node</li>
-            <li>• Data: Warehousing, Pipelines, Analytics</li>
-            <li>• Security-first delivery</li>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Why Choose Us</h3>
+          <ul className="grid gap-3 text-sm text-gray-700">
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>20+ years of ERP implementation experience</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>Certified Microsoft Dynamics consultants</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>Industry expertise across retail, hospitality, and services</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>Proven implementation methodology</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>Comprehensive service portfolio</span>
+            </li>
+            <li className="flex items-start">
+              <span className="text-blue-600 mr-2">✓</span>
+              <span>Long-term strategic partnership</span>
+            </li>
           </ul>
         </div>
       </div>

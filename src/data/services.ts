@@ -6,19 +6,34 @@ export type Service = {
 
 export const services: Service[] = [
   {
-    title: "Cloud Architecture",
-    description: "Design secure, scalable AWS/Azure/GCP architectures with IaC and observability.",
-    items: ["Landing zones", "Kubernetes", "Serverless", "Terraform"],
+    title: "Business Central Implementation",
+    description: "Expert implementation services for seamless ERP transformation with certified consultants and proven methodologies.",
+    items: ["Discovery & Requirements Analysis", "Solution Design & Configuration", "Data Migration & Integration", "Testing & Go-Live", "User Training & Adoption"],
   },
   {
-    title: "Web Platforms",
-    description: "Build modern web apps with Next.js, React, and edge-first deployments.",
-    items: ["Next.js", "API design", "Auth", "Accessibility"],
+    title: "Support Services",
+    description: "Comprehensive post-implementation support ensuring optimal performance and continuous system optimization.",
+    items: ["Technical Support & Maintenance", "User Support & Training", "System Updates & Upgrades", "Performance Optimization"],
   },
   {
-    title: "Data Engineering",
-    description: "Data pipelines, warehousing, and analytics for decision-making at scale.",
-    items: ["ETL/ELT", "Warehousing", "Dashboards"],
+    title: "LS Central Solutions",
+    description: "Unified retail and hospitality solutions built on Business Central with POS, inventory, and customer loyalty integration.",
+    items: ["Retail Implementation", "Hospitality Implementation", "Multi-channel Operations", "Property Management"],
+  },
+  {
+    title: "Upgrade Services",
+    description: "Seamless migration from legacy Dynamics NAV to modern cloud-based Business Central solutions.",
+    items: ["NAV to Business Central Migration", "Customization Conversion", "Cloud Migration", "Data Preservation"],
+  },
+  {
+    title: "Power BI Integration",
+    description: "Transform Business Central data into actionable insights with advanced analytics and real-time dashboards.",
+    items: ["Dashboard Development", "Advanced Analytics", "Custom Visualizations", "Training & Support"],
+  },
+  {
+    title: "System Audit & Optimization",
+    description: "Comprehensive system health assessment and optimization for performance, security, and compliance.",
+    items: ["Performance Assessment", "Security Review", "Configuration Analysis", "Data Quality Assessment"],
   },
 ];
 

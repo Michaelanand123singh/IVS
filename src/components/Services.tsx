@@ -7,8 +7,8 @@ export default function Services() {
       <div className="mx-auto max-w-6xl px-6 py-20">
         <SectionHeading
           eyebrow="What we do"
-          title="Services"
-          subtitle="End-to-end consulting across cloud, web, and data."
+          title="Our Services"
+          subtitle="Comprehensive Microsoft Dynamics 365 Business Central solutions for business transformation."
           align="left"
         />
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
