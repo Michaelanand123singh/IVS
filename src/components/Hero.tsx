@@ -1,144 +1,254 @@
-// Import background images from assets folder
-// Uncomment these lines when you add your actual image files:
-// import heroBg1 from '@/assets/images/hero-bg-1.jpg';
-// import heroBg2 from '@/assets/images/hero-bg-2.jpg';
-// import heroBg3 from '@/assets/images/hero-bg-3.jpg';
+"use client";
 
-export default function Hero() {
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+// --- TYPES --- //
+type Kpi = { label: string; value: string; change: string };
+type Bar = { label: string; value: number; color: string };
+interface SlideData {
+  type: string;
+  kpi1: Kpi;
+  kpi2: Kpi;
+  bars: Bar[];
+}
+
+// --- CAROUSEL DATA --- //
+const carouselSlides: SlideData[] = [
+  {
+    type: "Sales Dashboard",
+    kpi1: { label: "Revenue", value: "$2.4M", change: "+12.5%" },
+    kpi2: { label: "Orders", value: "1,247", change: "+8.2%" },
+    bars: [
+      { label: "Sales Target", value: 85, color: "#1F4E79" },
+      { label: "Lead Conversion", value: 72, color: "#F47A21" },
+      { label: "Customer Satisfaction", value: 94, color: "#50C878" },
+    ],
+  },
+  {
+    type: "Inventory Overview",
+    kpi1: { label: "Items in Stock", value: "14,280", change: "-1.5%" },
+    kpi2: { label: "Stock Turnover", value: "4.8", change: "+5.1%" },
+    bars: [
+      { label: "Order Accuracy", value: 98, color: "#1F4E79" },
+      { label: "On-time Shipment", value: 92, color: "#F47A21" },
+      { label: "Storage Capacity", value: 65, color: "#50C878" },
+    ],
+  },
+  {
+    type: "Financial Analytics",
+    kpi1: { label: "Net Profit", value: "$850K", change: "+18.3%" },
+    kpi2: { label: "Operating Margin", value: "24%", change: "+3.7%" },
+    bars: [
+      { label: "Cash Flow", value: 88, color: "#1F4E79" },
+      { label: "Expense Ratio", value: 45, color: "#F47A21" },
+      { label: "ROI", value: 78, color: "#50C878" },
+    ],
+  },
+];
+
+// --- BACKGROUND IMAGE CAROUSEL --- //
+const backgroundImages = [
+  "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80",
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80",
+  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80",
+  "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80",
+];
+
+// --- DASHBOARD SLIDE --- //
+function DashboardSlide({
+  data,
+  isActive,
+}: {
+  data: SlideData;
+  isActive: boolean;
+}) {
   return (
-    <section id="home" className="relative h-screen overflow-hidden">
-      {/* Sliding Background Images */}
-      <div className="absolute inset-0">
-        <div className="relative w-full h-full">
-          {/* Fallback gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1F4E79] via-[#2a5a8a] to-[#1F4E79]"></div>
-          
-          {/* Background Image 1 - Uncomment when you add your images */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-fade-in-out" 
-            style={{
-              // backgroundImage: `url(${heroBg1.src})` // Uncomment when you add your images
-              backgroundImage: `url('data:image/svg+xml;base64,${btoa(`
-                <svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#1F4E79;stop-opacity:0.9" />
-                      <stop offset="100%" style="stop-color:#2a5a8a;stop-opacity:0.7" />
-                    </linearGradient>
-                  </defs>
-                  <rect width="1920" height="1080" fill="url(#grad1)"/>
-                  <circle cx="300" cy="200" r="150" fill="#F47A21" opacity="0.1"/>
-                  <circle cx="1600" cy="800" r="200" fill="#F47A21" opacity="0.1"/>
-                  <rect x="100" y="400" width="300" height="200" fill="#F47A21" opacity="0.05" transform="rotate(15 250 500)"/>
-                </svg>
-              `)}')`
-            }}
-          >
+    <motion.div
+      className="w-full flex-shrink-0"
+      animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 30 }}
+      transition={{ duration: 0.6, ease: "easeInOut" }}
+    >
+      <div className="relative backdrop-blur-lg bg-white/70 rounded-2xl shadow-2xl border border-white/30 overflow-hidden">
+        {/* Dashboard Header */}
+        <div className="bg-[#1F4E79] px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
           </div>
-          
-          {/* Background Image 2 - Uncomment when you add your images */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-fade-in-out-delayed" 
-            style={{
-              // backgroundImage: `url(${heroBg2.src})` // Uncomment when you add your images
-              backgroundImage: `url('data:image/svg+xml;base64,${btoa(`
-                <svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#2a5a8a;stop-opacity:0.8" />
-                      <stop offset="100%" style="stop-color:#1F4E79;stop-opacity:0.9" />
-                    </linearGradient>
-                  </defs>
-                  <rect width="1920" height="1080" fill="url(#grad2)"/>
-                  <polygon points="0,0 400,0 200,300" fill="#F47A21" opacity="0.1"/>
-                  <polygon points="1520,0 1920,0 1720,400" fill="#F47A21" opacity="0.1"/>
-                  <circle cx="960" cy="540" r="300" fill="#F47A21" opacity="0.05"/>
-                </svg>
-              `)}')`
-            }}
-          >
+          <div className="text-white text-sm font-medium">{data.type}</div>
+        </div>
+
+        {/* Dashboard Body */}
+        <div className="p-6 space-y-6">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            {[data.kpi1, data.kpi2].map((kpi, i) => (
+              <div
+                key={i}
+                className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border border-white/30"
+              >
+                <div className="text-xs font-medium text-[#555555] uppercase tracking-wide mb-2">
+                  {kpi.label}
+                </div>
+                <div className="text-2xl font-bold text-[#1C1C1C]">
+                  {kpi.value}
+                </div>
+                <div
+                  className={`text-xs mt-1 ${
+                    kpi.change.startsWith("+")
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {kpi.change} vs last month
+                </div>
+              </div>
+            ))}
           </div>
-          
-          {/* Background Image 3 - Uncomment when you add your images */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-fade-in-out-delayed-2" 
-            style={{
-              // backgroundImage: `url(${heroBg3.src})` // Uncomment when you add your images
-              backgroundImage: `url('data:image/svg+xml;base64,${btoa(`
-                <svg width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#1F4E79;stop-opacity:0.85" />
-                      <stop offset="50%" style="stop-color:#F47A21;stop-opacity:0.3" />
-                      <stop offset="100%" style="stop-color:#2a5a8a;stop-opacity:0.8" />
-                    </linearGradient>
-                  </defs>
-                  <rect width="1920" height="1080" fill="url(#grad3)"/>
-                  <rect x="0" y="0" width="500" height="500" fill="#F47A21" opacity="0.1" transform="rotate(45 250 250)"/>
-                  <rect x="1200" y="300" width="400" height="400" fill="#F47A21" opacity="0.1" transform="rotate(-30 1400 500)"/>
-                </svg>
-              `)}')`
-            }}
-          >
+
+          {/* Bars */}
+          <div className="bg-white/50 rounded-lg p-4 border border-white/30">
+            <div className="text-sm font-semibold text-[#1C1C1C] mb-4">
+              Performance Overview
+            </div>
+            <div className="space-y-3">
+              {data.bars.map((bar, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: bar.color }}
+                  ></div>
+                  <div className="flex-1">
+                    <div className="text-xs text-gray-500 mb-1">{bar.label}</div>
+                    <div className="h-2 bg-gray-200/60 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${bar.value}%`,
+                          backgroundColor: bar.color,
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="text-xs font-semibold text-[#555555]">
+                    {bar.value}%
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/30"></div>
-      
-      {/* Main content with text overlay - Centered heading only */}
-      <div className="relative z-10 flex items-center justify-center h-full">
-        <div className="text-center">
-          {/* Main heading */}
-          <h1 className="text-5xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-tight drop-shadow-lg">
-            Transform Your Business with
-            <span className="block text-[#F47A21] mt-4 drop-shadow-lg">
-              Expert Dynamics Solutions
-            </span>
-          </h1>
-        </div>
+    </motion.div>
+  );
+}
+
+// --- HERO --- //
+export default function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [bgIndex, setBgIndex] = useState(0);
+
+  // Background Image Carousel
+  useEffect(() => {
+    const bgInterval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 7000);
+    return () => clearInterval(bgInterval);
+  }, []);
+
+  // Dashboard Slide Carousel
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 5000);
+    return () => clearInterval(slideInterval);
+  }, []);
+
+  return (
+    <section className="relative overflow-hidden">
+      {/* --- BACKGROUND IMAGE CAROUSEL --- */}
+      <div className="absolute inset-0 transition-all duration-1000">
+        <AnimatePresence>
+          <motion.div
+            key={bgIndex}
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${backgroundImages[bgIndex]})`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+          />
+        </AnimatePresence>
+
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
-      
-      {/* Bottom section with company highlights */}
-      <div className="relative bg-[#F7F9FC] border-t border-gray-200">
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-[#1F4E79]/10 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-[#1F4E79]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="text-sm font-semibold text-[#1C1C1C]">Certified Experts</div>
-              <div className="text-xs text-[#555555] mt-1">Microsoft Certified Consultants</div>
+
+      {/* --- MAIN CONTENT --- */}
+      <div className="relative mx-auto max-w-7xl px-6 py-24 lg:py-32 z-10 text-white">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* LEFT CONTENT */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="lg:col-span-7"
+          >
+            <h1 className="text-5xl font-bold leading-tight">
+              Transform Your Business with
+              <span className="block text-blue-400 mt-2">
+                Expert Dynamics Solutions
+              </span>
+            </h1>
+            <p className="mt-6 text-lg text-gray-200 max-w-2xl">
+              Streamline Operations, Accelerate Growth, and Maximize ROI with
+              our Comprehensive Microsoft Dynamics 365 Services.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <a
+                href="#contact"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              >
+                Schedule Free Consultation
+              </a>
+              <a
+                href="#services"
+                className="border-2 border-blue-500 text-blue-400 px-6 py-3 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition"
+              >
+                Explore Our Services
+              </a>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-[#1F4E79]/10 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-[#1F4E79]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
+          </motion.div>
+
+          {/* RIGHT DASHBOARD CAROUSEL */}
+          <div className="lg:col-span-5 relative">
+            <div className="overflow-hidden">
+              <div
+                className="flex transition-transform duration-700"
+                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+              >
+                {carouselSlides.map((slide, i) => (
+                  <DashboardSlide key={i} data={slide} isActive={i === currentSlide} />
+                ))}
               </div>
-              <div className="text-sm font-semibold text-[#1C1C1C]">Rapid Deployment</div>
-              <div className="text-xs text-[#555555] mt-1">Faster Time-to-Value</div>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-[#1F4E79]/10 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-[#1F4E79]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
-                </svg>
-              </div>
-              <div className="text-sm font-semibold text-[#1C1C1C]">24/7 Support</div>
-              <div className="text-xs text-[#555555] mt-1">Round-the-Clock Assistance</div>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-[#1F4E79]/10 rounded-lg flex items-center justify-center mb-3">
-                <svg className="w-6 h-6 text-[#1F4E79]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <div className="text-sm font-semibold text-[#1C1C1C]">Industry Focus</div>
-              <div className="text-xs text-[#555555] mt-1">Retail, Hospitality & Services</div>
+
+            {/* Dots */}
+            <div className="flex justify-center mt-6 space-x-2">
+              {carouselSlides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentSlide(i)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    i === currentSlide ? "bg-blue-400" : "bg-gray-300"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -146,5 +256,3 @@ export default function Hero() {
     </section>
   );
 }
-
-
