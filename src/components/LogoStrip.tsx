@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const logos = [
   { src: "/logo.png", alt: "Integrated Value Solutions" },
   { src: "/vercel.svg", alt: "Vercel" },
@@ -8,13 +10,18 @@ const logos = [
 
 export default function LogoStrip() {
   return (
-    <section aria-label="Client logos" className="border-y bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+    <section aria-label="Client logos" className="border-y border-gray-200 bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-5">
           {logos.map((l) => (
-            <div key={l.alt} className="flex items-center justify-center opacity-70 grayscale hover:opacity-100 hover:grayscale-0 transition">
-              {/* Using inline img to keep it simple; these are small local svgs */}
-              <img src={l.src} alt={l.alt} className="h-6" />
+            <div key={l.alt} className="flex items-center justify-center opacity-50 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-300">
+              <Image 
+                src={l.src} 
+                alt={l.alt} 
+                width={100}
+                height={30}
+                className="h-6 w-auto object-contain"
+              />
             </div>
           ))}
         </div>
