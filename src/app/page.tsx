@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import LogoStrip from "@/components/LogoStrip";
+import ERPLifeCycle from "@/components/ERPLifeCycle";
 import Services from "@/components/Services";
 import About from "@/components/About";
 import StatsBand from "@/components/StatsBand";
@@ -16,6 +17,7 @@ export default function Home() {
       <main>
         <Hero />
         <LogoStrip />
+        <ERPLifeCycle />
         <Services />
         <About />
         <StatsBand />

@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getContactById, updateContactStatus, initDatabase } from '@/lib/database';
+import { getContactById, updateContactStatus, deleteContact } from '@/lib/database-mongodb';
 import jwt from 'jsonwebtoken';
-
-// Initialize database on first request
-let dbInitialized = false;
-if (!dbInitialized) {
-  initDatabase();
-  dbInitialized = true;
-}
 
 export async function GET(
   request: NextRequest,
@@ -28,10 +21,7 @@ export async function GET(
     }
 
     const resolvedParams = await params;
-    const contactId = parseInt(resolvedParams.id);
-    if (isNaN(contactId)) {
-      return NextResponse.json({ error: 'Invalid contact ID' }, { status: 400 });
-    }
+    const contactId = resolvedParams.id;
 
     const contact = await getContactById(contactId);
     
@@ -69,10 +59,7 @@ export async function PATCH(
     }
 
     const resolvedParams = await params;
-    const contactId = parseInt(resolvedParams.id);
-    if (isNaN(contactId)) {
-      return NextResponse.json({ error: 'Invalid contact ID' }, { status: 400 });
-    }
+    const contactId = resolvedParams.id;
 
     const body = await request.json();
     const { status } = body;
@@ -87,6 +74,40 @@ export async function PATCH(
 
   } catch (error) {
     console.error('Error updating contact:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    // Check for admin authentication
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+      jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    } catch (error) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    const resolvedParams = await params;
+    const contactId = resolvedParams.id;
+
+    await deleteContact(contactId);
+
+    return NextResponse.json({ success: true }, { status: 200 });
+
+  } catch (error) {
+    console.error('Error deleting contact:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

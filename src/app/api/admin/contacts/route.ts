@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllContacts, initDatabase } from '@/lib/database';
+import { getAllContacts } from '@/lib/database-mongodb';
 import jwt from 'jsonwebtoken';
-
-// Initialize database on first request
-let dbInitialized = false;
-if (!dbInitialized) {
-  initDatabase();
-  dbInitialized = true;
-}
 
 export async function GET(request: NextRequest) {
   try {

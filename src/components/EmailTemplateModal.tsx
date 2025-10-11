@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 
 interface EmailTemplate {
-  id?: number;
+  id?: string;
   name: string;
   subject: string;
   html_content: string;
@@ -16,7 +16,7 @@ interface EmailTemplateModalProps {
   onClose: () => void;
   template?: EmailTemplate | null;
   onSave: (template: Omit<EmailTemplate, 'id'>) => void;
-  onUpdate?: (id: number, template: Partial<Omit<EmailTemplate, 'id'>>) => void;
+  onUpdate?: (id: string, template: Partial<Omit<EmailTemplate, 'id'>>) => void;
 }
 
 export default function EmailTemplateModal({ 

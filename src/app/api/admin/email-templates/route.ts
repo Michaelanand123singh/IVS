@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllEmailTemplates, createEmailTemplate, initDatabase } from '@/lib/database';
+import { getAllEmailTemplates, createEmailTemplate } from '@/lib/database-mongodb';
 import jwt from 'jsonwebtoken';
-
-let dbInitialized = false;
-if (!dbInitialized) {
-  initDatabase();
-  dbInitialized = true;
-}
 
 export async function GET(request: NextRequest) {
   try {

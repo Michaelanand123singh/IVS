@@ -1,6 +1,6 @@
-# Contact Form Automation System
+# Contact Form Automation System (MongoDB)
 
-This document explains the complete contact form automation system implemented for the Integrated Value Solutions website.
+This document explains the complete contact form automation system implemented for the Integrated Value Solutions website using MongoDB.
 
 ## 🚀 Features
 
@@ -41,10 +41,15 @@ src/
 ├── components/
 │   └── Contact.tsx                   # Updated contact form
 ├── lib/
-│   ├── database.ts                   # Database operations
+│   ├── database-mongodb.ts           # MongoDB operations
+│   ├── mongodb.ts                    # MongoDB connection
 │   └── email.ts                      # Email service
+├── models/
+│   ├── Contact.ts                    # Contact model
+│   ├── AdminUser.ts                  # Admin user model
+│   └── EmailTemplate.ts              # Email template model
 └── scripts/
-    └── setup-admin.ts                # Admin user setup
+    └── setup-admin-mongodb.ts        # Admin user setup
 ```
 
 ## 🛠️ Setup Instructions
@@ -54,6 +59,9 @@ src/
 Create a `.env.local` file in the root directory:
 
 ```env
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/itg-website
+
 # Email Configuration
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
@@ -87,14 +95,23 @@ const transporter = nodemailer.createTransporter({
 
 ### 3. Database Setup
 
-The SQLite database will be created automatically when the first API request is made. No manual setup required.
+#### MongoDB Atlas (Recommended):
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. Create a new cluster
+3. Get your connection string
+4. Add it to your `.env.local` file
+
+#### Local MongoDB:
+1. Install MongoDB locally
+2. Start MongoDB service
+3. Use `mongodb://localhost:27017/itg-website` as your MONGODB_URI
 
 ### 4. Admin User Setup
 
 Run the setup script to create the initial admin user:
 
 ```bash
-npm run setup-admin
+npm run setup-admin-mongodb
 ```
 
 Default credentials:
@@ -127,7 +144,7 @@ npm run dev
 
 - **JWT Authentication**: Secure admin login with token expiration
 - **Input Validation**: Server-side validation for all form inputs
-- **SQL Injection Protection**: Parameterized queries
+- **NoSQL Injection Protection**: Mongoose schema validation
 - **Email Validation**: Proper email format checking
 - **Rate Limiting**: Built-in Next.js API protection
 
@@ -170,7 +187,7 @@ npm run dev
 Edit the HTML templates in `src/lib/email.ts` to match your branding.
 
 ### Database Schema Changes:
-Modify the table creation queries in `src/lib/database.ts` and run the setup script again.
+Modify the Mongoose schemas in `src/models/` and restart the application.
 
 ## 🐛 Troubleshooting
 
@@ -182,11 +199,12 @@ Modify the table creation queries in `src/lib/database.ts` and run the setup scr
    - Check spam folder
 
 2. **Database errors**:
-   - Ensure write permissions in project directory
-   - Check if `database.sqlite` file exists
+   - Check MongoDB connection string
+   - Ensure MongoDB service is running
+   - Verify network connectivity to MongoDB Atlas
 
 3. **Admin login issues**:
-   - Run `npm run setup-admin` to create admin user
+   - Run `npm run setup-admin-mongodb` to create admin user
    - Check JWT_SECRET in environment variables
 
 4. **Build errors**:

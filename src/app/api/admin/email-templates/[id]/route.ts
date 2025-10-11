@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getEmailTemplateById, updateEmailTemplate, deleteEmailTemplate, initDatabase } from '@/lib/database';
+import { getEmailTemplateById, updateEmailTemplate, deleteEmailTemplate } from '@/lib/database-mongodb';
 import jwt from 'jsonwebtoken';
-
-let dbInitialized = false;
-if (!dbInitialized) {
-  initDatabase();
-  dbInitialized = true;
-}
 
 export async function GET(
   request: NextRequest,
@@ -27,10 +21,7 @@ export async function GET(
     }
 
     const resolvedParams = await params;
-    const templateId = parseInt(resolvedParams.id);
-    if (isNaN(templateId)) {
-      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 });
-    }
+    const templateId = resolvedParams.id;
 
     const template = await getEmailTemplateById(templateId);
 
@@ -67,10 +58,7 @@ export async function PATCH(
     }
 
     const resolvedParams = await params;
-    const templateId = parseInt(resolvedParams.id);
-    if (isNaN(templateId)) {
-      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 });
-    }
+    const templateId = resolvedParams.id;
 
     const body = await request.json();
     const { name, subject, html_content, type, is_active } = body;
@@ -117,10 +105,7 @@ export async function DELETE(
     }
 
     const resolvedParams = await params;
-    const templateId = parseInt(resolvedParams.id);
-    if (isNaN(templateId)) {
-      return NextResponse.json({ error: 'Invalid template ID' }, { status: 400 });
-    }
+    const templateId = resolvedParams.id;
 
     await deleteEmailTemplate(templateId);
 

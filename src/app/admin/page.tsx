@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
 
 interface Contact {
-  id: number;
+  id: string;
   name: string;
   email: string;
   company?: string;
@@ -16,7 +16,7 @@ interface Contact {
 }
 
 interface EmailTemplate {
-  id: number;
+  id: string;
   name: string;
   subject: string;
   html_content: string;
@@ -105,7 +105,7 @@ export default function AdminPanel() {
     }
   };
 
-  const updateContactStatus = async (id: number, status: 'new' | 'contacted' | 'closed') => {
+  const updateContactStatus = async (id: string, status: 'new' | 'contacted' | 'closed') => {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
 
@@ -163,7 +163,7 @@ export default function AdminPanel() {
     }
   };
 
-  const handleUpdateTemplate = async (id: number, template: Partial<Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>>) => {
+  const handleUpdateTemplate = async (id: string, template: Partial<Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>>) => {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
 
@@ -192,7 +192,7 @@ export default function AdminPanel() {
     }
   };
 
-  const handleDeleteTemplate = async (id: number) => {
+  const handleDeleteTemplate = async (id: string) => {
     if (!confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
       return;
     }
@@ -223,7 +223,7 @@ export default function AdminPanel() {
     }
   };
 
-  const handleToggleTemplateStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleTemplateStatus = async (id: string, currentStatus: boolean) => {
     const token = localStorage.getItem('adminToken');
     if (!token) return;
 
@@ -699,7 +699,7 @@ export default function AdminPanel() {
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-[#555555] mb-1">Database Type</label>
-                        <p className="text-sm text-[#1C1C1C]">SQLite</p>
+                        <p className="text-sm text-[#1C1C1C]">MongoDB</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-[#555555] mb-1">Total Contacts</label>

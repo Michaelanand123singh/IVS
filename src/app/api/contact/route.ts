@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createContact, initDatabase } from '@/lib/database';
+import { createContact } from '@/lib/database-mongodb';
 import { sendUserConfirmationEmail, sendAdminNotificationEmail } from '@/lib/email';
-
-// Initialize database on first request
-let dbInitialized = false;
-if (!dbInitialized) {
-  initDatabase();
-  dbInitialized = true;
-}
 
 export async function POST(request: NextRequest) {
   try {

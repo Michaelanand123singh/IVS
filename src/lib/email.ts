@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { getActiveEmailTemplate } from './database';
+import { getActiveEmailTemplate } from './database-mongodb';
 
 // Email configuration - using Gmail SMTP as example
 // You can configure this with your preferred email service
