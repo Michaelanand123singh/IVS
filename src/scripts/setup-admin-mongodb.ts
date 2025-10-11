@@ -1,43 +1,51 @@
+import dotenv from 'dotenv';
+import path from 'path';
+
+// CRITICAL: Load environment variables from .env.local BEFORE any other imports
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+
+import mongoose from 'mongoose';
 import { createAdmin, getAdminByUsername } from '../lib/database-mongodb';
 
 async function setupAdmin() {
+  console.log('🚀 Starting admin setup script...');
+  
   try {
-    // Check and create first admin user
-    const username1 = 'admin';
-    const password1 = 'admin123';
+    // Note: The connectDB function will now use the MONGODB_URI from your .env.local file
+    console.log('Connecting to the database specified in .env.local...');
     
-    const existingAdmin1 = await getAdminByUsername(username1);
-    if (existingAdmin1) {
-      console.log('Admin user already exists: admin');
-    } else {
-      await createAdmin(username1, password1);
-      console.log('First admin user created successfully!');
-      console.log('Username: admin');
-      console.log('Password: admin123');
+    // Define the users you want to create or check
+    const usersToCreate = [
+      { username: 'admin', password: 'admin123' },
+      { username: 'manager', password: 'manager456' }
+    ];
+
+    for (const user of usersToCreate) {
+      const existingAdmin = await getAdminByUsername(user.username);
+      if (existingAdmin) {
+        console.log(`✅ User "${user.username}" already exists in the database. Skipping creation.`);
+      } else {
+        await createAdmin(user.username, user.password);
+        console.log(`🎉 User "${user.username}" created successfully in the database!`);
+      }
     }
-    
-    // Check and create second admin user
-    const username2 = 'manager';
-    const password2 = 'manager456';
-    
-    const existingAdmin2 = await getAdminByUsername(username2);
-    if (existingAdmin2) {
-      console.log('Manager user already exists: manager');
-    } else {
-      await createAdmin(username2, password2);
-      console.log('Second admin user created successfully!');
-      console.log('Username: manager');
-      console.log('Password: manager456');
-    }
-    
-    console.log('\n=== Admin Credentials ===');
-    console.log('Admin 1 - Username: admin, Password: admin123');
-    console.log('Admin 2 - Username: manager, Password: manager456');
-    console.log('Please change passwords after first login.');
+
+    console.log('\n=== Admin Credentials Summary ===');
+    usersToCreate.forEach(user => {
+      console.log(`- Username: ${user.username}, Password: ${user.password}`);
+    });
+    console.log('\n⚠️  Important: Please change these default passwords after your first login.');
     
   } catch (error) {
-    console.error('Error setting up admin users:', error);
+    console.error('❌ An error occurred during admin setup:', error);
+  } finally {
+    // Close the connection to allow the script to exit gracefully.
+    console.log('Closing database connection...');
+    await mongoose.connection.close();
+    console.log('🏁 Script finished.');
   }
 }
 
+// Execute the function
 setupAdmin();
+

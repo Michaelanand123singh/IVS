@@ -1,10 +1,6 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/itg-website';
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
-}
+// Do NOT define the MONGODB_URI here.
 
 /**
  * Global is used here to maintain a cached connection across hot reloads
@@ -23,6 +19,16 @@ async function connectDB() {
   }
 
   if (!cached.promise) {
+    // Read the environment variable INSIDE the function.
+    // This is the critical change.
+    const MONGODB_URI = process.env.MONGODB_URI;
+
+    if (!MONGODB_URI) {
+      throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
+    }
+    
+    console.log("Connecting to MONGO URI:", MONGODB_URI); // For debugging
+
     const opts = {
       bufferCommands: false,
     };

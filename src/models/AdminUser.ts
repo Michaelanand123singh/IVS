@@ -12,7 +12,7 @@ const AdminUserSchema = new Schema<IAdminUser>({
   username: {
     type: String,
     required: [true, 'Username is required'],
-    unique: true,
+    unique: true, // This is enough to create the index
     trim: true,
     minlength: [3, 'Username must be at least 3 characters'],
     maxlength: [50, 'Username cannot be more than 50 characters']
@@ -36,8 +36,5 @@ const AdminUserSchema = new Schema<IAdminUser>({
 }, {
   timestamps: true
 });
-
-// Create index for username
-AdminUserSchema.index({ username: 1 });
 
 export default mongoose.models.AdminUser || mongoose.model<IAdminUser>('AdminUser', AdminUserSchema);

@@ -170,7 +170,7 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden">
       {/* --- BACKGROUND IMAGE CAROUSEL --- */}
-      <div className="absolute inset-0 transition-all duration-1000">
+      <div className="absolute inset-0 transition-all duration-300">
         <AnimatePresence>
           <motion.div
             key={bgIndex}
@@ -181,7 +181,7 @@ export default function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.4 }}
           />
         </AnimatePresence>
 
@@ -201,7 +201,7 @@ export default function Hero() {
           >
             <h1 className="text-5xl font-bold leading-tight">
               Transform Your Business with
-              <span className="block text-blue-400 mt-2">
+              <span className="block text-amber-400 mt-2">
                 Expert Dynamics Solutions
               </span>
             </h1>
@@ -212,13 +212,13 @@ export default function Hero() {
             <div className="mt-8 flex flex-wrap gap-4">
               <a
                 href="#contact"
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition"
               >
                 Schedule Free Consultation
               </a>
               <a
                 href="#services"
-                className="border-2 border-blue-500 text-blue-400 px-6 py-3 rounded-lg font-semibold hover:bg-blue-500 hover:text-white transition"
+                className="border-2 border-amber-500 text-amber-400 px-6 py-3 rounded-lg font-semibold hover:bg-amber-500 hover:text-white transition"
               >
                 Explore Our Services
               </a>
