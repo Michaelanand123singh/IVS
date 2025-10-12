@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
   /* Primary Brand Colors - Deep Blue #1F4E79 */
@@ -51,22 +53,7 @@
   --error-600: #dc2626;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--text-primary);
-  --color-primary: var(--primary-900);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: var(--background-light);
-  --color-secondary-foreground: var(--text-primary);
-  --color-muted: var(--background-muted);
-  --color-muted-foreground: var(--text-secondary);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-accent: var(--accent-500);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Custom CSS variables for theming */
 
 body {
   background: var(--background);
