@@ -35,6 +35,26 @@ export const services: Service[] = [
     description: "Comprehensive system health assessment and optimization for performance, security, and compliance.",
     items: ["Performance Assessment", "Security Review", "Configuration Analysis", "Data Quality Assessment"],
   },
+  {
+    title: "Agentic AI Solutions",
+    description: "Intelligent autonomous agents that can perform complex tasks, make decisions, and adapt to changing environments for enhanced business automation.",
+    items: ["AI Agent Development", "Workflow Automation", "Decision Support Systems", "Intelligent Process Automation", "Custom AI Solutions"],
+  },
+  {
+    title: "AI & Machine Learning",
+    description: "Advanced AI and ML solutions to extract insights from data, predict trends, and automate decision-making processes.",
+    items: ["Predictive Analytics", "Machine Learning Models", "Deep Learning Solutions", "Natural Language Processing", "Computer Vision", "Data Science Consulting"],
+  },
+  {
+    title: "Cloud Computing",
+    description: "Scalable cloud infrastructure and services to modernize your business operations with secure, reliable, and cost-effective solutions.",
+    items: ["Cloud Migration", "Infrastructure as a Service (IaaS)", "Platform as a Service (PaaS)", "Cloud Security", "DevOps & CI/CD", "Cloud Monitoring & Optimization"],
+  },
+  {
+    title: "Software Development",
+    description: "Custom software solutions tailored to your business needs, from web applications to mobile apps across all platforms.",
+    items: ["Web Application Development", "Mobile App Development (Android & iOS)", "Custom Software Solutions", "API Development", "Database Design", "Quality Assurance & Testing"],
+  },
 ];
 
 
