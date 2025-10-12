@@ -9,7 +9,7 @@ export const testimonials: Testimonial[] = [
     quote:
       "Integrated Value Solutions delivered our Business Central implementation ahead of schedule with zero business disruption. Their expertise in retail operations transformed our inventory management.",
     author: "Sarah M.",
-    role: "Operations Director, Retail Chain",
+    role: "Operation Director, Retail Chain",
   },
   {
     quote:
