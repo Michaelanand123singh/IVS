@@ -92,13 +92,13 @@ export default function ERPLifeCycle() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 bg-gradient-to-br from-[#F7F9FC] to-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-[#F7F9FC] to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
         {/* Life Cycle Diagram - Perfect Circle Format */}
         <div className="relative flex justify-center items-center">
           {/* Circle Container */}
-          <div className="relative w-[600px] h-[600px]">
+          <div className="relative w-[280px] h-[280px] sm:w-[400px] sm:h-[400px] md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px]">
             {/* Circle Path */}
             <svg
               className="absolute inset-0 w-full h-full"
@@ -133,10 +133,10 @@ export default function ERPLifeCycle() {
             {/* Center Text */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
-                <h2 className="text-3xl font-bold text-[#1C1C1C] mb-2">
+                <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-[#1C1C1C] mb-1 sm:mb-2">
                   Project Life Cycle
                 </h2>
-                <p className="text-[#555555] text-sm">
+                <p className="text-[#555555] text-xs sm:text-sm">
                   8-Step Process
                 </p>
               </div>
@@ -171,11 +171,11 @@ export default function ERPLifeCycle() {
                 >
                   {/* Step Circle */}
                   <div
-                    className={`relative w-16 h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg cursor-pointer transition-all duration-500 hover:scale-110 ${
+                    className={`relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full bg-gradient-to-br ${step.color} shadow-lg cursor-pointer transition-all duration-500 hover:scale-110 ${
                       isHovered ? 'ring-2 ring-white ring-opacity-50 scale-110' : ''
                     }`}
                   >
-                    <div className="absolute inset-0 flex items-center justify-center text-lg">
+                    <div className="absolute inset-0 flex items-center justify-center text-sm sm:text-base lg:text-lg">
                       {step.icon}
                     </div>
                     
@@ -186,7 +186,7 @@ export default function ERPLifeCycle() {
                   </div>
 
                   {/* Step Number */}
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#1F4E79] text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 bg-[#1F4E79] text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {step.id}
                   </div>
 
@@ -194,11 +194,11 @@ export default function ERPLifeCycle() {
                   <div
                     className="absolute left-1/2 transform -translate-x-1/2 text-center transition-all duration-500"
                     style={{ 
-                      width: '160px',
-                      top: y > 300 ? 'calc(100% + 8px)' : 'calc(-100% - 8px)'
+                      width: '120px',
+                      top: y > 300 ? 'calc(100% + 4px)' : 'calc(-100% - 4px)'
                     }}
                   >
-                    <h3 className="font-semibold text-sm text-[#555555]">
+                    <h3 className="font-semibold text-xs sm:text-sm text-[#555555] leading-tight">
                       {step.title}
                     </h3>
                   </div>
@@ -206,28 +206,28 @@ export default function ERPLifeCycle() {
                   {/* Hover Popup */}
                   {isHovered && (
                     <div
-                      className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 min-w-[200px] max-w-[250px] transition-all duration-300"
+                      className="absolute z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-3 sm:p-4 min-w-[160px] max-w-[200px] sm:min-w-[200px] sm:max-w-[250px] transition-all duration-300"
                       style={{
                         left: '50%',
-                        top: y > 300 ? 'calc(-100% - 20px)' : 'calc(100% + 20px)',
+                        top: y > 300 ? 'calc(-100% - 15px)' : 'calc(100% + 15px)',
                         transform: 'translateX(-50%)',
                         animation: 'fadeInUp 0.3s ease-out'
                       }}
                     >
                       {/* Popup Arrow */}
                       <div
-                        className={`absolute w-3 h-3 bg-white border-r border-b border-gray-200 transform rotate-45 ${
-                          y > 300 ? 'top-full -mt-1.5' : 'bottom-full -mb-1.5'
+                        className={`absolute w-2 h-2 sm:w-3 sm:h-3 bg-white border-r border-b border-gray-200 transform rotate-45 ${
+                          y > 300 ? 'top-full -mt-1' : 'bottom-full -mb-1'
                         }`}
                         style={{ left: '50%', transform: 'translateX(-50%) rotate(45deg)' }}
                       ></div>
                       
                       {/* Popup Content */}
                       <div className="text-center">
-                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-sm mx-auto mb-2`}>
+                        <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-xs sm:text-sm mx-auto mb-1 sm:mb-2`}>
                           {step.icon}
                         </div>
-                        <h3 className="font-semibold text-[#1C1C1C] text-sm mb-1">
+                        <h3 className="font-semibold text-[#1C1C1C] text-xs sm:text-sm mb-1">
                           {step.title}
                         </h3>
                         <p className="text-[#555555] text-xs leading-relaxed">

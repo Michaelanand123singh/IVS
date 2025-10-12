@@ -2,9 +2,9 @@ import SectionHeading from "@/components/SectionHeading";
 
 export default function About() {
   return (
-    <section id="about" className="bg-[#F7F9FC] py-16">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+    <section id="about" className="bg-[#F7F9FC] py-12 sm:py-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <SectionHeading
               eyebrow="Who we are"
@@ -19,7 +19,7 @@ export default function About() {
             </p>
           </div>
           <div className="relative">
-            <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-[#1C1C1C] mb-4">Why Choose Us</h3>
               <ul className="space-y-3">
                 {[

@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /admin/
+Disallow: /api/
+
+# Allow important pages
+Allow: /#services
+Allow: /#about
+Allow: /#testimonials
+Allow: /#contact
+
+# Sitemap location
+Sitemap: https://www.ivsdxb.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Additional directives for specific bots
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2

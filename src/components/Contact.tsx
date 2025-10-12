@@ -52,17 +52,17 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="bg-white py-16">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold tracking-tight text-[#1C1C1C] md:text-3xl">Get Started with Integrated Value Solutions</h2>
-          <p className="mt-3 max-w-2xl mx-auto text-[#555555]">
+    <section id="contact" className="bg-white py-12 sm:py-16" role="region" aria-labelledby="contact-heading">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C]">Get Started with Integrated Value Solutions</h2>
+          <p className="mt-3 max-w-2xl mx-auto text-sm sm:text-base text-[#555555]">
             Ready to transform your business with Microsoft Dynamics 365 Business Central? 
             Contact our expert consultants today to discuss your requirements and discover how our comprehensive services can drive operational excellence and business growth.
           </p>
         </div>
         
-        <div className="grid gap-12 lg:grid-cols-2">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
           <div>
             <h3 className="text-lg font-semibold text-[#1C1C1C] mb-6">Contact Information</h3>
             <div className="space-y-4">
@@ -101,7 +101,7 @@ export default function Contact() {
               </div>
             </div>
             
-            <div className="mt-6 rounded-lg border border-[#F47A21]/20 bg-[#F47A21]/5 p-6">
+            <div className="mt-6 rounded-lg border border-[#F47A21]/20 bg-[#F47A21]/5 p-4 sm:p-6">
               <h4 className="text-base font-semibold text-[#1C1C1C] mb-2">Schedule a Free Consultation</h4>
               <p className="text-[#555555] text-sm">
                 Let&apos;s discuss your business requirements and explore how our Dynamics 365 solutions can deliver measurable value for your organization.

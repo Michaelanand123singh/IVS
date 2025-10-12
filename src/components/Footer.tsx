@@ -1,8 +1,8 @@
 export default function Footer() {
   return (
     <footer className="border-t border-gray-200 bg-[#F7F9FC]">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        <div className="grid gap-6 md:grid-cols-4">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
           <div className="md:col-span-2">
             <h3 className="text-base font-semibold text-[#1C1C1C] mb-3">Integrated Value Solutions</h3>
             <p className="text-[#555555] mb-4 text-sm">
@@ -24,10 +24,14 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[#1C1C1C] mb-3">Services</h4>
             <ul className="space-y-2 text-sm text-[#555555]">
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors">Business Central Implementation</a></li>
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors">Support Services</a></li>
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors">LS Central Solutions</a></li>
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors">Upgrade Services</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Business Central Implementation services">Business Central Implementation</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Support Services for ERP systems">Support Services</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="LS Central Solutions for retail and hospitality">LS Central Solutions</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Upgrade Services from legacy systems">Upgrade Services</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Power BI Integration services">Power BI Integration</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="AI and Machine Learning solutions">AI & ML Solutions</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Cloud Computing services">Cloud Computing</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Software Development services">Software Development</a></li>
             </ul>
           </div>
           <div>
@@ -39,7 +43,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-6 border-t border-gray-200 pt-6 text-center text-sm text-[#888888]">
+        <div className="mt-6 sm:mt-8 border-t border-gray-200 pt-4 sm:pt-6 text-center text-xs sm:text-sm text-[#888888]">
           © {new Date().getFullYear()} Integrated Value Solutions. All rights reserved. | Microsoft Dynamics 365 Business Central Partner
         </div>
       </div>

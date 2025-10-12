@@ -12,24 +12,24 @@ export default function Services() {
   const hasMoreServices = services.length > 6;
 
   return (
-    <section id="services" className="bg-white py-16">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="services" className="bg-white py-12 sm:py-16" role="region" aria-labelledby="services-heading">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="What we do"
           title="Our Services"
           subtitle="Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services."
           align="left"
         />
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="List of services offered">
           {displayedServices.map((s) => (
-            <div key={s.title} className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-[#1F4E79] hover:shadow-md">
+            <article key={s.title} className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm transition-all hover:border-[#1F4E79] hover:shadow-md" role="listitem">
               <div className="relative">
                 <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#1F4E79]/10 text-[#1F4E79]">
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-[#1C1C1C]">{s.title}</h3>
+                <h3 className="text-lg font-semibold text-[#1C1C1C]" id={`service-${s.title.toLowerCase().replace(/\s+/g, '-')}`}>{s.title}</h3>
                 <p className="mt-2 text-[#555555] leading-relaxed">{s.description}</p>
                 {s.items?.length ? (
                   <ul className="mt-4 space-y-2">
@@ -44,15 +44,15 @@ export default function Services() {
                   </ul>
                 ) : null}
               </div>
-            </div>
+            </article>
           ))}
         </div>
         
         {hasMoreServices && (
-          <div className="mt-12 text-center">
+          <div className="mt-8 sm:mt-12 text-center">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1F4E79] px-6 py-3 text-white font-medium transition-all hover:bg-[#1F4E79]/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#1F4E79] px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-white font-medium transition-all hover:bg-[#1F4E79]/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-2"
             >
               {showAll ? (
                 <>
