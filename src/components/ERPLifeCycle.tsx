@@ -72,7 +72,20 @@ const lifeCycleSteps: LifeCycleStep[] = [
 export default function ERPLifeCycle() {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -81,7 +94,7 @@ export default function ERPLifeCycle() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     if (sectionRef.current) {
@@ -96,8 +109,15 @@ export default function ERPLifeCycle() {
     const progress = index / (totalSteps - 1); // 0 to 1
     const x = progress * 100; // 0 to 100%
     
-    // Alternate between above and below the horizontal line
-    // Even indices (0, 2, 4, 6) go above, odd indices (1, 3, 5, 7) go below
+    // On mobile, use a more compact layout
+    if (isMobile) {
+      // More vertical spacing on mobile for better touch interaction
+      const isAbove = index % 2 === 0;
+      const y = isAbove ? 30 : 70; // 30% above line, 70% below line
+      return { x, y, isAbove };
+    }
+    
+    // Desktop layout
     const isAbove = index % 2 === 0;
     const y = isAbove ? 35 : 65; // 35% above line, 65% below line
     
@@ -105,22 +125,58 @@ export default function ERPLifeCycle() {
   };
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section ref={sectionRef} className="py-8 sm:py-12 lg:py-16 xl:py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#1C1C1C] mb-2 sm:mb-4">
+        <div className="text-center mb-6 sm:mb-8 lg:mb-12">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#1C1C1C] mb-2 sm:mb-3 lg:mb-4">
             Project Life Cycle
           </h2>
-          <p className="text-[#555555] text-sm sm:text-base lg:text-lg">
+          <p className="text-[#555555] text-xs sm:text-sm md:text-base lg:text-lg">
             8-Step Process
           </p>
         </div>
 
-        {/* Horizontal Life Cycle Diagram */}
-        <div className="relative w-full">
-          {/* Horizontal Line Container */}
-          <div className="relative w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+        {/* Mobile: Vertical Stack Layout */}
+        {isMobile ? (
+          <div className="space-y-3 sm:space-y-4">
+            {lifeCycleSteps.map((step, index) => (
+              <div
+                key={step.id}
+                className={`flex items-center p-3 sm:p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 shadow-sm transition-all duration-500 hover:shadow-md active:scale-95 ${
+                  isVisible ? 'opacity-100 translate-x-0 animate-slide-in-left' : 'opacity-0 translate-x-4'
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+                onTouchStart={() => setHoveredStep(step.id)}
+                onTouchEnd={() => setHoveredStep(null)}
+              >
+                {/* Step Number */}
+                <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-[#1F4E79] text-white text-xs sm:text-sm font-bold rounded-full flex items-center justify-center shadow-lg mr-3 sm:mr-4">
+                  {step.id}
+                </div>
+                
+                {/* Step Icon */}
+                <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-base sm:text-lg mr-3 sm:mr-4 shadow-md`}>
+                  {step.icon}
+                </div>
+                
+                {/* Step Content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-xs sm:text-sm text-[#1C1C1C] mb-1 leading-tight">
+                    {step.title}
+                  </h3>
+                  <p className="text-xs text-[#555555] leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Desktop: Horizontal Line Layout */
+          <div className="relative w-full">
+            {/* Horizontal Line Container */}
+            <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px] overflow-hidden">
             
             {/* Horizontal Line SVG */}
             <svg
@@ -169,18 +225,20 @@ export default function ERPLifeCycle() {
                     top: `${position.y}%`,
                     opacity: isVisibleStep ? 1 : 0,
                     transform: `translate(-50%, -50%) ${isVisibleStep ? 'scale(1)' : 'scale(0.8)'}`,
-                    transitionDelay: `${index * 200}ms`
+                    transitionDelay: `${index * 150}ms`
                   }}
                   onMouseEnter={() => setHoveredStep(step.id)}
                   onMouseLeave={() => setHoveredStep(null)}
+                  onTouchStart={() => setHoveredStep(step.id)}
+                  onTouchEnd={() => setHoveredStep(null)}
                 >
                   {/* Step Circle */}
                   <div
-                    className={`relative w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 rounded-full bg-gradient-to-br ${step.color} shadow-professional cursor-pointer transition-all duration-500 hover:scale-110 hover:shadow-professional-lg ${
-                      isHovered ? 'ring-4 ring-white ring-opacity-60 scale-110' : ''
+                    className={`relative w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 xl:w-18 xl:h-18 rounded-full bg-gradient-to-br ${step.color} shadow-professional cursor-pointer transition-all duration-500 hover:scale-110 hover:shadow-professional-lg touch-manipulation ${
+                      isHovered ? 'ring-2 sm:ring-4 ring-white ring-opacity-60 scale-110' : ''
                     }`}
                   >
-                    <div className="absolute inset-0 flex items-center justify-center text-base sm:text-lg md:text-xl lg:text-2xl">
+                    <div className="absolute inset-0 flex items-center justify-center text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl">
                       {step.icon}
                     </div>
                     
@@ -191,7 +249,7 @@ export default function ERPLifeCycle() {
                   </div>
 
                   {/* Step Number */}
-                  <div className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 bg-[#1F4E79] text-white text-xs sm:text-sm md:text-base font-bold rounded-full flex items-center justify-center shadow-lg">
+                  <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 md:-top-3 md:-right-3 w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 lg:w-8 lg:h-8 xl:w-9 xl:h-9 bg-[#1F4E79] text-white text-xs sm:text-sm md:text-base font-bold rounded-full flex items-center justify-center shadow-lg">
                     {step.id}
                   </div>
 
@@ -199,8 +257,8 @@ export default function ERPLifeCycle() {
                   <div
                     className="absolute left-1/2 transform -translate-x-1/2 text-center transition-all duration-500"
                     style={{ 
-                      width: '140px',
-                      top: position.isAbove ? 'calc(100% + 8px)' : 'calc(-100% - 8px)'
+                      width: '120px',
+                      top: position.isAbove ? 'calc(100% + 6px)' : 'calc(-100% - 6px)'
                     }}
                   >
                     <h3 className="font-semibold text-xs sm:text-sm md:text-base text-[#555555] leading-tight">
@@ -211,28 +269,28 @@ export default function ERPLifeCycle() {
                   {/* Hover Popup */}
                   {isHovered && (
                     <div
-                      className="absolute z-50 bg-white rounded-xl shadow-2xl border border-gray-200 p-4 sm:p-5 min-w-[180px] max-w-[220px] sm:min-w-[220px] sm:max-w-[280px] transition-all duration-300"
+                      className="absolute z-50 bg-white rounded-xl shadow-2xl border border-gray-200 p-3 sm:p-4 md:p-5 min-w-[160px] max-w-[200px] sm:min-w-[180px] sm:max-w-[240px] md:min-w-[200px] md:max-w-[280px] transition-all duration-300"
                       style={{
                         left: '50%',
-                        top: position.isAbove ? 'calc(-100% - 20px)' : 'calc(100% + 20px)',
+                        top: position.isAbove ? 'calc(-100% - 15px)' : 'calc(100% + 15px)',
                         transform: 'translateX(-50%)',
                         animation: 'fadeInUp 0.3s ease-out'
                       }}
                     >
                       {/* Popup Arrow */}
                       <div
-                        className={`absolute w-3 h-3 sm:w-4 sm:h-4 bg-white border-r border-b border-gray-200 transform rotate-45 ${
-                          position.isAbove ? 'top-full -mt-1.5' : 'bottom-full -mb-1.5'
+                        className={`absolute w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 bg-white border-r border-b border-gray-200 transform rotate-45 ${
+                          position.isAbove ? 'top-full -mt-1' : 'bottom-full -mb-1'
                         }`}
                         style={{ left: '50%', transform: 'translateX(-50%) rotate(45deg)' }}
                       ></div>
                       
                       {/* Popup Content */}
                       <div className="text-center">
-                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-sm sm:text-base mx-auto mb-2 sm:mb-3`}>
+                        <div className={`w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-xs sm:text-sm md:text-base mx-auto mb-2 sm:mb-3`}>
                           {step.icon}
                         </div>
-                        <h3 className="font-semibold text-[#1C1C1C] text-sm sm:text-base mb-2">
+                        <h3 className="font-semibold text-[#1C1C1C] text-xs sm:text-sm md:text-base mb-1 sm:mb-2">
                           {step.title}
                         </h3>
                         <p className="text-[#555555] text-xs sm:text-sm leading-relaxed">
@@ -286,6 +344,7 @@ export default function ERPLifeCycle() {
             )}
           </div>
         </div>
+        )}
       </div>
     </section>
   );
