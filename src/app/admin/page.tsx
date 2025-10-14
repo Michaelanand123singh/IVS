@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
 import AdminServiceModal from '@/components/AdminServiceModal';
 
@@ -469,10 +470,15 @@ export default function AdminPanel() {
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 gap-4 sm:gap-0">
             <div className="flex items-center">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#1F4E79] rounded-lg flex items-center justify-center mr-2 sm:mr-3">
-                <svg className="w-4 h-4 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+              <div className="mr-3 sm:mr-4">
+                <Image
+                  src="/logo.png"
+                  alt="Integrated Value Solutions Logo"
+                  width={40}
+                  height={40}
+                  className="h-8 sm:h-10 w-auto"
+                  priority
+                />
               </div>
               <div>
                 <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#1C1C1C]">Admin Dashboard</h1>

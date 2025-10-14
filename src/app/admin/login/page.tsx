@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -43,6 +44,18 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center">
+          {/* Logo */}
+          <div className="flex justify-center mb-6">
+            <Image
+              src="/logo.png"
+              alt="Integrated Value Solutions Logo"
+              width={120}
+              height={60}
+              className="h-12 sm:h-16 w-auto"
+              priority
+            />
+          </div>
+          
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Login</h2>
           <p className="mt-2 text-sm text-gray-600">
             Integrated Value Solutions
@@ -71,7 +84,7 @@ export default function AdminLogin() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#1F4E79] focus:border-[#1F4E79] text-base sm:text-sm transition-colors duration-200"
                   placeholder="Enter your username"
                 />
               </div>
@@ -89,7 +102,7 @@ export default function AdminLogin() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-base sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2.5 sm:py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-[#1F4E79] focus:border-[#1F4E79] text-base sm:text-sm transition-colors duration-200"
                   placeholder="Enter your password"
                 />
               </div>
@@ -99,7 +112,7 @@ export default function AdminLogin() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 sm:py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex justify-center py-2.5 sm:py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#1F4E79] hover:bg-[#1a3f66] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1F4E79] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
