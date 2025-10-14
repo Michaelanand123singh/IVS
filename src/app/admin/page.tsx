@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
+import AdminServiceModal from '@/components/AdminServiceModal';
 
 interface Contact {
   id: string;
@@ -26,6 +27,23 @@ interface EmailTemplate {
   updated_at: string;
 }
 
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  items?: string[];
+  learnMore?: {
+    detailedDescription: string;
+    features: string[];
+    benefits: string[];
+    useCases: string[];
+  };
+  isActive: boolean;
+  displayOrder: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AdminStats {
   totalContacts: number;
   newContacts: number;
@@ -37,14 +55,17 @@ interface AdminStats {
 export default function AdminPanel() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>('all');
-  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'settings'>('contacts');
+  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'settings'>('contacts');
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showServiceModal, setShowServiceModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [editingService, setEditingService] = useState<Service | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -96,6 +117,16 @@ export default function AdminPanel() {
       if (templatesResponse.ok) {
         const templatesData = await templatesResponse.json();
         setEmailTemplates(templatesData.templates || []);
+      }
+
+      // Fetch services
+      const servicesResponse = await fetch('/api/admin/services', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (servicesResponse.ok) {
+        const servicesData = await servicesResponse.json();
+        setServices(servicesData.services || []);
       }
 
     } catch (error) {
@@ -265,6 +296,139 @@ export default function AdminPanel() {
     setShowEmailModal(true);
   };
 
+  // Service management functions
+  const handleSaveService = async (service: Omit<Service, 'id' | 'created_at' | 'updated_at'>) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/admin/services', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(service),
+      });
+
+      if (response.ok) {
+        // Refresh services
+        const servicesResponse = await fetch('/api/admin/services', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (servicesResponse.ok) {
+          const servicesData = await servicesResponse.json();
+          setServices(servicesData.services || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save service:', error);
+    }
+  };
+
+  const handleUpdateService = async (id: string, service: Partial<Omit<Service, 'id' | 'created_at' | 'updated_at'>>) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/services/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(service),
+      });
+
+      if (response.ok) {
+        // Refresh services
+        const servicesResponse = await fetch('/api/admin/services', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (servicesResponse.ok) {
+          const servicesData = await servicesResponse.json();
+          setServices(servicesData.services || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update service:', error);
+    }
+  };
+
+  const handleDeleteService = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this service? This action cannot be undone.')) {
+      return;
+    }
+
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/services/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Refresh services
+        const servicesResponse = await fetch('/api/admin/services', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (servicesResponse.ok) {
+          const servicesData = await servicesResponse.json();
+          setServices(servicesData.services || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete service:', error);
+    }
+  };
+
+  const handleToggleServiceStatus = async (id: string, currentStatus: boolean) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/services/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
+
+      if (response.ok) {
+        // Refresh services
+        const servicesResponse = await fetch('/api/admin/services', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (servicesResponse.ok) {
+          const servicesData = await servicesResponse.json();
+          setServices(servicesData.services || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle service status:', error);
+    }
+  };
+
+  const handleDuplicateService = (service: Service) => {
+    const duplicatedService: Omit<Service, 'id' | 'created_at' | 'updated_at'> = {
+      title: `${service.title} (Copy)`,
+      description: service.description,
+      items: service.items,
+      learnMore: service.learnMore,
+      isActive: false, // Duplicated services start as inactive
+      displayOrder: service.displayOrder
+    };
+    
+    setEditingService(duplicatedService as Service);
+    setShowServiceModal(true);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-red-100 text-red-800 border-red-200';
@@ -400,11 +564,12 @@ export default function AdminPanel() {
               {[
                 { id: 'contacts', name: 'Contact Management', icon: '👥', shortName: 'Contacts' },
                 { id: 'templates', name: 'Email Templates', icon: '📧', shortName: 'Templates' },
+                { id: 'services', name: 'Services Management', icon: '🛠️', shortName: 'Services' },
                 { id: 'settings', name: 'Settings', icon: '⚙️', shortName: 'Settings' }
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'settings')}
+                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'services' | 'settings')}
                   className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm text-left sm:text-center ${
                     activeTab === tab.id
                       ? 'border-[#1F4E79] text-[#1F4E79]'
@@ -673,6 +838,156 @@ export default function AdminPanel() {
               </div>
             )}
 
+            {/* Services Tab */}
+            {activeTab === 'services' && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#1C1C1C]">Services Management</h2>
+                  <button
+                    onClick={() => setShowServiceModal(true)}
+                    className="bg-[#1F4E79] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    New Service
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                  {services.map((service) => (
+                    <div key={service.id} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3 sm:gap-0">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{service.title}</h3>
+                          <p className="text-xs sm:text-sm text-[#555555] mt-1">Order: {service.displayOrder}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleToggleServiceStatus(service.id, service.isActive)}
+                            className={`px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                              service.isActive 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            }`}
+                            title={service.isActive ? 'Click to deactivate' : 'Click to activate'}
+                          >
+                            {service.isActive ? 'Active' : 'Inactive'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteService(service.id)}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                            title="Delete service"
+                          >
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-[#555555] mb-1">Description</label>
+                        <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-2 rounded line-clamp-3">{service.description}</p>
+                      </div>
+
+                      {service.items && service.items.length > 0 && (
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-[#555555] mb-1">Items</label>
+                          <div className="space-y-1">
+                            {service.items.slice(0, 3).map((item, index) => (
+                              <div key={index} className="flex items-start text-sm text-[#555555]">
+                                <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#F47A21]" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                <span className="truncate">{item}</span>
+                              </div>
+                            ))}
+                            {service.items.length > 3 && (
+                              <p className="text-xs text-[#888888]">+{service.items.length - 3} more items</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {service.learnMore && (
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between">
+                            <label className="block text-sm font-medium text-[#555555]">Learn More</label>
+                            {service.learnMore.detailedDescription && (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                Available
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs text-[#888888] mt-1">
+                            Features: {service.learnMore.features?.length || 0} | 
+                            Benefits: {service.learnMore.benefits?.length || 0} | 
+                            Use Cases: {service.learnMore.useCases?.length || 0}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-sm font-medium text-[#555555]">Status</label>
+                        </div>
+                        <p className="text-xs text-[#888888] mt-1">
+                          Created: {new Date(service.created_at).toLocaleDateString()} at {new Date(service.created_at).toLocaleTimeString()}
+                        </p>
+                        {service.updated_at !== service.created_at && (
+                          <p className="text-xs text-[#888888]">
+                            Updated: {new Date(service.updated_at).toLocaleDateString()} at {new Date(service.updated_at).toLocaleTimeString()}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingService(service);
+                            setShowServiceModal(true);
+                          }}
+                          className="flex-1 bg-[#1F4E79] text-white px-3 py-2 rounded text-xs sm:text-sm hover:bg-[#1a4268] transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDuplicateService(service)}
+                          className="px-3 py-2 border border-gray-300 text-gray-700 rounded text-xs sm:text-sm hover:bg-gray-50 transition-colors flex items-center justify-center"
+                          title="Duplicate service"
+                        >
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          <span className="hidden sm:inline">Duplicate</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {services.length === 0 && (
+                  <div className="text-center py-12">
+                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-[#1C1C1C] mb-2">No services found</h3>
+                    <p className="text-[#555555] mb-4">Create your first service to get started.</p>
+                    <button
+                      onClick={() => setShowServiceModal(true)}
+                      className="bg-[#1F4E79] text-white px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors"
+                    >
+                      Create Service
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="max-w-2xl">
@@ -726,6 +1041,18 @@ export default function AdminPanel() {
         template={editingTemplate}
         onSave={handleSaveTemplate}
         onUpdate={handleUpdateTemplate}
+      />
+
+      {/* Service Modal */}
+      <AdminServiceModal
+        isOpen={showServiceModal}
+        onClose={() => {
+          setShowServiceModal(false);
+          setEditingService(null);
+        }}
+        service={editingService}
+        onSave={handleSaveService}
+        onUpdate={handleUpdateService}
       />
     </div>
   );

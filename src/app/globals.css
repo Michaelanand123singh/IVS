@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  /* Primary Brand Colors - Deep Blue #1F4E79 */
+  /* Primary Brand Colors - Professional Deep Blue */
   --primary-50: #f0f4f8;
   --primary-100: #d9e2ec;
   --primary-200: #bcccdc;
@@ -16,7 +16,7 @@
   --primary-900: #1F4E79;
   --primary-950: #102a43;
 
-  /* Accent Colors - Vibrant Orange #F47A21 */
+  /* Accent Colors - Professional Orange */
   --accent-50: #fff7ed;
   --accent-100: #ffedd5;
   --accent-200: #fed7aa;
@@ -28,29 +28,59 @@
   --accent-800: #9a3412;
   --accent-900: #7c2d12;
 
-  /* Text Colors */
-  --text-primary: #1C1C1C;
-  --text-secondary: #555555;
-  --text-muted: #888888;
+  /* Professional Gray Scale */
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
 
-  /* Background Colors */
-  --background: #FFFFFF;
-  --background-light: #F7F9FC;
-  --background-muted: #f8fafc;
+  /* Text Colors - Enhanced Contrast */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+
+  /* Background Colors - Professional Gradients */
+  --background: #ffffff;
+  --background-light: #f8fafc;
+  --background-muted: #f1f5f9;
+  --background-dark: #0f172a;
+  --background-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  --background-hero: linear-gradient(135deg, #1F4E79 0%, #334e68 50%, #243b53 100%);
 
   /* Border and Input Colors */
   --border: #e2e8f0;
   --border-light: #f1f5f9;
+  --border-dark: #cbd5e1;
   --input: #ffffff;
   --ring: #1F4E79;
 
-  /* Success/Error Colors */
+  /* Professional Status Colors */
   --success-50: #f0fdf4;
   --success-500: #22c55e;
   --success-600: #16a34a;
+  --warning-50: #fffbeb;
+  --warning-500: #f59e0b;
+  --warning-600: #d97706;
   --error-50: #fef2f2;
   --error-500: #ef4444;
   --error-600: #dc2626;
+  --info-50: #eff6ff;
+  --info-500: #3b82f6;
+  --info-600: #2563eb;
+
+  /* Professional Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 /* Custom CSS variables for theming */
@@ -60,6 +90,52 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Professional Utility Classes */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #1F4E79 0%, #334e68 50%, #243b53 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, #F47A21 0%, #ea580c 100%);
+}
+
+.bg-gradient-light {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.text-gradient-primary {
+  background: linear-gradient(135deg, #1F4E79 0%, #334e68 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-accent {
+  background: linear-gradient(135deg, #F47A21 0%, #ea580c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-professional {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-professional-lg {
+  box-shadow: var(--shadow-xl);
+}
+
+.border-professional {
+  border: 1px solid var(--border);
+}
+
+.border-professional-dark {
+  border: 1px solid var(--border-dark);
 }
 
 /* Custom scrollbar */

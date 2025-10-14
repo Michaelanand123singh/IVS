@@ -52,7 +52,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="bg-white py-12 sm:py-16" role="region" aria-labelledby="contact-heading">
+    <section id="contact" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="contact-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="text-center mb-8 sm:mb-12">
           <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C]">Get Started with Integrated Value Solutions</h2>
@@ -142,7 +142,7 @@ export default function Contact() {
                   placeholder="Full Name" 
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20" 
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
               </div>
               <div>
@@ -153,7 +153,7 @@ export default function Contact() {
                   placeholder="Email Address" 
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20" 
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
               </div>
               <div>
@@ -162,7 +162,7 @@ export default function Contact() {
                   placeholder="Company Name" 
                   value={formData.company}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20" 
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
               </div>
               <div>
@@ -190,7 +190,7 @@ export default function Contact() {
                   rows={4} 
                   value={formData.message}
                   onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20" 
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
               </div>
               <button 

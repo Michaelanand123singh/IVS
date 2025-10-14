@@ -16,7 +16,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-professional border-b border-gray-200">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 py-4">
         <Link href="#" className="flex items-center" aria-label="Integrated Value Solutions - Home">
           <Image
@@ -31,11 +31,23 @@ export default function Header() {
         </Link>
         
         {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-6 md:flex text-sm font-medium" role="navigation" aria-label="Main navigation">
-          <a href="#services" className="text-gray-600 transition-colors hover:text-gray-900" aria-label="View our services">Services</a>
-          <a href="#about" className="text-gray-600 transition-colors hover:text-gray-900" aria-label="Learn about Integrated Value Solutions">About</a>
-          <a href="#testimonials" className="text-gray-600 transition-colors hover:text-gray-900" aria-label="Read client testimonials">Testimonials</a>
-          <a href="#contact" className="text-gray-600 transition-colors hover:text-gray-900" aria-label="Contact us for consultation">Contact</a>
+        <nav className="hidden items-center gap-8 md:flex text-sm font-medium" role="navigation" aria-label="Main navigation">
+          <a href="#services" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="View our services">
+            Services
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="#about" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Learn about Integrated Value Solutions">
+            About
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="#testimonials" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Read client testimonials">
+            Testimonials
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+          </a>
+          <a href="#contact" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Contact us for consultation">
+            Contact
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+          </a>
         </nav>
 
         {/* Mobile Menu Button */}

@@ -1,18 +1,79 @@
 "use client";
 
-import { services } from "@/data/services";
+import { Service } from "@/data/services";
 import SectionHeading from "@/components/SectionHeading";
-import { useState } from "react";
+import ServiceModal from "@/components/ServiceModal";
+import { useState, useEffect } from "react";
 
 export default function Services() {
+  const [services, setServices] = useState<Service[]>([]);
   const [showAll, setShowAll] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const response = await fetch('/api/admin/services');
+      if (response.ok) {
+        const data = await response.json();
+        setServices(data.services || []);
+      } else {
+        // Fallback to static data if API fails
+        const { services: staticServices } = await import('@/data/services');
+        setServices(staticServices);
+      }
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      // Fallback to static data
+      const { services: staticServices } = await import('@/data/services');
+      setServices(staticServices);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Show first 6 services initially, all services when expanded
   const displayedServices = showAll ? services : services.slice(0, 6);
   const hasMoreServices = services.length > 6;
 
+  const handleLearnMore = (service: Service) => {
+    setSelectedService(service);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedService(null);
+  };
+
+  if (loading) {
+    return (
+      <section id="services" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="services-heading">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <SectionHeading
+            eyebrow="What we do"
+            title="Our Services"
+            subtitle="Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services."
+            align="left"
+          />
+          <div className="mt-8 sm:mt-12 flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1F4E79] mx-auto"></div>
+              <p className="mt-4 text-[#555555]">Loading services...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="services" className="bg-white py-12 sm:py-16" role="region" aria-labelledby="services-heading">
+    <section id="services" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="services-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeading
           eyebrow="What we do"
@@ -22,10 +83,10 @@ export default function Services() {
         />
         <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="List of services offered">
           {displayedServices.map((s) => (
-            <article key={s.title} className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white p-4 sm:p-6 shadow-sm transition-all hover:border-[#1F4E79] hover:shadow-md" role="listitem">
+            <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
               <div className="relative">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[#1F4E79]/10 text-[#1F4E79]">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1F4E79]/10 to-[#1F4E79]/20 text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300">
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -43,6 +104,18 @@ export default function Services() {
                     ))}
                   </ul>
                 ) : null}
+                
+                {/* Learn More Button */}
+                {s.learnMore && (
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => handleLearnMore(s)}
+                      className="w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#1F4E79] to-[#334e68] rounded-lg hover:from-[#334e68] hover:to-[#1F4E79] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-2 shadow-sm hover:shadow-md"
+                    >
+                      Learn More
+                    </button>
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -73,6 +146,13 @@ export default function Services() {
           </div>
         )}
       </div>
+      
+      {/* Service Modal */}
+      <ServiceModal
+        service={selectedService}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </section>
   );
 }

@@ -1,10 +1,22 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-[#F7F9FC]">
+    <footer className="border-t border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
           <div className="md:col-span-2">
-            <h3 className="text-base font-semibold text-[#1C1C1C] mb-3">Integrated Value Solutions</h3>
+            <div className="mb-4">
+              <Image
+                src="/logo.png"
+                alt="Integrated Value Solutions - Microsoft Dynamics 365 Business Central Partner"
+                width={180}
+                height={50}
+                className="h-10 sm:h-12 w-auto"
+                priority
+                quality={90}
+              />
+            </div>
             <p className="text-[#555555] mb-4 text-sm">
               Your trusted partner for Microsoft Dynamics 365 Business Central success with over 20 years of ERP implementation experience.
             </p>

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "setup-admin-mongodb": "tsx src/scripts/setup-admin-mongodb.ts",
-    "delete-admin-users": "tsx src/scripts/delete-admin-users.ts"
+    "delete-admin-users": "tsx src/scripts/delete-admin-users.ts",
+    "migrate-services": "tsx src/scripts/migrate-services.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -19,6 +20,7 @@
     "framer-motion": "^12.23.24",
     "jsonwebtoken": "^9.0.2",
     "lightningcss": "^1.30.2",
+    "lucide-react": "^0.545.0",
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.1",
     "next": "^15.5.4",

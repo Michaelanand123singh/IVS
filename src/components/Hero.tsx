@@ -168,7 +168,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden" role="banner" aria-label="Hero section with business transformation solutions">
+    <section className="relative overflow-hidden bg-gradient-primary min-h-screen" role="banner" aria-label="Hero section with business transformation solutions">
       {/* --- BACKGROUND IMAGE CAROUSEL --- */}
       <div className="absolute inset-0 transition-all duration-300" aria-hidden="true">
         <AnimatePresence>
