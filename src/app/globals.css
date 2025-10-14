@@ -265,3 +265,21 @@ body {
 .animate-pulse-custom {
   animation: pulse 2s ease-in-out infinite;
 }
+
+/* Logo strip scrolling animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+.hover\:pause-animation:hover {
+  animation-play-state: paused;
+}

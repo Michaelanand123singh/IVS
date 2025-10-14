@@ -15,75 +15,48 @@ interface LifeCycleStep {
 const lifeCycleSteps: LifeCycleStep[] = [
   {
     id: 1,
-    title: "Selecting the Right ERP",
-    icon: "🔍",
-    color: "from-green-500 to-green-600",
-    description: "Choose the perfect ERP solution tailored to your business needs",
-    duration: "",
-    phase: "Planning"
+    title: "Initiation",
+    icon: "💡",
+    color: "bg-blue-500",
+    description: "Define project scope, objectives, and requirements for your ERP implementation",
+    duration: "1-2 weeks",
+    phase: "Initiation"
   },
   {
     id: 2,
-    title: "Project Blueprint",
+    title: "Planning",
     icon: "📋",
-    color: "from-orange-400 to-orange-500",
-    description: "Create a comprehensive roadmap for your ERP implementation",
-    duration: "1-2 weeks",
+    color: "bg-teal-500",
+    description: "Create detailed project roadmap, timelines, and resource allocation strategy",
+    duration: "2-3 weeks",
     phase: "Planning"
   },
   {
     id: 3,
-    title: "Bridging the Gap",
-    icon: "🌉",
-    color: "from-orange-500 to-orange-600",
-    description: "Connect existing systems with your new ERP platform",
-    duration: "4-8 weeks",
-    phase: "Implementation"
+    title: "Execution",
+    icon: "⚙️",
+    color: "bg-orange-500",
+    description: "Implement ERP system, configure modules, and integrate with existing systems",
+    duration: "8-12 weeks",
+    phase: "Execution"
   },
   {
     id: 4,
-    title: "Process Refinement",
-    icon: "⚙️",
-    color: "from-blue-500 to-blue-600",
-    description: "Optimize and streamline your business processes",
-    duration: "2-4 weeks",
-    phase: "Implementation"
+    title: "Controlling",
+    icon: "🔍",
+    color: "bg-pink-500",
+    description: "Monitor progress, manage risks, and ensure quality standards are met",
+    duration: "Ongoing",
+    phase: "Controlling"
   },
   {
     id: 5,
-    title: "Empowering Your Team",
-    icon: "💪",
-    color: "from-green-500 to-green-600",
-    description: "Train and empower your team for successful adoption",
-    duration: "2-3 weeks",
-    phase: "Training"
-  },
-  {
-    id: 6,
-    title: "Rigorous Testing",
-    icon: "🧪",
-    color: "from-orange-400 to-orange-500",
-    description: "Comprehensive testing to ensure system reliability",
+    title: "Closing",
+    icon: "🤝",
+    color: "bg-purple-500",
+    description: "Finalize implementation, conduct training, and handover to operations team",
     duration: "2-4 weeks",
-    phase: "Testing"
-  },
-  {
-    id: 7,
-    title: "System Go-Live",
-    icon: "🚀",
-    color: "from-orange-500 to-orange-600",
-    description: "Launch your ERP system with confidence and support",
-    duration: "1-2 weeks",
-    phase: "Launch"
-  },
-  {
-    id: 8,
-    title: "Ongoing Optimization",
-    icon: "🎧",
-    color: "from-blue-500 to-blue-600",
-    description: "Continuous support and optimization for maximum ROI",
-    duration: "Ongoing",
-    phase: "Support"
+    phase: "Closing"
   }
 ];
 
@@ -124,64 +97,50 @@ export default function ERPLifeCycle() {
 
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-white">
+    <section ref={sectionRef} className="py-8 sm:py-10 lg:py-12 xl:py-14 bg-white">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8 lg:mb-10">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#1C1C1C] mb-2 sm:mb-3 lg:mb-4">
-            ERP Implementation Timeline
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#1C1C1C] mb-3 sm:mb-4">
+            Project Management Phases
           </h2>
-          <p className="text-[#555555] text-xs sm:text-sm md:text-base lg:text-lg">
-            Straightforward 8-Step Process with Clear Milestones
+          <p className="text-[#555555] text-sm sm:text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
+            Our comprehensive 5-phase approach ensures successful ERP implementation from initiation to completion.
           </p>
         </div>
 
-        {/* Mobile: Vertical Timeline Layout */}
+        {/* Mobile: Vertical Card Layout */}
         {isMobile ? (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {lifeCycleSteps.map((step, index) => (
               <div
                 key={step.id}
-                className={`relative flex items-start transition-all duration-700 ${
+                className={`relative transition-all duration-700 ${
                   isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                {/* Timeline Line */}
-                <div className="flex flex-col items-center mr-4 sm:mr-6">
-                  {/* Step Circle */}
-                  <div className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-lg sm:text-xl shadow-lg z-10`}>
-                    <span>{step.icon}</span>
-                </div>
-                
-                  {/* Vertical Line */}
-                  {index < lifeCycleSteps.length - 1 && (
-                    <div className="w-1 h-12 sm:h-16 bg-gradient-to-b from-gray-300 to-gray-200 mt-2"></div>
-                  )}
-                </div>
-                
-                {/* Step Content */}
-                <div className="flex-1 min-w-0 pb-6">
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5">
-                    {/* Phase Badge */}
-                    <div className="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full mb-3">
-                      {step.phase}
+                {/* Phase Card */}
+                <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                  {/* Card Header */}
+                  <div className={`${step.color} text-white px-4 py-3`}>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">{step.title}</h3>
+                      <div className="w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-lg">
+                  {step.icon}
+                      </div>
                     </div>
-                    
-                    <h3 className="font-semibold text-sm sm:text-base text-[#1C1C1C] mb-2 leading-tight">
-                    {step.title}
-                  </h3>
-                    
-                    <p className="text-xs sm:text-sm text-[#555555] leading-relaxed mb-3">
+                    <div className="text-sm opacity-90 mt-1">{step.phase}</div>
+                </div>
+                
+                  {/* Card Content */}
+                  <div className="p-4">
+                    <p className="text-gray-600 text-sm leading-relaxed mb-3">
                     {step.description}
                   </p>
-                    
-                    {/* Duration */}
-                    <div className="flex items-center text-xs sm:text-sm text-[#1F4E79] font-medium">
-                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Duration: {step.duration}
+                    <div className="flex justify-between items-center text-xs text-gray-500">
+                      <span className="font-medium">{step.phase}</span>
+                      <span>{step.duration}</span>
                     </div>
                   </div>
                 </div>
@@ -189,111 +148,112 @@ export default function ERPLifeCycle() {
             ))}
           </div>
         ) : (
-          /* Desktop: Alternating Timeline Layout */
+          /* Desktop: Card-Based Timeline Layout */
           <div className="relative">
             {/* Main Timeline Container */}
-            <div className="relative w-full h-[500px] sm:h-[550px] md:h-[600px] lg:h-[650px] xl:h-[700px]">
+            <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px] xl:h-[600px]">
               
               {/* Central Timeline Line */}
-              <div className="absolute top-1/2 left-0 w-full h-1 bg-gradient-to-r from-[#1F4E79] via-[#F47A21] to-[#1F4E79] transform -translate-y-1/2 rounded-full"></div>
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-300 transform -translate-y-1/2"></div>
               
-              {/* Timeline Steps with Alternating Positions */}
+              {/* Icons on Timeline */}
             {lifeCycleSteps.map((step, index) => {
-              const isHovered = hoveredStep === step.id;
-                const isAbove = index % 2 === 0; // Even indices above, odd below
                 const progress = index / (lifeCycleSteps.length - 1);
                 const leftPosition = `${(progress * 80 + 10)}%`; // 10% margin on each side
 
               return (
-                <div
-                  key={step.id}
+                  <div
+                    key={`icon-${step.id}`}
+                    className={`absolute transition-all duration-1000 ease-out ${
+                      isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
+                    }`}
+                    style={{
+                      left: leftPosition,
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      transitionDelay: `${index * 200}ms`
+                    }}
+                  >
+                    {/* Icon on Timeline */}
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full ${step.color} flex items-center justify-center text-lg sm:text-xl md:text-2xl shadow-lg`}>
+                      {step.icon}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Connecting Lines */}
+              {lifeCycleSteps.map((step, index) => {
+                const isAbove = index % 2 === 0; // Even indices above, odd below
+                const progress = index / (lifeCycleSteps.length - 1);
+                const leftPosition = `${(progress * 80 + 10)}%`; // 10% margin on each side
+                
+                // Calculate equal distances: timeline at 50%, cards at 15% and 75%
+                // Distance from timeline to above cards: 50% - 15% = 35%
+                // Distance from timeline to below cards: 75% - 50% = 25%
+                // But we want equal distances, so let's use 30% for both
+                const lineHeight = '30%';
+                const lineTop = isAbove ? '20%' : '50%'; // 50% - 30% = 20% for above, 50% for below
+                
+                return (
+                  <div
+                    key={`line-${step.id}`}
+                    className={`absolute w-0.5 bg-gray-300 transition-all duration-1000 ${
+                      isVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{ 
+                      left: leftPosition,
+                      top: lineTop,
+                      height: lineHeight,
+                      transform: 'translateX(-50%)',
+                      transitionDelay: `${index * 200 + 400}ms`
+                    }}
+                  ></div>
+                );
+              })}
+              
+              {/* Cards */}
+              {lifeCycleSteps.map((step, index) => {
+                const isHovered = hoveredStep === step.id;
+                const isAbove = index % 2 === 0; // Even indices above, odd below
+                const progress = index / (lifeCycleSteps.length - 1);
+                const leftPosition = `${(progress * 80 + 10)}%`; // 10% margin on each side
+                
+                return (
+                  <div
+                    key={`card-${step.id}`}
                     className={`absolute transition-all duration-1000 ease-out group ${
                       isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
                     }`}
-                  style={{
+                    style={{
                       left: leftPosition,
-                      top: isAbove ? '15%' : '75%',
+                      top: isAbove ? '10%' : '70%',
                       transform: 'translateX(-50%)',
-                      transitionDelay: `${index * 200}ms`
-                  }}
-                  onMouseEnter={() => setHoveredStep(step.id)}
-                  onMouseLeave={() => setHoveredStep(null)}
+                      transitionDelay: `${index * 200 + 300}ms`
+                    }}
+                    onMouseEnter={() => setHoveredStep(step.id)}
+                    onMouseLeave={() => setHoveredStep(null)}
                   >
-                    {/* Connecting Line to Timeline */}
-                    <div 
-                      className={`absolute w-0.5 bg-gray-300 transition-all duration-1000 ${
-                        isVisible ? 'opacity-100' : 'opacity-0'
-                      }`}
-                      style={{
-                        height: isAbove ? '80px' : '80px',
-                        top: isAbove ? '100%' : '-80px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        transitionDelay: `${index * 200 + 500}ms`
-                      }}
-                    ></div>
-                    
-                    {/* Step Circle on Timeline */}
-                    <div 
-                      className={`absolute w-6 h-6 -mt-3 left-1/2 transform -translate-x-1/2 rounded-full border-4 transition-all duration-1000 ${
-                        isVisible 
-                          ? 'bg-white border-[#1F4E79] shadow-lg' 
-                          : 'bg-gray-200 border-gray-300'
-                      }`}
-                      style={{
-                        top: isAbove ? '80px' : '-80px',
-                        transitionDelay: `${index * 200 + 300}ms`
-                      }}
-                    >
-                    </div>
-                    
-                    {/* Step Icon Circle */}
-                    <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-18 lg:h-18 xl:w-20 xl:h-20 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl shadow-lg cursor-pointer transition-all duration-300 hover:scale-110 hover:shadow-xl mx-auto ${
-                      isHovered ? 'ring-4 ring-white ring-opacity-60 scale-110' : ''
+                    {/* Phase Card */}
+                    <div className={`w-60 sm:w-72 md:w-80 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-xl cursor-pointer ${
+                      isHovered ? 'scale-105' : ''
                     }`}>
-                      {step.icon}
-                  </div>
-
-                  {/* Step Title */}
-                    <div className={`mt-3 text-center ${isAbove ? 'order-2' : 'order-1'}`}>
-                      <h3 className="font-semibold text-xs sm:text-sm text-[#1C1C1C] leading-tight max-w-[180px] mx-auto">
-                      {step.title}
-                    </h3>
-                  </div>
-
-                    {/* Hover Tooltip */}
-                  {isHovered && (
-                      <div className={`absolute z-[9999] w-80 bg-white rounded-xl shadow-2xl border border-gray-200 p-5 transition-all duration-300 ${
-                        isAbove ? 'bottom-full mb-6' : 'top-full mt-6'
-                      }`}
-                      style={{
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        maxWidth: '320px'
-                      }}>
-                        {/* Tooltip Arrow */}
-                        <div className={`absolute w-3 h-3 bg-white border-r border-b border-gray-200 rotate-45 ${
-                          isAbove ? 'top-full -mt-1.5' : 'bottom-full -mb-1.5'
-                        }`}
-                        style={{ left: '50%', transform: 'translateX(-50%) rotate(45deg)' }}></div>
-                        
-                      <div className="text-center">
-                          <div className={`w-10 h-10 mx-auto mb-3 rounded-full bg-gradient-to-br ${step.color} flex items-center justify-center text-lg`}>
-                          {step.icon}
-                        </div>
-                          <h3 className="font-semibold text-[#1C1C1C] text-sm mb-2">
-                          {step.title}
-                        </h3>
-                          <p className="text-[#555555] text-xs leading-relaxed mb-3">
+                      {/* Card Header */}
+                      <div className={`${step.color} text-white px-3 py-2 rounded-t-lg`}>
+                        <h3 className="text-base font-semibold">{step.title}</h3>
+                      </div>
+                      
+                      {/* Card Content */}
+                      <div className="p-3">
+                        <p className="text-gray-600 text-xs leading-relaxed mb-2">
                           {step.description}
                         </p>
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="text-[#1F4E79] font-medium">Phase: {step.phase}</span>
-                            {step.duration && <span className="text-gray-600">Duration: {step.duration}</span>}
-                          </div>
+                        <div className="flex justify-between items-center text-xs text-gray-500">
+                          <span className="font-medium">{step.phase}</span>
+                          <span>{step.duration}</span>
+                        </div>
                       </div>
                     </div>
-                  )}
                 </div>
               );
             })}
