@@ -154,19 +154,8 @@ export default function AdminPanel() {
         const testimonialsData = await testimonialsResponse.json();
         setTestimonials(testimonialsData.testimonials || []);
       } else {
-        // Fallback to static data for testing
-        const { testimonials: staticTestimonials } = await import('@/data/testimonials');
-        const mockTestimonials = staticTestimonials.map((t, index) => ({
-          id: `test-${index}`,
-          quote: t.quote,
-          author: t.author,
-          role: t.role,
-          isActive: true,
-          displayOrder: index,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }));
-        setTestimonials(mockTestimonials);
+        console.error('Failed to fetch testimonials from API');
+        setTestimonials([]);
       }
 
     } catch (error) {
@@ -494,25 +483,10 @@ export default function AdminPanel() {
           setTestimonials(testimonialsData.testimonials || []);
         }
       } else {
-        // For testing: Add to local state
-        const newTestimonial: Testimonial = {
-          id: `test-${Date.now()}`,
-          ...testimonial,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        setTestimonials(prev => [...prev, newTestimonial]);
+        console.error('Failed to save testimonial');
       }
     } catch (error) {
       console.error('Failed to save testimonial:', error);
-      // For testing: Add to local state
-      const newTestimonial: Testimonial = {
-        id: `test-${Date.now()}`,
-        ...testimonial,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      setTestimonials(prev => [...prev, newTestimonial]);
     }
   };
 
@@ -540,21 +514,10 @@ export default function AdminPanel() {
           setTestimonials(testimonialsData.testimonials || []);
         }
       } else {
-        // For testing: Update local state
-        setTestimonials(prev => prev.map(t => 
-          t.id === id 
-            ? { ...t, ...testimonial, updated_at: new Date().toISOString() }
-            : t
-        ));
+        console.error('Failed to update testimonial');
       }
     } catch (error) {
       console.error('Failed to update testimonial:', error);
-      // For testing: Update local state
-      setTestimonials(prev => prev.map(t => 
-        t.id === id 
-          ? { ...t, ...testimonial, updated_at: new Date().toISOString() }
-          : t
-      ));
     }
   };
 
@@ -584,13 +547,10 @@ export default function AdminPanel() {
           setTestimonials(testimonialsData.testimonials || []);
         }
       } else {
-        // For testing: Remove from local state
-        setTestimonials(prev => prev.filter(t => t.id !== id));
+        console.error('Failed to delete testimonial');
       }
     } catch (error) {
       console.error('Failed to delete testimonial:', error);
-      // For testing: Remove from local state
-      setTestimonials(prev => prev.filter(t => t.id !== id));
     }
   };
 
@@ -618,21 +578,10 @@ export default function AdminPanel() {
           setTestimonials(testimonialsData.testimonials || []);
         }
       } else {
-        // For testing: Update local state
-        setTestimonials(prev => prev.map(t => 
-          t.id === id 
-            ? { ...t, isActive: !currentStatus, updated_at: new Date().toISOString() }
-            : t
-        ));
+        console.error('Failed to toggle testimonial status');
       }
     } catch (error) {
       console.error('Failed to toggle testimonial status:', error);
-      // For testing: Update local state
-      setTestimonials(prev => prev.map(t => 
-        t.id === id 
-          ? { ...t, isActive: !currentStatus, updated_at: new Date().toISOString() }
-          : t
-      ));
     }
   };
 

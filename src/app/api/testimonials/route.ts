@@ -13,7 +13,15 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ testimonials });
   } catch (error) {
-    console.error('Error fetching testimonials:', error);
-    return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 });
+    console.error('Error fetching testimonials from database:', error);
+    
+    // Fallback to static data when database is not available
+    try {
+      const { testimonials: staticTestimonials } = await import('@/data/testimonials');
+      return NextResponse.json({ testimonials: staticTestimonials });
+    } catch (importError) {
+      console.error('Error loading static testimonials:', importError);
+      return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 });
+    }
   }
 }

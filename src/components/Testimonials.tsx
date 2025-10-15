@@ -40,14 +40,8 @@ export default function Testimonials() {
       }
     };
 
-    // For now, use static data while MongoDB connection is being resolved
-    import('@/data/testimonials').then(({ testimonials: staticTestimonials }) => {
-      setTestimonials(staticTestimonials);
-      setLoading(false);
-    });
-    
-    // Uncomment the line below once MongoDB connection is working
-    // fetchTestimonials();
+    // Fetch from API
+    fetchTestimonials();
   }, []);
 
   if (loading) {
