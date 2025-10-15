@@ -19,7 +19,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     icon: "💡",
     color: "bg-blue-500",
     description: "Define project scope, objectives, and requirements for your ERP implementation",
-    duration: "1-2 weeks",
+    duration: "",
     phase: "Initiation"
   },
   {
@@ -28,7 +28,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     icon: "📋",
     color: "bg-teal-500",
     description: "Create detailed project roadmap, timelines, and resource allocation strategy",
-    duration: "2-3 weeks",
+    duration: "",
     phase: "Planning"
   },
   {
@@ -37,7 +37,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     icon: "⚙️",
     color: "bg-orange-500",
     description: "Implement ERP system, configure modules, and integrate with existing systems",
-    duration: "8-12 weeks",
+    duration: "",
     phase: "Execution"
   },
   {
@@ -46,7 +46,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     icon: "🔍",
     color: "bg-pink-500",
     description: "Monitor progress, manage risks, and ensure quality standards are met",
-    duration: "Ongoing",
+    duration: "",
     phase: "Controlling"
   },
   {
@@ -55,7 +55,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     icon: "🤝",
     color: "bg-purple-500",
     description: "Finalize implementation, conduct training, and handover to operations team",
-    duration: "2-4 weeks",
+    duration: "",
     phase: "Closing"
   }
 ];
