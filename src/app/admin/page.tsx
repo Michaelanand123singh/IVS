@@ -6,6 +6,7 @@ import Image from 'next/image';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
 import AdminServiceModal from '@/components/AdminServiceModal';
 import AdminTestimonialModal from '@/components/AdminTestimonialModal';
+import AdminHeroModal from '@/components/AdminHeroModal';
 
 interface Contact {
   id: string;
@@ -57,6 +58,22 @@ interface Testimonial {
   updated_at: string;
 }
 
+interface Hero {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonLink: string;
+  secondaryButtonText: string;
+  secondaryButtonLink: string;
+  backgroundImages: string[];
+  isActive: boolean;
+  displayOrder: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AdminStats {
   totalContacts: number;
   newContacts: number;
@@ -70,18 +87,21 @@ export default function AdminPanel() {
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [hero, setHero] = useState<Hero | null>(null);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>('all');
-  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'testimonials' | 'settings'>('contacts');
+  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'testimonials' | 'hero' | 'settings'>('contacts');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  const [showHeroModal, setShowHeroModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
+  const [editingHero, setEditingHero] = useState<Hero | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -156,6 +176,19 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to fetch testimonials from API');
         setTestimonials([]);
+      }
+
+      // Fetch hero
+      const heroResponse = await fetch('/api/admin/hero', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (heroResponse.ok) {
+        const heroData = await heroResponse.json();
+        setHero(heroData.hero);
+      } else {
+        console.error('Failed to fetch hero from API');
+        setHero(null);
       }
 
     } catch (error) {
@@ -598,6 +631,50 @@ export default function AdminPanel() {
     setShowTestimonialModal(true);
   };
 
+  // Hero management functions
+  const handleSaveHero = async (heroData: Omit<Hero, 'id' | 'created_at' | 'updated_at'>) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/admin/hero', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(heroData),
+      });
+
+      if (response.ok) {
+        // Refresh hero
+        const heroResponse = await fetch('/api/admin/hero', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (heroResponse.ok) {
+          const heroData = await heroResponse.json();
+          setHero(heroData.hero);
+        }
+      } else {
+        console.error('Failed to save hero');
+      }
+    } catch (error) {
+      console.error('Failed to save hero:', error);
+    }
+  };
+
+  const handleEditHero = () => {
+    if (hero) {
+      setEditingHero(hero);
+      setShowHeroModal(true);
+    }
+  };
+
+  const handleCreateHero = () => {
+    setEditingHero(null);
+    setShowHeroModal(true);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-red-100 text-red-800 border-red-200';
@@ -740,11 +817,12 @@ export default function AdminPanel() {
                 { id: 'templates', name: 'Email Templates', icon: '📧', shortName: 'Templates' },
                 { id: 'services', name: 'Services Management', icon: '🛠️', shortName: 'Services' },
                 { id: 'testimonials', name: 'Testimonials Management', icon: '💬', shortName: 'Testimonials' },
+                { id: 'hero', name: 'Hero Section', icon: '🎯', shortName: 'Hero' },
                 { id: 'settings', name: 'Settings', icon: '⚙️', shortName: 'Settings' }
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'services' | 'testimonials' | 'settings')}
+                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'services' | 'testimonials' | 'hero' | 'settings')}
                   className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm text-left sm:text-center ${
                     activeTab === tab.id
                       ? 'border-[#1F4E79] text-[#1F4E79]'
@@ -1274,6 +1352,129 @@ export default function AdminPanel() {
               </div>
             )}
 
+            {/* Hero Tab */}
+            {activeTab === 'hero' && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#1C1C1C]">Hero Section Management</h2>
+                  <button
+                    onClick={hero ? handleEditHero : handleCreateHero}
+                    className="bg-[#1F4E79] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    {hero ? 'Edit Hero Section' : 'Create Hero Section'}
+                  </button>
+                </div>
+
+                {hero ? (
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Hero Content Preview */}
+                      <div>
+                        <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] mb-4">Current Hero Content</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Title</label>
+                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.title}</p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Subtitle</label>
+                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.subtitle}</p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Description</label>
+                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.description}</p>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-[#555555] mb-1">Primary Button</label>
+                              <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.primaryButtonText}</p>
+                              <p className="text-xs text-[#888888] mt-1">Link: {hero.primaryButtonLink}</p>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-[#555555] mb-1">Secondary Button</label>
+                              <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.secondaryButtonText}</p>
+                              <p className="text-xs text-[#888888] mt-1">Link: {hero.secondaryButtonLink}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hero Details */}
+                      <div>
+                        <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] mb-4">Hero Details</h3>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Status</label>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              hero.isActive 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {hero.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Display Order</label>
+                            <p className="text-sm text-[#1C1C1C]">{hero.displayOrder}</p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Background Images</label>
+                            <p className="text-sm text-[#1C1C1C]">{hero.backgroundImages.length} image(s)</p>
+                            {hero.backgroundImages.length > 0 && (
+                              <div className="mt-2 grid grid-cols-2 gap-2">
+                                {hero.backgroundImages.slice(0, 4).map((url, index) => (
+                                  <img 
+                                    key={index}
+                                    src={url} 
+                                    alt={`Background ${index + 1}`}
+                                    className="w-full h-16 object-cover rounded"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Created</label>
+                            <p className="text-xs text-[#888888]">
+                              {new Date(hero.created_at).toLocaleDateString()} at {new Date(hero.created_at).toLocaleTimeString()}
+                            </p>
+                          </div>
+                          {hero.updated_at !== hero.created_at && (
+                            <div>
+                              <label className="block text-sm font-medium text-[#555555] mb-1">Last Updated</label>
+                              <p className="text-xs text-[#888888]">
+                                {new Date(hero.updated_at).toLocaleDateString()} at {new Date(hero.updated_at).toLocaleTimeString()}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-[#1C1C1C] mb-2">No hero section found</h3>
+                    <p className="text-[#555555] mb-4">Create your first hero section to get started.</p>
+                    <button
+                      onClick={handleCreateHero}
+                      className="bg-[#1F4E79] text-white px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors"
+                    >
+                      Create Hero Section
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="max-w-2xl">
@@ -1351,6 +1552,18 @@ export default function AdminPanel() {
         testimonial={editingTestimonial}
         onSave={handleSaveTestimonial}
         onUpdate={handleUpdateTestimonial}
+      />
+
+      {/* Hero Modal */}
+      <AdminHeroModal
+        isOpen={showHeroModal}
+        onClose={() => {
+          setShowHeroModal(false);
+          setEditingHero(null);
+        }}
+        heroData={editingHero}
+        onSave={handleSaveHero}
+        isEditing={!!editingHero}
       />
     </div>
   );
