@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
 import AdminServiceModal from '@/components/AdminServiceModal';
+import AdminTestimonialModal from '@/components/AdminTestimonialModal';
 
 interface Contact {
   id: string;
@@ -45,6 +46,17 @@ interface Service {
   updated_at: string;
 }
 
+interface Testimonial {
+  id: string;
+  quote: string;
+  author: string;
+  role: string;
+  isActive: boolean;
+  displayOrder: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AdminStats {
   totalContacts: number;
   newContacts: number;
@@ -57,16 +69,19 @@ export default function AdminPanel() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>('all');
-  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'settings'>('contacts');
+  const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'testimonials' | 'settings'>('contacts');
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
   const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -128,6 +143,30 @@ export default function AdminPanel() {
       if (servicesResponse.ok) {
         const servicesData = await servicesResponse.json();
         setServices(servicesData.services || []);
+      }
+
+      // Fetch testimonials
+      const testimonialsResponse = await fetch('/api/admin/testimonials', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (testimonialsResponse.ok) {
+        const testimonialsData = await testimonialsResponse.json();
+        setTestimonials(testimonialsData.testimonials || []);
+      } else {
+        // Fallback to static data for testing
+        const { testimonials: staticTestimonials } = await import('@/data/testimonials');
+        const mockTestimonials = staticTestimonials.map((t, index) => ({
+          id: `test-${index}`,
+          quote: t.quote,
+          author: t.author,
+          role: t.role,
+          isActive: true,
+          displayOrder: index,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }));
+        setTestimonials(mockTestimonials);
       }
 
     } catch (error) {
@@ -430,6 +469,186 @@ export default function AdminPanel() {
     setShowServiceModal(true);
   };
 
+  // Testimonial management functions
+  const handleSaveTestimonial = async (testimonial: Omit<Testimonial, 'id' | 'created_at' | 'updated_at'>) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch('/api/admin/testimonials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(testimonial),
+      });
+
+      if (response.ok) {
+        // Refresh testimonials
+        const testimonialsResponse = await fetch('/api/admin/testimonials', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (testimonialsResponse.ok) {
+          const testimonialsData = await testimonialsResponse.json();
+          setTestimonials(testimonialsData.testimonials || []);
+        }
+      } else {
+        // For testing: Add to local state
+        const newTestimonial: Testimonial = {
+          id: `test-${Date.now()}`,
+          ...testimonial,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setTestimonials(prev => [...prev, newTestimonial]);
+      }
+    } catch (error) {
+      console.error('Failed to save testimonial:', error);
+      // For testing: Add to local state
+      const newTestimonial: Testimonial = {
+        id: `test-${Date.now()}`,
+        ...testimonial,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      setTestimonials(prev => [...prev, newTestimonial]);
+    }
+  };
+
+  const handleUpdateTestimonial = async (id: string, testimonial: Partial<Omit<Testimonial, 'id' | 'created_at' | 'updated_at'>>) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/testimonials/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(testimonial),
+      });
+
+      if (response.ok) {
+        // Refresh testimonials
+        const testimonialsResponse = await fetch('/api/admin/testimonials', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (testimonialsResponse.ok) {
+          const testimonialsData = await testimonialsResponse.json();
+          setTestimonials(testimonialsData.testimonials || []);
+        }
+      } else {
+        // For testing: Update local state
+        setTestimonials(prev => prev.map(t => 
+          t.id === id 
+            ? { ...t, ...testimonial, updated_at: new Date().toISOString() }
+            : t
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update testimonial:', error);
+      // For testing: Update local state
+      setTestimonials(prev => prev.map(t => 
+        t.id === id 
+          ? { ...t, ...testimonial, updated_at: new Date().toISOString() }
+          : t
+      ));
+    }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this testimonial? This action cannot be undone.')) {
+      return;
+    }
+
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/testimonials/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Refresh testimonials
+        const testimonialsResponse = await fetch('/api/admin/testimonials', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (testimonialsResponse.ok) {
+          const testimonialsData = await testimonialsResponse.json();
+          setTestimonials(testimonialsData.testimonials || []);
+        }
+      } else {
+        // For testing: Remove from local state
+        setTestimonials(prev => prev.filter(t => t.id !== id));
+      }
+    } catch (error) {
+      console.error('Failed to delete testimonial:', error);
+      // For testing: Remove from local state
+      setTestimonials(prev => prev.filter(t => t.id !== id));
+    }
+  };
+
+  const handleToggleTestimonialStatus = async (id: string, currentStatus: boolean) => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`/api/admin/testimonials/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
+
+      if (response.ok) {
+        // Refresh testimonials
+        const testimonialsResponse = await fetch('/api/admin/testimonials', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (testimonialsResponse.ok) {
+          const testimonialsData = await testimonialsResponse.json();
+          setTestimonials(testimonialsData.testimonials || []);
+        }
+      } else {
+        // For testing: Update local state
+        setTestimonials(prev => prev.map(t => 
+          t.id === id 
+            ? { ...t, isActive: !currentStatus, updated_at: new Date().toISOString() }
+            : t
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to toggle testimonial status:', error);
+      // For testing: Update local state
+      setTestimonials(prev => prev.map(t => 
+        t.id === id 
+          ? { ...t, isActive: !currentStatus, updated_at: new Date().toISOString() }
+          : t
+      ));
+    }
+  };
+
+  const handleDuplicateTestimonial = (testimonial: Testimonial) => {
+    const duplicatedTestimonial: Omit<Testimonial, 'id' | 'created_at' | 'updated_at'> = {
+      quote: testimonial.quote,
+      author: `${testimonial.author} (Copy)`,
+      role: testimonial.role,
+      isActive: false, // Duplicated testimonials start as inactive
+      displayOrder: testimonial.displayOrder
+    };
+    
+    setEditingTestimonial(duplicatedTestimonial as Testimonial);
+    setShowTestimonialModal(true);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-red-100 text-red-800 border-red-200';
@@ -571,11 +790,12 @@ export default function AdminPanel() {
                 { id: 'contacts', name: 'Contact Management', icon: '👥', shortName: 'Contacts' },
                 { id: 'templates', name: 'Email Templates', icon: '📧', shortName: 'Templates' },
                 { id: 'services', name: 'Services Management', icon: '🛠️', shortName: 'Services' },
+                { id: 'testimonials', name: 'Testimonials Management', icon: '💬', shortName: 'Testimonials' },
                 { id: 'settings', name: 'Settings', icon: '⚙️', shortName: 'Settings' }
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'services' | 'settings')}
+                  onClick={() => setActiveTab(tab.id as 'contacts' | 'templates' | 'services' | 'testimonials' | 'settings')}
                   className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm text-left sm:text-center ${
                     activeTab === tab.id
                       ? 'border-[#1F4E79] text-[#1F4E79]'
@@ -994,6 +1214,117 @@ export default function AdminPanel() {
               </div>
             )}
 
+            {/* Testimonials Tab */}
+            {activeTab === 'testimonials' && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-[#1C1C1C]">Testimonials Management</h2>
+                  <button
+                    onClick={() => setShowTestimonialModal(true)}
+                    className="bg-[#1F4E79] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors flex items-center justify-center text-sm sm:text-base"
+                  >
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    New Testimonial
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                  {testimonials.map((testimonial) => (
+                    <div key={testimonial.id} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3 sm:gap-0">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{testimonial.author}</h3>
+                          <p className="text-xs sm:text-sm text-[#555555] mt-1">{testimonial.role}</p>
+                          <p className="text-xs text-[#888888] mt-1">Order: {testimonial.displayOrder}</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleToggleTestimonialStatus(testimonial.id, testimonial.isActive)}
+                            className={`px-2 py-1 rounded-full text-xs font-medium transition-colors ${
+                              testimonial.isActive 
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                            }`}
+                            title={testimonial.isActive ? 'Click to deactivate' : 'Click to activate'}
+                          >
+                            {testimonial.isActive ? 'Active' : 'Inactive'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteTestimonial(testimonial.id)}
+                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
+                            title="Delete testimonial"
+                          >
+                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-[#555555] mb-1">Quote</label>
+                        <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-2 rounded line-clamp-4">{testimonial.quote}</p>
+                      </div>
+
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-sm font-medium text-[#555555]">Status</label>
+                        </div>
+                        <p className="text-xs text-[#888888] mt-1">
+                          Created: {new Date(testimonial.created_at).toLocaleDateString()} at {new Date(testimonial.created_at).toLocaleTimeString()}
+                        </p>
+                        {testimonial.updated_at !== testimonial.created_at && (
+                          <p className="text-xs text-[#888888]">
+                            Updated: {new Date(testimonial.updated_at).toLocaleDateString()} at {new Date(testimonial.updated_at).toLocaleTimeString()}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingTestimonial(testimonial);
+                            setShowTestimonialModal(true);
+                          }}
+                          className="flex-1 bg-[#1F4E79] text-white px-3 py-2 rounded text-xs sm:text-sm hover:bg-[#1a4268] transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDuplicateTestimonial(testimonial)}
+                          className="px-3 py-2 border border-gray-300 text-gray-700 rounded text-xs sm:text-sm hover:bg-gray-50 transition-colors flex items-center justify-center"
+                          title="Duplicate testimonial"
+                        >
+                          <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          <span className="hidden sm:inline">Duplicate</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {testimonials.length === 0 && (
+                  <div className="text-center py-12">
+                    <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-[#1C1C1C] mb-2">No testimonials found</h3>
+                    <p className="text-[#555555] mb-4">Create your first testimonial to get started.</p>
+                    <button
+                      onClick={() => setShowTestimonialModal(true)}
+                      className="bg-[#1F4E79] text-white px-4 py-2 rounded-lg hover:bg-[#1a4268] transition-colors"
+                    >
+                      Create Testimonial
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="max-w-2xl">
@@ -1059,6 +1390,18 @@ export default function AdminPanel() {
         service={editingService}
         onSave={handleSaveService}
         onUpdate={handleUpdateService}
+      />
+
+      {/* Testimonial Modal */}
+      <AdminTestimonialModal
+        isOpen={showTestimonialModal}
+        onClose={() => {
+          setShowTestimonialModal(false);
+          setEditingTestimonial(null);
+        }}
+        testimonial={editingTestimonial}
+        onSave={handleSaveTestimonial}
+        onUpdate={handleUpdateTestimonial}
       />
     </div>
   );

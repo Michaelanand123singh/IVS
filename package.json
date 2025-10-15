@@ -9,7 +9,8 @@
     "lint": "eslint",
     "setup-admin-mongodb": "tsx src/scripts/setup-admin-mongodb.ts",
     "delete-admin-users": "tsx src/scripts/delete-admin-users.ts",
-    "migrate-services": "tsx src/scripts/migrate-services.ts"
+    "migrate-services": "tsx src/scripts/migrate-services.ts",
+    "migrate-testimonials": "tsx src/scripts/migrate-testimonials.ts"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",

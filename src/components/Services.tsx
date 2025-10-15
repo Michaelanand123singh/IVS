@@ -105,14 +105,14 @@ export default function Services() {
                   </ul>
                 ) : null}
                 
-                {/* Learn More Button */}
+                {/* Read More Button - Now at the end of content */}
                 {s.learnMore && (
-                  <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="mt-4">
                     <button
                       onClick={() => handleLearnMore(s)}
-                      className="w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-[#1F4E79] to-[#334e68] rounded-lg hover:from-[#334e68] hover:to-[#1F4E79] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-2 shadow-sm hover:shadow-md"
+                      className="text-[#1F4E79] hover:text-[#1a4268] font-medium underline decoration-2 underline-offset-2 hover:decoration-[#1a4268] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-1 rounded-sm"
                     >
-                      Learn More
+                      Read more
                     </button>
                   </div>
                 )}
