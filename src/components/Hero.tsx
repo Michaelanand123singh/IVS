@@ -141,25 +141,18 @@ export default function Hero() {
   // Get active headings sorted by display order
   const activeHeadings = heroData?.headings?.filter(h => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) || [];
 
-  // Background Image Carousel - Auto scroll left to right
+  // Synchronized Carousel - Both background images and headings change together
   useEffect(() => {
-    if (!heroData?.backgroundImages?.length || isPaused) return;
+    if (!heroData?.backgroundImages?.length || !activeHeadings.length || isPaused) return;
     
-    const bgInterval = setInterval(() => {
+    const carouselInterval = setInterval(() => {
+      // Change both background image and heading content simultaneously
       setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
-    }, 5000); // Reduced interval for smoother carousel effect
-    return () => clearInterval(bgInterval);
-  }, [heroData?.backgroundImages, isPaused]);
-
-  // Heading Carousel - Auto scroll through headings
-  useEffect(() => {
-    if (!activeHeadings.length || isPaused) return;
-    
-    const headingInterval = setInterval(() => {
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
-    }, 4000); // Slightly faster than background for variety
-    return () => clearInterval(headingInterval);
-  }, [activeHeadings.length, isPaused]);
+    }, 5000); // 5 seconds for both to change together
+    
+    return () => clearInterval(carouselInterval);
+  }, [heroData?.backgroundImages, activeHeadings.length, isPaused]);
 
   // Handle mouse events for pause on hover
   const handleMouseEnter = () => setIsPaused(true);
@@ -250,23 +243,6 @@ export default function Hero() {
         {/* Dark overlay for readability */}
         <div className="absolute inset-0 bg-black/60" aria-hidden="true"></div>
         
-        {/* Carousel Indicators */}
-        {heroData.backgroundImages.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            {heroData.backgroundImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setBgIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === bgIndex 
-                    ? 'bg-amber-400 scale-110' 
-                    : 'bg-white/50 hover:bg-white/70'
-                }`}
-                aria-label={`Go to image ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
       </div>
 
       {/* --- CENTERED CONTENT --- */}
@@ -341,23 +317,6 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Heading Carousel Indicators */}
-        {activeHeadings.length > 1 && (
-          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            {activeHeadings.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setHeadingIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === headingIndex 
-                    ? 'bg-amber-400 scale-110' 
-                    : 'bg-white/50 hover:bg-white/70'
-                }`}
-                aria-label={`Go to heading ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );

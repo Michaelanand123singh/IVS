@@ -57,6 +57,7 @@ interface Testimonial {
   displayOrder: number;
   created_at: string;
   updated_at: string;
+  isDeleting?: boolean;
 }
 
 interface HeroHeading {
@@ -564,39 +565,66 @@ export default function AdminPanel() {
   };
 
   const handleDeleteTestimonial = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this testimonial? This action cannot be undone.')) {
-      return;
-    }
-
-    const token = localStorage.getItem('adminToken');
-    if (!token) return;
-
-    try {
-      const response = await fetch(`/api/admin/testimonials/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        // Refresh testimonials
-        const testimonialsResponse = await fetch('/api/admin/testimonials', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-        if (testimonialsResponse.ok) {
-          const testimonialsData = await testimonialsResponse.json();
-          setTestimonials(testimonialsData.testimonials || []);
-        }
-      } else {
-        const errorData = await response.json();
-        console.error('Failed to delete testimonial:', errorData);
-        alert(`Failed to delete testimonial: ${errorData.error || 'Unknown error'}`);
+    // Use setTimeout to defer the confirmation dialog and prevent blocking
+    setTimeout(async () => {
+      if (!confirm('Are you sure you want to delete this testimonial? This action cannot be undone.')) {
+        return;
       }
-    } catch (err) {
-      console.error('Failed to delete testimonial:', err);
-      alert('Failed to delete testimonial. Please try again.');
-    }
+
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+
+      // Show loading state immediately
+      setTestimonials(prev => prev.map(t => 
+        t.id === id ? { ...t, isDeleting: true } : t
+      ));
+
+      try {
+        const response = await fetch(`/api/admin/testimonials/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          // Optimize state update - remove from list immediately for better UX
+          setTestimonials(prev => prev.filter(t => t.id !== id));
+          
+          // Refresh testimonials in background without blocking UI
+          setTimeout(async () => {
+            try {
+              const testimonialsResponse = await fetch('/api/admin/testimonials', {
+                headers: { 'Authorization': `Bearer ${token}` },
+              });
+              if (testimonialsResponse.ok) {
+                const testimonialsData = await testimonialsResponse.json();
+                setTestimonials(testimonialsData.testimonials || []);
+              }
+            } catch (err) {
+              console.error('Failed to refresh testimonials:', err);
+            }
+          }, 100);
+        } else {
+          // Remove loading state on error
+          setTestimonials(prev => prev.map(t => 
+            t.id === id ? { ...t, isDeleting: false } : t
+          ));
+          
+          const errorData = await response.json();
+          console.error('Failed to delete testimonial:', errorData);
+          alert(`Failed to delete testimonial: ${errorData.error || 'Unknown error'}`);
+        }
+      } catch (err) {
+        // Remove loading state on error
+        setTestimonials(prev => prev.map(t => 
+          t.id === id ? { ...t, isDeleting: false } : t
+        ));
+        
+        console.error('Failed to delete testimonial:', err);
+        alert('Failed to delete testimonial. Please try again.');
+      }
+    }, 0);
   };
 
   const handleToggleTestimonialStatus = async (id: string, currentStatus: boolean) => {
@@ -1314,12 +1342,24 @@ export default function AdminPanel() {
                           </button>
                           <button
                             onClick={() => handleDeleteTestimonial(testimonial.id)}
-                            className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors"
-                            title="Delete testimonial"
+                            disabled={testimonial.isDeleting}
+                            className={`p-1 rounded transition-colors ${
+                              testimonial.isDeleting 
+                                ? 'text-gray-400 cursor-not-allowed' 
+                                : 'text-red-500 hover:text-red-700 hover:bg-red-50'
+                            }`}
+                            title={testimonial.isDeleting ? 'Deleting...' : 'Delete testimonial'}
                           >
-                            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            {testimonial.isDeleting ? (
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            ) : (
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            )}
                           </button>
                         </div>
                       </div>
