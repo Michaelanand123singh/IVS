@@ -68,7 +68,7 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { title, description, items, learnMore, isActive, displayOrder } = body;
+    const { title, description, icon, items, learnMore, isActive, displayOrder } = body;
 
     await connectToDatabase();
 
@@ -88,6 +88,7 @@ export async function PATCH(
     // Update fields
     if (title !== undefined) service.title = title;
     if (description !== undefined) service.description = description;
+    if (icon !== undefined) service.icon = icon;
     if (items !== undefined) service.items = items;
     if (learnMore !== undefined) service.learnMore = learnMore;
     if (isActive !== undefined) service.isActive = isActive;
@@ -101,6 +102,7 @@ export async function PATCH(
         id: service._id,
         title: service.title,
         description: service.description,
+        icon: service.icon,
         items: service.items,
         learnMore: service.learnMore,
         isActive: service.isActive,

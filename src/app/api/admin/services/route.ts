@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, items, learnMore, displayOrder } = body;
+    const { title, description, icon, items, learnMore, displayOrder } = body;
 
     if (!title || !description) {
       return NextResponse.json({ error: 'Title and description are required' }, { status: 400 });
@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
     const service = new Service({
       title,
       description,
+      icon: icon || undefined,
       items: items || [],
       learnMore: learnMore || null,
       displayOrder: displayOrder || 0,
@@ -78,6 +79,7 @@ export async function POST(request: NextRequest) {
         id: service._id,
         title: service.title,
         description: service.description,
+        icon: service.icon,
         items: service.items,
         learnMore: service.learnMore,
         isActive: service.isActive,

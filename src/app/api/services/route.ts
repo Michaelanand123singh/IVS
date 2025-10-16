@@ -8,7 +8,7 @@ export async function GET() {
     
     const services = await Service.find({ isActive: true })
       .sort({ displayOrder: 1, created_at: -1 })
-      .select('title description items learnMore')
+      .select('title description icon items learnMore')
       .lean();
 
     return NextResponse.json({ services });
