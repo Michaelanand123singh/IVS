@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     Promise.all([
       sendUserConfirmationEmail(contactData),
       sendAdminNotificationEmail(contactData),
-    ]).catch((error) => {
-      console.error('Email sending error:', error);
+    ]).catch((err) => {
+      console.error('Email sending err:', err);
       // Don't fail the request if emails fail
     });
 
@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-  } catch (error) {
-    console.error('Contact form submission error:', error);
+  } catch (err) {
+    console.error('Contact form submission err:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

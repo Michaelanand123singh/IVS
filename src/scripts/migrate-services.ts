@@ -35,8 +35,8 @@ async function migrateServices() {
     
     console.log(`Successfully migrated ${migratedServices.length} services to database.`);
     process.exit(0);
-  } catch (error) {
-    console.error('Error migrating services:', error);
+  } catch (err) {
+    console.error('Error migrating services:', err);
     process.exit(1);
   }
 }

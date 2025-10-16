@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
-interface HeroData {
-  id?: string;
+interface HeroHeading {
   title: string;
   subtitle: string;
   description: string;
@@ -11,6 +11,13 @@ interface HeroData {
   primaryButtonLink: string;
   secondaryButtonText: string;
   secondaryButtonLink: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+interface HeroData {
+  id?: string;
+  headings: HeroHeading[];
   backgroundImages: string[];
   isActive: boolean;
   displayOrder: number;
@@ -34,13 +41,7 @@ export default function AdminHeroModal({
   isEditing = false 
 }: AdminHeroModalProps) {
   const [formData, setFormData] = useState<Omit<HeroData, 'id' | 'created_at' | 'updated_at'>>({
-    title: '',
-    subtitle: '',
-    description: '',
-    primaryButtonText: '',
-    primaryButtonLink: '',
-    secondaryButtonText: '',
-    secondaryButtonLink: '',
+    headings: [],
     backgroundImages: [],
     isActive: true,
     displayOrder: 0
@@ -56,13 +57,7 @@ export default function AdminHeroModal({
     if (isOpen) {
       if (heroData && isEditing) {
         setFormData({
-          title: heroData.title || '',
-          subtitle: heroData.subtitle || '',
-          description: heroData.description || '',
-          primaryButtonText: heroData.primaryButtonText || '',
-          primaryButtonLink: heroData.primaryButtonLink || '',
-          secondaryButtonText: heroData.secondaryButtonText || '',
-          secondaryButtonLink: heroData.secondaryButtonLink || '',
+          headings: heroData.headings || [],
           backgroundImages: heroData.backgroundImages || [],
           isActive: heroData.isActive ?? true,
           displayOrder: heroData.displayOrder || 0
@@ -70,13 +65,7 @@ export default function AdminHeroModal({
       } else {
         // Reset form for new hero
         setFormData({
-          title: '',
-          subtitle: '',
-          description: '',
-          primaryButtonText: '',
-          primaryButtonLink: '',
-          secondaryButtonText: '',
-          secondaryButtonLink: '',
+          headings: [],
           backgroundImages: [],
           isActive: true,
           displayOrder: 0
@@ -90,19 +79,26 @@ export default function AdminHeroModal({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.subtitle.trim()) newErrors.subtitle = 'Subtitle is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.primaryButtonText.trim()) newErrors.primaryButtonText = 'Primary button text is required';
-    if (!formData.primaryButtonLink.trim()) newErrors.primaryButtonLink = 'Primary button link is required';
-    if (!formData.secondaryButtonText.trim()) newErrors.secondaryButtonText = 'Secondary button text is required';
-    if (!formData.secondaryButtonLink.trim()) newErrors.secondaryButtonLink = 'Secondary button link is required';
+    if (formData.headings.length === 0) {
+      newErrors.headings = 'At least one heading combination is required';
+    }
 
-    if (formData.title.length > 200) newErrors.title = 'Title must be 200 characters or less';
-    if (formData.subtitle.length > 200) newErrors.subtitle = 'Subtitle must be 200 characters or less';
-    if (formData.description.length > 500) newErrors.description = 'Description must be 500 characters or less';
-    if (formData.primaryButtonText.length > 50) newErrors.primaryButtonText = 'Primary button text must be 50 characters or less';
-    if (formData.secondaryButtonText.length > 50) newErrors.secondaryButtonText = 'Secondary button text must be 50 characters or less';
+    formData.headings.forEach((heading, index) => {
+      const prefix = `heading_${index}`;
+      if (!heading.title.trim()) newErrors[`${prefix}_title`] = 'Title is required';
+      if (!heading.subtitle.trim()) newErrors[`${prefix}_subtitle`] = 'Subtitle is required';
+      if (!heading.description.trim()) newErrors[`${prefix}_description`] = 'Description is required';
+      if (!heading.primaryButtonText.trim()) newErrors[`${prefix}_primaryButtonText`] = 'Primary button text is required';
+      if (!heading.primaryButtonLink.trim()) newErrors[`${prefix}_primaryButtonLink`] = 'Primary button link is required';
+      if (!heading.secondaryButtonText.trim()) newErrors[`${prefix}_secondaryButtonText`] = 'Secondary button text is required';
+      if (!heading.secondaryButtonLink.trim()) newErrors[`${prefix}_secondaryButtonLink`] = 'Secondary button link is required';
+
+      if (heading.title.length > 200) newErrors[`${prefix}_title`] = 'Title must be 200 characters or less';
+      if (heading.subtitle.length > 200) newErrors[`${prefix}_subtitle`] = 'Subtitle must be 200 characters or less';
+      if (heading.description.length > 500) newErrors[`${prefix}_description`] = 'Description must be 500 characters or less';
+      if (heading.primaryButtonText.length > 50) newErrors[`${prefix}_primaryButtonText`] = 'Primary button text must be 50 characters or less';
+      if (heading.secondaryButtonText.length > 50) newErrors[`${prefix}_secondaryButtonText`] = 'Secondary button text must be 50 characters or less';
+    });
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -119,8 +115,8 @@ export default function AdminHeroModal({
     try {
       await onSave(formData);
       onClose();
-    } catch (error) {
-      console.error('Error saving hero:', error);
+    } catch (err) {
+      console.error('Error saving hero:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,6 +126,76 @@ export default function AdminHeroModal({
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const addHeading = () => {
+    const newHeading: HeroHeading = {
+      title: '',
+      subtitle: '',
+      description: '',
+      primaryButtonText: '',
+      primaryButtonLink: '',
+      secondaryButtonText: '',
+      secondaryButtonLink: '',
+      isActive: true,
+      displayOrder: formData.headings.length
+    };
+    setFormData(prev => ({
+      ...prev,
+      headings: [...prev.headings, newHeading]
+    }));
+  };
+
+  const updateHeading = (index: number, field: keyof HeroHeading, value: string | number | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      headings: prev.headings.map((heading, i) => 
+        i === index ? { ...heading, [field]: value } : heading
+      )
+    }));
+    
+    // Clear related errors
+    const prefix = `heading_${index}`;
+    const errorKey = `${prefix}_${field}`;
+    if (errors[errorKey]) {
+      setErrors(prev => ({ ...prev, [errorKey]: '' }));
+    }
+  };
+
+  const removeHeading = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      headings: prev.headings.filter((_, i) => i !== index).map((heading, i) => ({
+        ...heading,
+        displayOrder: i
+      }))
+    }));
+  };
+
+  const moveHeadingUp = (index: number) => {
+    if (index > 0) {
+      setFormData(prev => {
+        const newHeadings = [...prev.headings];
+        [newHeadings[index - 1], newHeadings[index]] = [newHeadings[index], newHeadings[index - 1]];
+        return {
+          ...prev,
+          headings: newHeadings.map((heading, i) => ({ ...heading, displayOrder: i }))
+        };
+      });
+    }
+  };
+
+  const moveHeadingDown = (index: number) => {
+    if (index < formData.headings.length - 1) {
+      setFormData(prev => {
+        const newHeadings = [...prev.headings];
+        [newHeadings[index], newHeadings[index + 1]] = [newHeadings[index + 1], newHeadings[index]];
+        return {
+          ...prev,
+          headings: newHeadings.map((heading, i) => ({ ...heading, displayOrder: i }))
+        };
+      });
     }
   };
 
@@ -213,8 +279,8 @@ export default function AdminHeroModal({
           const data = await res.json();
           console.log(`Successfully uploaded ${file.name}:`, data.url);
           return data.url;
-        } catch (error) {
-          console.error(`Error uploading ${file.name}:`, error);
+        } catch (err) {
+          console.error(`Error uploading ${file.name}:`, err);
           return null; // Return null instead of throwing
         }
       });
@@ -233,8 +299,8 @@ export default function AdminHeroModal({
       } else {
         setUploadStatus('No images were uploaded successfully');
       }
-    } catch (error) {
-      console.error('Error in uploadMultipleImages:', error);
+    } catch (err) {
+      console.error('Error in uploadMultipleImages:', err);
       setUploadStatus('Error uploading images');
     } finally {
       setIsUploading(false);
@@ -269,154 +335,234 @@ export default function AdminHeroModal({
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Title */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.title ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter main title"
-                  maxLength={200}
-                />
-                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+            {/* Headings Management */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900">Hero Headings</h3>
+                <button
+                  type="button"
+                  onClick={addHeading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Add Heading
+                </button>
               </div>
+              
+              {errors.headings && <p className="text-red-500 text-sm mb-4">{errors.headings}</p>}
+              
+              {formData.headings.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No headings added yet. Click &quot;Add Heading&quot; to create your first heading combination.</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {formData.headings.map((heading, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-md font-medium text-gray-800">Heading {index + 1}</h4>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => moveHeadingUp(index)}
+                            disabled={index === 0}
+                            className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveHeadingDown(index)}
+                            disabled={index === formData.headings.length - 1}
+                            className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeHeading(index)}
+                            className="px-2 py-1 text-xs bg-red-200 text-red-700 rounded hover:bg-red-300"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Title */}
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Title *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.title}
+                            onChange={(e) => updateHeading(index, 'title', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_title`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter main title"
+                            maxLength={200}
+                          />
+                          {errors[`heading_${index}_title`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_title`]}</p>}
+                        </div>
 
-              {/* Subtitle */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Subtitle *
-                </label>
-                <input
-                  type="text"
-                  value={formData.subtitle}
-                  onChange={(e) => handleInputChange('subtitle', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.subtitle ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter subtitle"
-                  maxLength={200}
-                />
-                {errors.subtitle && <p className="text-red-500 text-sm mt-1">{errors.subtitle}</p>}
-              </div>
+                        {/* Subtitle */}
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Subtitle *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.subtitle}
+                            onChange={(e) => updateHeading(index, 'subtitle', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_subtitle`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter subtitle"
+                            maxLength={200}
+                          />
+                          {errors[`heading_${index}_subtitle`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_subtitle`]}</p>}
+                        </div>
 
-              {/* Description */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description *
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.description ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter description"
-                  rows={3}
-                  maxLength={500}
-                />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
-              </div>
+                        {/* Description */}
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Description *
+                          </label>
+                          <textarea
+                            value={heading.description}
+                            onChange={(e) => updateHeading(index, 'description', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_description`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="Enter description"
+                            rows={2}
+                            maxLength={500}
+                          />
+                          {errors[`heading_${index}_description`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_description`]}</p>}
+                        </div>
 
-              {/* Primary Button */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Primary Button Text *
-                </label>
-                <input
-                  type="text"
-                  value={formData.primaryButtonText}
-                  onChange={(e) => handleInputChange('primaryButtonText', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.primaryButtonText ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g., Schedule Free Consultation"
-                  maxLength={50}
-                />
-                {errors.primaryButtonText && <p className="text-red-500 text-sm mt-1">{errors.primaryButtonText}</p>}
-              </div>
+                        {/* Primary Button */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Primary Button Text *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.primaryButtonText}
+                            onChange={(e) => updateHeading(index, 'primaryButtonText', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_primaryButtonText`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="e.g., Schedule Free Consultation"
+                            maxLength={50}
+                          />
+                          {errors[`heading_${index}_primaryButtonText`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_primaryButtonText`]}</p>}
+                        </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Primary Button Link *
-                </label>
-                <input
-                  type="text"
-                  value={formData.primaryButtonLink}
-                  onChange={(e) => handleInputChange('primaryButtonLink', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.primaryButtonLink ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g., #contact"
-                />
-                {errors.primaryButtonLink && <p className="text-red-500 text-sm mt-1">{errors.primaryButtonLink}</p>}
-              </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Primary Button Link *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.primaryButtonLink}
+                            onChange={(e) => updateHeading(index, 'primaryButtonLink', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_primaryButtonLink`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="e.g., #contact"
+                          />
+                          {errors[`heading_${index}_primaryButtonLink`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_primaryButtonLink`]}</p>}
+                        </div>
 
-              {/* Secondary Button */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Secondary Button Text *
-                </label>
-                <input
-                  type="text"
-                  value={formData.secondaryButtonText}
-                  onChange={(e) => handleInputChange('secondaryButtonText', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.secondaryButtonText ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g., Explore Our Services"
-                  maxLength={50}
-                />
-                {errors.secondaryButtonText && <p className="text-red-500 text-sm mt-1">{errors.secondaryButtonText}</p>}
-              </div>
+                        {/* Secondary Button */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Secondary Button Text *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.secondaryButtonText}
+                            onChange={(e) => updateHeading(index, 'secondaryButtonText', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_secondaryButtonText`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="e.g., Explore Our Services"
+                            maxLength={50}
+                          />
+                          {errors[`heading_${index}_secondaryButtonText`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_secondaryButtonText`]}</p>}
+                        </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Secondary Button Link *
-                </label>
-                <input
-                  type="text"
-                  value={formData.secondaryButtonLink}
-                  onChange={(e) => handleInputChange('secondaryButtonLink', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.secondaryButtonLink ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g., #services"
-                />
-                {errors.secondaryButtonLink && <p className="text-red-500 text-sm mt-1">{errors.secondaryButtonLink}</p>}
-              </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Secondary Button Link *
+                          </label>
+                          <input
+                            type="text"
+                            value={heading.secondaryButtonLink}
+                            onChange={(e) => updateHeading(index, 'secondaryButtonLink', e.target.value)}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                              errors[`heading_${index}_secondaryButtonLink`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder="e.g., #services"
+                          />
+                          {errors[`heading_${index}_secondaryButtonLink`] && <p className="text-red-500 text-xs mt-1">{errors[`heading_${index}_secondaryButtonLink`]}</p>}
+                        </div>
 
-              {/* Display Order */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Display Order
-                </label>
-                <input
-                  type="number"
-                  value={formData.displayOrder}
-                  onChange={(e) => handleInputChange('displayOrder', parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  min="0"
-                />
-              </div>
+                        {/* Heading Status */}
+                        <div className="md:col-span-2 flex items-center justify-between">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              id={`heading_${index}_isActive`}
+                              checked={heading.isActive}
+                              onChange={(e) => updateHeading(index, 'isActive', e.target.checked)}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label htmlFor={`heading_${index}_isActive`} className="ml-2 block text-sm text-gray-700">
+                              Active
+                            </label>
+                          </div>
+                          <span className="text-xs text-gray-500">Order: {heading.displayOrder}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="isActive"
-                  checked={formData.isActive}
-                  onChange={(e) => handleInputChange('isActive', e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
-                  Active
-                </label>
+            {/* Hero Settings */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Hero Settings</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Display Order */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Display Order
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.displayOrder}
+                    onChange={(e) => handleInputChange('displayOrder', parseInt(e.target.value) || 0)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    min="0"
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={formData.isActive}
+                    onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
+                    Active
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -489,12 +635,14 @@ export default function AdminHeroModal({
                   <div className="space-y-2">
                     {formData.backgroundImages.map((url, index) => (
                       <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                        <img 
+                        <Image 
                           src={url} 
                           alt={`Background ${index + 1}`}
-                          className="w-12 h-8 object-cover rounded"
+                          width={48}
+                          height={32}
+                          className="object-cover rounded"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
                           }}
                         />
                         <span className="flex-1 text-sm text-gray-600 truncate">{url}</span>

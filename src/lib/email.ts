@@ -47,9 +47,9 @@ export async function sendUserConfirmationEmail(contactData: ContactFormData) {
 
     await transporter.sendMail(mailOptions);
     console.log('User confirmation email sent successfully');
-  } catch (error) {
-    console.error('Error sending user confirmation email:', error);
-    throw error;
+  } catch (err) {
+    console.error('Error sending user confirmation email:', err);
+    throw err;
   }
 }
 
@@ -129,9 +129,9 @@ export async function sendAdminNotificationEmail(contactData: ContactFormData) {
 
     await transporter.sendMail(mailOptions);
     console.log('Admin notification email sent successfully');
-  } catch (error) {
-    console.error('Error sending admin notification email:', error);
-    throw error;
+  } catch (err) {
+    console.error('Error sending admin notification email:', err);
+    throw err;
   }
 }
 

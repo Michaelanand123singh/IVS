@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({ services });
-  } catch (error) {
-    console.error('Error fetching services:', error);
+  } catch (err) {
+    console.error('Error fetching services:', err);
     return NextResponse.json({ error: 'Failed to fetch services' }, { status: 500 });
   }
 }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
         updated_at: service.updated_at
       }
     }, { status: 201 });
-  } catch (error) {
-    console.error('Error creating service:', error);
+  } catch (err) {
+    console.error('Error creating service:', err);
     return NextResponse.json({ error: 'Failed to create service' }, { status: 500 });
   }
 }

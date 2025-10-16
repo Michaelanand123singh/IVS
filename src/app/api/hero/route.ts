@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Hero from '@/models/Hero';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectToDatabase();
     
@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({ hero });
-  } catch (error) {
-    console.error('Error fetching hero from database:', error);
+  } catch (err) {
+    console.error('Error fetching hero from database:', err);
     
     // Fallback to static data when database is not available
     try {
@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
         ]
       };
       return NextResponse.json({ hero: staticHero });
-    } catch (importError) {
-      console.error('Error loading static hero:', importError);
+    } catch (err) {
+      console.error('Error loading static hero:', err);
       return NextResponse.json({ error: 'Failed to fetch hero' }, { status: 500 });
     }
   }

@@ -36,8 +36,8 @@ async function setupAdmin() {
     });
     console.log('\n⚠️  Important: Please change these default passwords after your first login.');
     
-  } catch (error) {
-    console.error('❌ An error occurred during admin setup:', error);
+  } catch (err) {
+    console.error('❌ An err occurred during admin setup:', err);
   } finally {
     // Close the connection to allow the script to exit gracefully.
     console.log('Closing database connection...');

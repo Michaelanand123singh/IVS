@@ -37,7 +37,7 @@ export default function Contact() {
       } else {
         setError(data.error || 'Failed to send message. Please try again.');
       }
-    } catch (error) {
+    } catch {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);

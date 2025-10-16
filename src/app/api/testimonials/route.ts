@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Testimonial from '@/models/Testimonial';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectToDatabase();
     
@@ -12,15 +12,15 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({ testimonials });
-  } catch (error) {
-    console.error('Error fetching testimonials from database:', error);
+  } catch (err) {
+    console.error('Error fetching testimonials from database:', err);
     
     // Fallback to static data when database is not available
     try {
       const { testimonials: staticTestimonials } = await import('@/data/testimonials');
       return NextResponse.json({ testimonials: staticTestimonials });
-    } catch (importError) {
-      console.error('Error loading static testimonials:', importError);
+    } catch (err) {
+      console.error('Error loading static testimonials:', err);
       return NextResponse.json({ error: 'Failed to fetch testimonials' }, { status: 500 });
     }
   }

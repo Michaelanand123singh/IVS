@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({ contacts }, { status: 200 });
 
-  } catch (error) {
-    console.error('Error fetching contacts:', error);
+  } catch (err) {
+    console.error('Error fetching contacts:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

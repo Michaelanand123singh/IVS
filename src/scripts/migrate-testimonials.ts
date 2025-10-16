@@ -29,8 +29,8 @@ async function migrateTestimonials() {
     await Promise.all(testimonialPromises);
     
     console.log(`Successfully migrated ${testimonials.length} testimonials to database.`);
-  } catch (error) {
-    console.error('Error migrating testimonials:', error);
+  } catch (err) {
+    console.error('Error migrating testimonials:', err);
     process.exit(1);
   }
 }

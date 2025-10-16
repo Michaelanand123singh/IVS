@@ -16,7 +16,7 @@ export async function GET(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -31,8 +31,8 @@ export async function GET(
 
     return NextResponse.json({ contact }, { status: 200 });
 
-  } catch (error) {
-    console.error('Error fetching contact:', error);
+  } catch (err) {
+    console.error('Error fetching contact:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -54,7 +54,7 @@ export async function PATCH(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -72,8 +72,8 @@ export async function PATCH(
 
     return NextResponse.json({ success: true }, { status: 200 });
 
-  } catch (error) {
-    console.error('Error updating contact:', error);
+  } catch (err) {
+    console.error('Error updating contact:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -95,7 +95,7 @@ export async function DELETE(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -106,8 +106,8 @@ export async function DELETE(
 
     return NextResponse.json({ success: true }, { status: 200 });
 
-  } catch (error) {
-    console.error('Error deleting contact:', error);
+  } catch (err) {
+    console.error('Error deleting contact:', err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

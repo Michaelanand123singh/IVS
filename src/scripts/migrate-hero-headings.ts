@@ -1,0 +1,117 @@
+import mongoose from 'mongoose';
+import Hero from '../models/Hero';
+
+// Connect to MongoDB
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/itg-website';
+
+async function migrateHeroHeadings() {
+  try {
+    await mongoose.connect(MONGODB_URI);
+    console.log('Connected to MongoDB');
+
+    // Check if there are any existing hero records with the old structure
+    const existingHeroes = await Hero.find({});
+    console.log(`Found ${existingHeroes.length} existing hero records`);
+
+    if (existingHeroes.length > 0) {
+      console.log('Migrating existing hero records to new structure...');
+      
+      for (const hero of existingHeroes) {
+        // Check if this hero already has the new structure
+        if (hero.headings && Array.isArray(hero.headings)) {
+          console.log(`Hero ${hero._id} already has new structure, skipping...`);
+          continue;
+        }
+
+        // Convert old structure to new structure
+        const newHeroData = {
+          headings: [{
+            title: hero.title || 'Transform Your Business with',
+            subtitle: hero.subtitle || 'Expert Dynamics Solutions',
+            description: hero.description || 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
+            primaryButtonText: hero.primaryButtonText || 'Schedule Free Consultation',
+            primaryButtonLink: hero.primaryButtonLink || '#contact',
+            secondaryButtonText: hero.secondaryButtonText || 'Explore Our Services',
+            secondaryButtonLink: hero.secondaryButtonLink || '#services',
+            isActive: true,
+            displayOrder: 0
+          }],
+          backgroundImages: hero.backgroundImages || [],
+          isActive: hero.isActive,
+          displayOrder: hero.displayOrder,
+          created_at: hero.created_at,
+          updated_at: new Date()
+        };
+
+        // Update the hero record
+        await Hero.findByIdAndUpdate(hero._id, newHeroData);
+        console.log(`Migrated hero ${hero._id} to new structure`);
+      }
+    } else {
+      // Create a new hero with sample headings
+      const sampleHero = new Hero({
+        headings: [
+          {
+            title: 'Transform Your Business with',
+            subtitle: 'Expert Dynamics Solutions',
+            description: 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
+            primaryButtonText: 'Schedule Free Consultation',
+            primaryButtonLink: '#contact',
+            secondaryButtonText: 'Explore Our Services',
+            secondaryButtonLink: '#services',
+            isActive: true,
+            displayOrder: 0
+          },
+          {
+            title: 'Accelerate Digital Transformation',
+            subtitle: 'With Microsoft Power Platform',
+            description: 'Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.',
+            primaryButtonText: 'Get Started Today',
+            primaryButtonLink: '#contact',
+            secondaryButtonText: 'View Portfolio',
+            secondaryButtonLink: '#services',
+            isActive: true,
+            displayOrder: 1
+          },
+          {
+            title: 'Optimize Your Operations',
+            subtitle: 'With Custom ERP Solutions',
+            description: 'Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.',
+            primaryButtonText: 'Learn More',
+            primaryButtonLink: '#services',
+            secondaryButtonText: 'Contact Us',
+            secondaryButtonLink: '#contact',
+            isActive: true,
+            displayOrder: 2
+          }
+        ],
+        backgroundImages: [
+          'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80',
+          'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80',
+          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80',
+          'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80',
+          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80'
+        ],
+        isActive: true,
+        displayOrder: 0
+      });
+
+      await sampleHero.save();
+      console.log('Created new hero with sample headings');
+    }
+
+    console.log('Migration completed successfully!');
+  } catch (err) {
+    console.error('Migration failed:', err);
+  } finally {
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
+  }
+}
+
+// Run migration if this file is executed directly
+if (require.main === module) {
+  migrateHeroHeadings();
+}
+
+export default migrateHeroHeadings;

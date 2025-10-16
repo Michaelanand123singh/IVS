@@ -11,11 +11,12 @@
     "delete-admin-users": "tsx src/scripts/delete-admin-users.ts",
     "migrate-services": "tsx src/scripts/migrate-services.ts",
     "migrate-testimonials": "tsx src/scripts/migrate-testimonials.ts",
-    "migrate-hero": "tsx src/scripts/migrate-hero.ts"
+    "migrate-hero": "tsx src/scripts/migrate-hero.ts",
+    "migrate-hero-headings": "tsx src/scripts/migrate-hero-headings.ts",
+    "quick-migrate": "node src/scripts/quick-migrate.js",
+    "native-migrate": "node src/scripts/native-migrate.js"
   },
   "dependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.2",
     "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.3",
@@ -23,7 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "lightningcss": "^1.30.2",
     "lucide-react": "^0.545.0",
-    "mongodb": "^6.20.0",
+    "mongodb": "4.17.2",
     "mongoose": "^8.19.1",
     "next": "^15.5.4",
     "nodemailer": "^7.0.9",
@@ -33,6 +34,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -44,5 +47,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5"
+  },
+  "overrides": {
+    "mongodb": "4.17.2"
   }
 }

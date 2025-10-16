@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 interface Service {
   id?: string;
   title: string;
   description: string;
+  icon?: string;
   items?: string[];
   learnMore?: {
     detailedDescription: string;
@@ -37,6 +39,7 @@ export default function AdminServiceModal({
   const [formData, setFormData] = useState<Omit<Service, 'id'>>({
     title: '',
     description: '',
+    icon: '',
     items: [],
     learnMore: {
       detailedDescription: '',
@@ -49,12 +52,15 @@ export default function AdminServiceModal({
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('');
 
   useEffect(() => {
     if (service) {
       setFormData({
         title: service.title,
         description: service.description,
+        icon: service.icon || '',
         items: service.items || [],
         learnMore: service.learnMore || {
           detailedDescription: '',
@@ -69,6 +75,7 @@ export default function AdminServiceModal({
       setFormData({
         title: '',
         description: '',
+        icon: '',
         items: [],
         learnMore: {
           detailedDescription: '',
@@ -115,8 +122,8 @@ export default function AdminServiceModal({
         await onSave(formData);
       }
       onClose();
-    } catch (error) {
-      console.error('Error saving service:', error);
+    } catch (err) {
+      console.error('Error saving service:', err);
     } finally {
       setLoading(false);
     }
@@ -173,6 +180,84 @@ export default function AdminServiceModal({
         }
       }));
     }
+  };
+
+  const uploadImage = async (file: File) => {
+    try {
+      setIsUploading(true);
+      setUploadStatus('Uploading image...');
+
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.error('No admin token found');
+        setUploadStatus('Error: No admin token found');
+        return;
+      }
+
+      const form = new FormData();
+      form.append('file', file);
+      form.append('folder', 'services');
+
+      const res = await fetch('/api/admin/uploads', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Upload failed:', errorData);
+        setUploadStatus('Error: Upload failed');
+        return;
+      }
+
+      const data = await res.json();
+      console.log('Successfully uploaded:', data.url);
+      setUploadStatus('Image uploaded successfully!');
+      
+      setFormData(prev => ({
+        ...prev,
+        icon: data.url
+      }));
+
+      // Clear status after 2 seconds
+      setTimeout(() => setUploadStatus(''), 2000);
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      setUploadStatus('Error uploading image');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+      if (!validTypes.includes(file.type)) {
+        setUploadStatus('Error: Please select a valid image file (JPEG, PNG, WebP, GIF, SVG)');
+        return;
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadStatus('Error: File size must be less than 5MB');
+        return;
+      }
+
+      uploadImage(file);
+    }
+  };
+
+  const removeIcon = () => {
+    setFormData(prev => ({
+      ...prev,
+      icon: ''
+    }));
+    setUploadStatus('');
   };
 
   if (!isOpen) return null;
@@ -257,6 +342,102 @@ export default function AdminServiceModal({
                   placeholder="Service description"
                 />
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+              </div>
+
+              {/* Service Icon */}
+              <div>
+                <label className="block text-sm font-medium text-[#555555] mb-2">
+                  Service Icon
+                </label>
+                <div className="space-y-4">
+                  {/* Current Icon Preview */}
+                  {formData.icon && (
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                        <Image
+                          src={formData.icon}
+                          alt="Service icon"
+                          width={64}
+                          height={64}
+                          className="object-contain"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                            ((e.currentTarget as HTMLImageElement).nextElementSibling as HTMLElement)!.style.display = 'flex';
+                          }}
+                        />
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs" style={{ display: 'none' }}>
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600">Current icon</p>
+                        <p className="text-xs text-gray-400 truncate max-w-xs">{formData.icon}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeIcon}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove icon"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Upload Section */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <div className="text-center">
+                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <div className="mt-4">
+                        <label htmlFor="icon-upload" className="cursor-pointer">
+                          <span className="mt-2 block text-sm font-medium text-[#555555]">
+                            {formData.icon ? 'Change Icon' : 'Upload Icon'}
+                          </span>
+                          <span className="mt-1 block text-xs text-gray-400">
+                            PNG, JPG, WebP, GIF, SVG up to 5MB
+                          </span>
+                        </label>
+                        <input
+                          id="icon-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="sr-only"
+                          disabled={isUploading}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Upload Status */}
+                  {uploadStatus && (
+                    <div className={`text-sm p-2 rounded ${
+                      uploadStatus.includes('Error') 
+                        ? 'bg-red-50 text-red-700' 
+                        : 'bg-green-50 text-green-700'
+                    }`}>
+                      {uploadStatus}
+                    </div>
+                  )}
+
+                  {/* Manual URL Input */}
+                  <div>
+                    <label className="block text-xs font-medium text-[#555555] mb-1">
+                      Or enter image URL manually:
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.icon}
+                      onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1F4E79] focus:border-transparent text-sm"
+                      placeholder="https://example.com/icon.png"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Items */}

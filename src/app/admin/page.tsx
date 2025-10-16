@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import EmailTemplateModal from '@/components/EmailTemplateModal';
@@ -34,6 +34,7 @@ interface Service {
   id: string;
   title: string;
   description: string;
+  icon?: string;
   items?: string[];
   learnMore?: {
     detailedDescription: string;
@@ -58,8 +59,7 @@ interface Testimonial {
   updated_at: string;
 }
 
-interface Hero {
-  id: string;
+interface HeroHeading {
   title: string;
   subtitle: string;
   description: string;
@@ -67,6 +67,13 @@ interface Hero {
   primaryButtonLink: string;
   secondaryButtonText: string;
   secondaryButtonLink: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+interface Hero {
+  id: string;
+  headings: HeroHeading[];
   backgroundImages: string[];
   isActive: boolean;
   displayOrder: number;
@@ -90,7 +97,6 @@ export default function AdminPanel() {
   const [hero, setHero] = useState<Hero | null>(null);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [filter, setFilter] = useState<'all' | 'new' | 'contacted' | 'closed'>('all');
   const [activeTab, setActiveTab] = useState<'contacts' | 'templates' | 'services' | 'testimonials' | 'hero' | 'settings'>('contacts');
@@ -104,17 +110,7 @@ export default function AdminPanel() {
   const [editingHero, setEditingHero] = useState<Hero | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      router.push('/admin/login');
-      return;
-    }
-
-    fetchData(token);
-  }, [router]);
-
-  const fetchData = async (token: string) => {
+  const fetchData = useCallback(async (token: string) => {
     try {
       // Fetch contacts
       const contactsResponse = await fetch('/api/admin/contacts', {
@@ -191,12 +187,22 @@ export default function AdminPanel() {
         setHero(null);
       }
 
-    } catch (error) {
-      setError('Failed to fetch data');
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.push('/admin/login');
+      return;
+    }
+
+    fetchData(token);
+  }, [router, fetchData]);
 
   const updateContactStatus = async (id: string, status: 'new' | 'contacted' | 'closed') => {
     const token = localStorage.getItem('adminToken');
@@ -222,8 +228,8 @@ export default function AdminPanel() {
         // Refresh stats
         fetchData(token);
       }
-    } catch (error) {
-      console.error('Failed to update contact status:', error);
+    } catch (err) {
+      console.error('Failed to update contact status:', err);
     }
   };
 
@@ -251,8 +257,8 @@ export default function AdminPanel() {
           setEmailTemplates(templatesData.templates || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to save template:', error);
+    } catch (err) {
+      console.error('Failed to save template:', err);
     }
   };
 
@@ -280,8 +286,8 @@ export default function AdminPanel() {
           setEmailTemplates(templatesData.templates || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to update template:', error);
+    } catch (err) {
+      console.error('Failed to update template:', err);
     }
   };
 
@@ -311,8 +317,8 @@ export default function AdminPanel() {
           setEmailTemplates(templatesData.templates || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to delete template:', error);
+    } catch (err) {
+      console.error('Failed to delete template:', err);
     }
   };
 
@@ -340,8 +346,8 @@ export default function AdminPanel() {
           setEmailTemplates(templatesData.templates || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to toggle template status:', error);
+    } catch (err) {
+      console.error('Failed to toggle template status:', err);
     }
   };
 
@@ -383,8 +389,8 @@ export default function AdminPanel() {
           setServices(servicesData.services || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to save service:', error);
+    } catch (err) {
+      console.error('Failed to save service:', err);
     }
   };
 
@@ -412,8 +418,8 @@ export default function AdminPanel() {
           setServices(servicesData.services || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to update service:', error);
+    } catch (err) {
+      console.error('Failed to update service:', err);
     }
   };
 
@@ -443,8 +449,8 @@ export default function AdminPanel() {
           setServices(servicesData.services || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to delete service:', error);
+    } catch (err) {
+      console.error('Failed to delete service:', err);
     }
   };
 
@@ -472,8 +478,8 @@ export default function AdminPanel() {
           setServices(servicesData.services || []);
         }
       }
-    } catch (error) {
-      console.error('Failed to toggle service status:', error);
+    } catch (err) {
+      console.error('Failed to toggle service status:', err);
     }
   };
 
@@ -518,8 +524,8 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to save testimonial');
       }
-    } catch (error) {
-      console.error('Failed to save testimonial:', error);
+    } catch (err) {
+      console.error('Failed to save testimonial:', err);
     }
   };
 
@@ -549,8 +555,8 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to update testimonial');
       }
-    } catch (error) {
-      console.error('Failed to update testimonial:', error);
+    } catch (err) {
+      console.error('Failed to update testimonial:', err);
     }
   };
 
@@ -582,8 +588,8 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to delete testimonial');
       }
-    } catch (error) {
-      console.error('Failed to delete testimonial:', error);
+    } catch (err) {
+      console.error('Failed to delete testimonial:', err);
     }
   };
 
@@ -613,8 +619,8 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to toggle testimonial status');
       }
-    } catch (error) {
-      console.error('Failed to toggle testimonial status:', error);
+    } catch (err) {
+      console.error('Failed to toggle testimonial status:', err);
     }
   };
 
@@ -658,8 +664,8 @@ export default function AdminPanel() {
       } else {
         console.error('Failed to save hero');
       }
-    } catch (error) {
-      console.error('Failed to save hero:', error);
+    } catch (err) {
+      console.error('Failed to save hero:', err);
     }
   };
 
@@ -1112,7 +1118,29 @@ export default function AdminPanel() {
                     <div key={service.id} className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 hover:shadow-md transition-shadow">
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3 sm:gap-0">
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{service.title}</h3>
+                          <div className="flex items-center gap-3 mb-2">
+                            {service.icon && (
+                              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                                <Image
+                                  src={service.icon}
+                                  alt={`${service.title} icon`}
+                                  width={24}
+                                  height={24}
+                                  className="object-contain"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                    ((e.currentTarget as HTMLImageElement).nextElementSibling as HTMLElement)!.style.display = 'flex';
+                                  }}
+                                />
+                                <div className="w-6 h-6 bg-gray-200 flex items-center justify-center text-gray-500 text-xs" style={{ display: 'none' }}>
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                </div>
+                              </div>
+                            )}
+                            <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{service.title}</h3>
+                          </div>
                           <p className="text-xs sm:text-sm text-[#555555] mt-1">Order: {service.displayOrder}</p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -1371,36 +1399,61 @@ export default function AdminPanel() {
                 {hero ? (
                   <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Hero Content Preview */}
-                      <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] mb-4">Current Hero Content</h3>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-[#555555] mb-1">Title</label>
-                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.title}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#555555] mb-1">Subtitle</label>
-                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.subtitle}</p>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#555555] mb-1">Description</label>
-                            <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.description}</p>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-[#555555] mb-1">Primary Button</label>
-                              <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.primaryButtonText}</p>
-                              <p className="text-xs text-[#888888] mt-1">Link: {hero.primaryButtonLink}</p>
+                {/* Hero Content Preview */}
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] mb-4">Current Hero Headings</h3>
+                  <div className="space-y-4">
+                    {hero.headings && hero.headings.length > 0 ? (
+                      hero.headings
+                        .filter(h => h.isActive)
+                        .sort((a, b) => a.displayOrder - b.displayOrder)
+                        .map((heading, index) => (
+                          <div key={index} className="border border-gray-200 rounded-lg p-4 bg-[#F7F9FC]">
+                            <div className="flex justify-between items-start mb-3">
+                              <h4 className="text-sm font-semibold text-[#1C1C1C]">Heading {index + 1}</h4>
+                              <span className={`text-xs px-2 py-1 rounded-full ${
+                                heading.isActive 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {heading.isActive ? 'Active' : 'Inactive'}
+                              </span>
                             </div>
-                            <div>
-                              <label className="block text-sm font-medium text-[#555555] mb-1">Secondary Button</label>
-                              <p className="text-sm text-[#1C1C1C] bg-[#F7F9FC] p-3 rounded">{hero.secondaryButtonText}</p>
-                              <p className="text-xs text-[#888888] mt-1">Link: {hero.secondaryButtonLink}</p>
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-xs font-medium text-[#555555] mb-1">Title</label>
+                                <p className="text-sm text-[#1C1C1C]">{heading.title}</p>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-[#555555] mb-1">Subtitle</label>
+                                <p className="text-sm text-[#1C1C1C]">{heading.subtitle}</p>
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-[#555555] mb-1">Description</label>
+                                <p className="text-sm text-[#1C1C1C]">{heading.description}</p>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-[#555555] mb-1">Primary Button</label>
+                                  <p className="text-xs text-[#1C1C1C]">{heading.primaryButtonText}</p>
+                                  <p className="text-xs text-[#888888] mt-1">Link: {heading.primaryButtonLink}</p>
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-[#555555] mb-1">Secondary Button</label>
+                                  <p className="text-xs text-[#1C1C1C]">{heading.secondaryButtonText}</p>
+                                  <p className="text-xs text-[#888888] mt-1">Link: {heading.secondaryButtonLink}</p>
+                                </div>
+                              </div>
                             </div>
                           </div>
-                        </div>
+                        ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <p>No headings configured yet.</p>
                       </div>
+                    )}
+                  </div>
+                </div>
 
                       {/* Hero Details */}
                       <div>
@@ -1421,18 +1474,26 @@ export default function AdminPanel() {
                             <p className="text-sm text-[#1C1C1C]">{hero.displayOrder}</p>
                           </div>
                           <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Headings Count</label>
+                            <p className="text-sm text-[#1C1C1C]">
+                              {hero.headings?.length || 0} heading(s) total, {hero.headings?.filter(h => h.isActive).length || 0} active
+                            </p>
+                          </div>
+                          <div>
                             <label className="block text-sm font-medium text-[#555555] mb-1">Background Images</label>
                             <p className="text-sm text-[#1C1C1C]">{hero.backgroundImages.length} image(s)</p>
                             {hero.backgroundImages.length > 0 && (
                               <div className="mt-2 grid grid-cols-2 gap-2">
                                 {hero.backgroundImages.slice(0, 4).map((url, index) => (
-                                  <img 
+                                  <Image 
                                     key={index}
                                     src={url} 
                                     alt={`Background ${index + 1}`}
+                                    width={200}
+                                    height={64}
                                     className="w-full h-16 object-cover rounded"
                                     onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
+                                      (e.currentTarget as HTMLImageElement).style.display = 'none';
                                     }}
                                   />
                                 ))}

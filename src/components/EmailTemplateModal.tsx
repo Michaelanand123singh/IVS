@@ -68,8 +68,8 @@ export default function EmailTemplateModal({
         await onSave(formData);
       }
       onClose();
-    } catch (error) {
-      console.error('Error saving template:', error);
+    } catch (err) {
+      console.error('Error saving template:', err);
     } finally {
       setLoading(false);
     }
@@ -359,11 +359,6 @@ export default function EmailTemplateModal({
     ];
   };
 
-  const getDefaultTemplate = (type: string) => {
-    const templates = getPreBuiltTemplates();
-    const defaultTemplate = templates.find(t => t.type === type);
-    return defaultTemplate ? defaultTemplate.html : '';
-  };
 
   const loadPreBuiltTemplate = (templateId: string) => {
     const templates = getPreBuiltTemplates();

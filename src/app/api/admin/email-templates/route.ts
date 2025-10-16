@@ -13,15 +13,15 @@ export async function GET(request: NextRequest) {
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     const templates = await getAllEmailTemplates();
 
     return NextResponse.json({ templates });
-  } catch (error) {
-    console.error('Error fetching email templates:', error);
+  } catch (err) {
+    console.error('Error fetching email templates:', err);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -67,8 +67,8 @@ export async function POST(request: NextRequest) {
       message: 'Email template created successfully',
       template 
     });
-  } catch (error) {
-    console.error('Error creating email template:', error);
+  } catch (err) {
+    console.error('Error creating email template:', err);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }

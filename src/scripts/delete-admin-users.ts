@@ -11,8 +11,8 @@ async function deleteAllAdmins() {
     console.log(`Successfully deleted ${result.deletedCount} admin user(s).`);
     console.log('All admin credentials have been removed from the database.');
     
-  } catch (error) {
-    console.error('Error deleting admin users:', error);
+  } catch (err) {
+    console.error('Error deleting admin users:', err);
   }
 }
 

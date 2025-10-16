@@ -1,6 +1,7 @@
 export type Service = {
   title: string;
   description: string;
+  icon?: string;
   items?: string[];
   learnMore?: {
     detailedDescription: string;
@@ -14,6 +15,7 @@ export const services: Service[] = [
   {
     title: "Microsoft Dynamics 365 Business Central Implementation",
     description: "Expert implementation services for seamless ERP transformation with certified consultants and proven methodologies.",
+    icon: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=100&q=80",
     items: ["Discovery & Requirements Analysis", "Solution Design & Configuration", "Data Migration & Integration", "Testing & Go-Live", "User Training & Adoption"],
     learnMore: {
       detailedDescription: "Our certified consultants bring extensive experience in deploying Business Central across diverse industries, ensuring your implementation aligns perfectly with your unique business processes and growth objectives. We follow a proven methodology with structured phases and clear deliverables.",
@@ -68,6 +70,7 @@ export const services: Service[] = [
   {
     title: "Microsoft Dynamics 365 Business Central Support Services",
     description: "Comprehensive post-implementation support ensuring optimal performance and continuous system optimization.",
+    icon: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=100&q=80",
     items: ["Technical Support & Maintenance", "User Support & Training", "System Updates & Upgrades", "Performance Optimization"],
     learnMore: {
       detailedDescription: "Our dedicated support services ensure your Business Central environment operates at peak performance while your team focuses on core business activities. We provide comprehensive post-implementation support across all aspects of your Business Central system.",
@@ -120,6 +123,7 @@ export const services: Service[] = [
   {
     title: "LS Central Implementation and Support Services",
     description: "Unified retail and hospitality solutions built on Business Central with POS, inventory, and customer loyalty integration.",
+    icon: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=100&q=80",
     items: ["Retail Implementation", "Hospitality Implementation", "Multi-channel Operations", "Property Management"],
     learnMore: {
       detailedDescription: "As an LS Central specialist, we deliver comprehensive retail and hospitality management solutions that seamlessly integrate POS, inventory, customer loyalty, and back-office operations. Our expertise ensures smooth implementation and ongoing support for businesses in retail and hospitality sectors.",
@@ -598,6 +602,7 @@ export const services: Service[] = [
   {
     title: "AI & Machine Learning",
     description: "Advanced AI and ML solutions to extract insights from data, predict trends, and automate decision-making processes.",
+    icon: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=100&q=80",
     items: ["Predictive Analytics", "Machine Learning Models", "Deep Learning Solutions", "Natural Language Processing", "Computer Vision", "Data Science Consulting"],
     learnMore: {
       detailedDescription: "Harness the power of artificial intelligence and machine learning to transform your data into actionable insights. Our AI/ML solutions help businesses predict future trends, automate complex processes, and make data-driven decisions that drive growth and efficiency.",
@@ -630,6 +635,7 @@ export const services: Service[] = [
   {
     title: "Cloud Computing",
     description: "Scalable cloud infrastructure and services to modernize your business operations with secure, reliable, and cost-effective solutions.",
+    icon: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=100&q=80",
     items: ["Cloud Migration", "Infrastructure as a Service (IaaS)", "Platform as a Service (PaaS)", "Cloud Security", "DevOps & CI/CD", "Cloud Monitoring & Optimization"],
     learnMore: {
       detailedDescription: "Transform your business with comprehensive cloud computing solutions that provide scalability, security, and cost-effectiveness. Our cloud experts help you migrate to the cloud, optimize your infrastructure, and implement best practices for maximum performance and security.",

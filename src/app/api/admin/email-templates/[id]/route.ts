@@ -16,7 +16,7 @@ export async function GET(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -30,8 +30,8 @@ export async function GET(
     }
 
     return NextResponse.json(template);
-  } catch (error) {
-    console.error('Error fetching email template:', error);
+  } catch (err) {
+    console.error('Error fetching email template:', err);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -53,7 +53,7 @@ export async function PATCH(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -77,8 +77,8 @@ export async function PATCH(
     });
 
     return NextResponse.json({ message: 'Email template updated successfully' });
-  } catch (error) {
-    console.error('Error updating email template:', error);
+  } catch (err) {
+    console.error('Error updating email template:', err);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -100,7 +100,7 @@ export async function DELETE(
 
     try {
       jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -110,8 +110,8 @@ export async function DELETE(
     await deleteEmailTemplate(templateId);
 
     return NextResponse.json({ message: 'Email template deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting email template:', error);
+  } catch (err) {
+    console.error('Error deleting email template:', err);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }

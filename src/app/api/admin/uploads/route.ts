@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
       resource_type: json.resource_type,
       cloud_name: cloudName,
     });
-  } catch (error) {
-    console.error('Cloudinary upload error:', error);
+  } catch {
+    console.error('Cloudinary upload failed');
     return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
   }
 }

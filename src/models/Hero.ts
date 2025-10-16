@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-export interface IHero extends Document {
+export interface IHeroHeading {
   title: string;
   subtitle: string;
   description: string;
@@ -8,6 +8,12 @@ export interface IHero extends Document {
   primaryButtonLink: string;
   secondaryButtonText: string;
   secondaryButtonLink: string;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+export interface IHero extends Document {
+  headings: IHeroHeading[];
   backgroundImages: string[];
   isActive: boolean;
   displayOrder: number;
@@ -15,7 +21,7 @@ export interface IHero extends Document {
   updated_at: Date;
 }
 
-const HeroSchema = new Schema<IHero>({
+const HeroHeadingSchema = new Schema<IHeroHeading>({
   title: {
     type: String,
     required: [true, 'Title is required'],
@@ -58,6 +64,18 @@ const HeroSchema = new Schema<IHero>({
     trim: true,
     maxlength: [200, 'Secondary button link cannot be more than 200 characters']
   },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  displayOrder: {
+    type: Number,
+    default: 0
+  }
+}, { _id: false });
+
+const HeroSchema = new Schema<IHero>({
+  headings: [HeroHeadingSchema],
   backgroundImages: [{
     type: String,
     trim: true,

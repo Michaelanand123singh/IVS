@@ -77,9 +77,9 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-  } catch (error) {
-    console.error('Admin login error:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+  } catch (err) {
+    console.error('Admin login err:', err);
+    console.error('Error stack:', err instanceof Error ? err.stack : 'No stack trace');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

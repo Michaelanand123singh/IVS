@@ -1,7 +1,7 @@
 import connectDB from './mongodb';
-import Contact, { IContact } from '@/models/Contact';
-import AdminUser, { IAdminUser } from '@/models/AdminUser';
-import EmailTemplate, { IEmailTemplate } from '@/models/EmailTemplate';
+import Contact from '@/models/Contact';
+import AdminUser from '@/models/AdminUser';
+import EmailTemplate from '@/models/EmailTemplate';
 import bcrypt from 'bcryptjs';
 
 // Contact operations

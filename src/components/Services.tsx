@@ -4,6 +4,7 @@ import { Service } from "@/data/services";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceModal from "@/components/ServiceModal";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
@@ -27,8 +28,8 @@ export default function Services() {
         const { services: staticServices } = await import('@/data/services');
         setServices(staticServices);
       }
-    } catch (error) {
-      console.error('Error fetching services:', error);
+    } catch (err) {
+      console.error('Error fetching services:', err);
       // Fallback to static data
       const { services: staticServices } = await import('@/data/services');
       setServices(staticServices);
@@ -85,8 +86,27 @@ export default function Services() {
           {displayedServices.map((s) => (
             <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
               <div className="relative">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1F4E79]/10 to-[#1F4E79]/20 text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300">
-                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1F4E79]/10 to-[#1F4E79]/20 text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
+                  {s.icon ? (
+                    <Image
+                      src={s.icon}
+                      alt={`${s.title} icon`}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                      onError={(e) => {
+                        // Fallback to default icon if image fails to load
+                        (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        ((e.currentTarget as HTMLImageElement).nextElementSibling as HTMLElement)!.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <svg 
+                    className={`h-6 w-6 ${s.icon ? 'hidden' : 'block'}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>

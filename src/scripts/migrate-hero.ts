@@ -48,8 +48,8 @@ async function migrateHero() {
       subtitle: hero.subtitle
     });
 
-  } catch (error) {
-    console.error('Error migrating hero:', error);
+  } catch (err) {
+    console.error('Error migrating hero:', err);
   } finally {
     process.exit(0);
   }

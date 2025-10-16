@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({ hero });
-  } catch (error) {
-    console.error('Error fetching hero from database:', error);
+  } catch (err) {
+    console.error('Error fetching hero from database:', err);
     
     // Fallback to static data when database is not available
     try {
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
         updated_at: hero.updated_at
       }
     }, { status: 201 });
-  } catch (error) {
-    console.error('Error creating hero:', error);
+  } catch (err) {
+    console.error('Error creating hero:', err);
     
     // When database is not available, return a mock response for testing
     const body = await request.json();

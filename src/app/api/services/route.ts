@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import Service from '@/models/Service';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     await connectToDatabase();
     
@@ -12,15 +12,15 @@ export async function GET(request: NextRequest) {
       .lean();
 
     return NextResponse.json({ services });
-  } catch (error) {
-    console.error('Error fetching services from database:', error);
+  } catch (err) {
+    console.error('Error fetching services from database:', err);
     
     // Fallback to static data when database is not available
     try {
       const { services: staticServices } = await import('@/data/services');
       return NextResponse.json({ services: staticServices });
-    } catch (importError) {
-      console.error('Error loading static services:', importError);
+    } catch (err) {
+      console.error('Error loading static services:', err);
       return NextResponse.json({ error: 'Failed to fetch services' }, { status: 500 });
     }
   }

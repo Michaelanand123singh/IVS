@@ -19,7 +19,7 @@ export async function GET(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -38,8 +38,8 @@ export async function GET(
     }
 
     return NextResponse.json({ testimonial });
-  } catch (error) {
-    console.error('Error fetching testimonial:', error);
+  } catch (err) {
+    console.error('Error fetching testimonial:', err);
     return NextResponse.json({ error: 'Failed to fetch testimonial' }, { status: 500 });
   }
 }
@@ -57,7 +57,7 @@ export async function PATCH(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -99,8 +99,8 @@ export async function PATCH(
         updated_at: testimonial.updated_at
       }
     });
-  } catch (error) {
-    console.error('Error updating testimonial:', error);
+  } catch (err) {
+    console.error('Error updating testimonial:', err);
     return NextResponse.json({ error: 'Failed to update testimonial' }, { status: 500 });
   }
 }
@@ -118,7 +118,7 @@ export async function DELETE(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -140,8 +140,8 @@ export async function DELETE(
     await testimonial.save();
 
     return NextResponse.json({ message: 'Testimonial deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting testimonial:', error);
+  } catch (err) {
+    console.error('Error deleting testimonial:', err);
     return NextResponse.json({ error: 'Failed to delete testimonial' }, { status: 500 });
   }
 }

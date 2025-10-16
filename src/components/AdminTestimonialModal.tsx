@@ -103,8 +103,8 @@ export default function AdminTestimonialModal({
         await onSave(formData);
       }
       onClose();
-    } catch (error) {
-      console.error('Error saving testimonial:', error);
+    } catch (err) {
+      console.error('Error saving testimonial:', err);
     } finally {
       setIsSubmitting(false);
     }

@@ -19,7 +19,7 @@ export async function GET(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -38,8 +38,8 @@ export async function GET(
     }
 
     return NextResponse.json({ service });
-  } catch (error) {
-    console.error('Error fetching service:', error);
+  } catch (err) {
+    console.error('Error fetching service:', err);
     return NextResponse.json({ error: 'Failed to fetch service' }, { status: 500 });
   }
 }
@@ -57,7 +57,7 @@ export async function PATCH(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -109,8 +109,8 @@ export async function PATCH(
         updated_at: service.updated_at
       }
     });
-  } catch (error) {
-    console.error('Error updating service:', error);
+  } catch (err) {
+    console.error('Error updating service:', err);
     return NextResponse.json({ error: 'Failed to update service' }, { status: 500 });
   }
 }
@@ -128,7 +128,7 @@ export async function DELETE(
     const token = authHeader.substring(7);
     try {
       jwt.verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
@@ -150,8 +150,8 @@ export async function DELETE(
     await service.save();
 
     return NextResponse.json({ message: 'Service deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting service:', error);
+  } catch (err) {
+    console.error('Error deleting service:', err);
     return NextResponse.json({ error: 'Failed to delete service' }, { status: 500 });
   }
 }

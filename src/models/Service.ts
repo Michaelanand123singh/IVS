@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IService extends Document {
   title: string;
   description: string;
+  icon?: string; // URL to the service icon/image
   items?: string[];
   learnMore?: {
     detailedDescription: string;
@@ -28,6 +29,16 @@ const ServiceSchema = new Schema<IService>({
     required: true,
     trim: true,
     maxlength: 500
+  },
+  icon: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v: string) {
+        return !v || /^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(v);
+      },
+      message: 'Icon must be a valid image URL'
+    }
   },
   items: [{
     type: String,
