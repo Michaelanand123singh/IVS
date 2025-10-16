@@ -228,6 +228,9 @@ export default function AdminHeroModal({
       });
 
       if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Upload failed:', errorData);
+        setUploadStatus(`Upload failed: ${errorData.error || 'Unknown error'}`);
         return;
       }
       const data = await res.json();
@@ -236,6 +239,7 @@ export default function AdminHeroModal({
           ...prev,
           backgroundImages: [...prev.backgroundImages, data.url]
         }));
+        setUploadStatus(`Successfully uploaded ${file.name}`);
       }
     } finally {
       setIsUploading(false);
@@ -273,6 +277,7 @@ export default function AdminHeroModal({
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({}));
             console.error(`Upload failed for ${file.name}:`, errorData);
+            setUploadStatus(`Failed to upload ${file.name}: ${errorData.error || 'Unknown error'}`);
             return null; // Return null instead of throwing
           }
           
@@ -597,7 +602,10 @@ export default function AdminHeroModal({
                         className="hidden"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
-                          if (file) uploadImage(file);
+                          if (file) {
+                            uploadImage(file);
+                            e.target.value = ''; // Reset input
+                          }
                         }}
                       />
                       {isUploading ? 'Uploading...' : 'Upload Single'}
@@ -610,7 +618,10 @@ export default function AdminHeroModal({
                         className="hidden"
                         onChange={(e) => {
                           const files = e.target.files;
-                          if (files && files.length > 0) uploadMultipleImages(files);
+                          if (files && files.length > 0) {
+                            uploadMultipleImages(files);
+                            e.target.value = ''; // Reset input
+                          }
                         }}
                       />
                       {isUploading ? 'Uploading...' : 'Upload Multiple'}

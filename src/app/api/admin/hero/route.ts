@@ -33,13 +33,41 @@ export async function GET(request: NextRequest) {
     try {
       const staticHero = {
         _id: 'static-hero',
-        title: 'Transform Your Business with',
-        subtitle: 'Expert Dynamics Solutions',
-        description: 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
-        primaryButtonText: 'Schedule Free Consultation',
-        primaryButtonLink: '#contact',
-        secondaryButtonText: 'Explore Our Services',
-        secondaryButtonLink: '#services',
+        headings: [
+          {
+            title: 'Transform Your Business with',
+            subtitle: 'Expert Dynamics Solutions',
+            description: 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
+            primaryButtonText: 'Schedule Free Consultation',
+            primaryButtonLink: '#contact',
+            secondaryButtonText: 'Explore Our Services',
+            secondaryButtonLink: '#services',
+            isActive: true,
+            displayOrder: 0
+          },
+          {
+            title: 'Accelerate Digital Transformation',
+            subtitle: 'With Microsoft Power Platform',
+            description: 'Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.',
+            primaryButtonText: 'Get Started Today',
+            primaryButtonLink: '#contact',
+            secondaryButtonText: 'View Portfolio',
+            secondaryButtonLink: '#services',
+            isActive: true,
+            displayOrder: 1
+          },
+          {
+            title: 'Optimize Your Operations',
+            subtitle: 'With Custom ERP Solutions',
+            description: 'Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.',
+            primaryButtonText: 'Learn More',
+            primaryButtonLink: '#services',
+            secondaryButtonText: 'Contact Us',
+            secondaryButtonLink: '#contact',
+            isActive: true,
+            displayOrder: 2
+          }
+        ],
         backgroundImages: [
           'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80',
           'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80',
@@ -76,19 +104,22 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { 
-      title, 
-      subtitle, 
-      description, 
-      primaryButtonText, 
-      primaryButtonLink, 
-      secondaryButtonText, 
-      secondaryButtonLink, 
+      headings,
       backgroundImages,
       displayOrder 
     } = body;
 
-    if (!title || !subtitle || !description || !primaryButtonText || !primaryButtonLink || !secondaryButtonText || !secondaryButtonLink) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    if (!headings || !Array.isArray(headings) || headings.length === 0) {
+      return NextResponse.json({ error: 'At least one heading is required' }, { status: 400 });
+    }
+
+    // Validate each heading
+    for (const heading of headings) {
+      if (!heading.title || !heading.subtitle || !heading.description || 
+          !heading.primaryButtonText || !heading.primaryButtonLink || 
+          !heading.secondaryButtonText || !heading.secondaryButtonLink) {
+        return NextResponse.json({ error: 'All heading fields are required' }, { status: 400 });
+      }
     }
 
     await connectToDatabase();
@@ -97,13 +128,7 @@ export async function POST(request: NextRequest) {
     await Hero.updateMany({ isActive: true }, { isActive: false });
 
     const hero = new Hero({
-      title,
-      subtitle,
-      description,
-      primaryButtonText,
-      primaryButtonLink,
-      secondaryButtonText,
-      secondaryButtonLink,
+      headings: headings || [],
       backgroundImages: backgroundImages || [],
       displayOrder: displayOrder || 0,
       isActive: true
@@ -115,13 +140,7 @@ export async function POST(request: NextRequest) {
       message: 'Hero created successfully', 
       hero: {
         id: hero._id,
-        title: hero.title,
-        subtitle: hero.subtitle,
-        description: hero.description,
-        primaryButtonText: hero.primaryButtonText,
-        primaryButtonLink: hero.primaryButtonLink,
-        secondaryButtonText: hero.secondaryButtonText,
-        secondaryButtonLink: hero.secondaryButtonLink,
+        headings: hero.headings,
         backgroundImages: hero.backgroundImages,
         isActive: hero.isActive,
         displayOrder: hero.displayOrder,
@@ -135,26 +154,14 @@ export async function POST(request: NextRequest) {
     // When database is not available, return a mock response for testing
     const body = await request.json();
     const { 
-      title, 
-      subtitle, 
-      description, 
-      primaryButtonText, 
-      primaryButtonLink, 
-      secondaryButtonText, 
-      secondaryButtonLink, 
+      headings,
       backgroundImages,
       displayOrder 
     } = body;
     
     const mockHero = {
       id: `hero-${Date.now()}`,
-      title,
-      subtitle,
-      description,
-      primaryButtonText,
-      primaryButtonLink,
-      secondaryButtonText,
-      secondaryButtonLink,
+      headings: headings || [],
       backgroundImages: backgroundImages || [],
       isActive: true,
       displayOrder: displayOrder || 0,

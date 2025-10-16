@@ -1139,7 +1139,7 @@ export default function AdminPanel() {
                                 </div>
                               </div>
                             )}
-                            <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{service.title}</h3>
+                          <h3 className="text-base sm:text-lg font-semibold text-[#1C1C1C] truncate">{service.title}</h3>
                           </div>
                           <p className="text-xs sm:text-sm text-[#555555] mt-1">Order: {service.displayOrder}</p>
                         </div>
@@ -1177,7 +1177,7 @@ export default function AdminPanel() {
                           <label className="block text-sm font-medium text-[#555555] mb-1">Items</label>
                           <div className="space-y-1">
                             {service.items.slice(0, 3).map((item, index) => (
-                              <div key={index} className="flex items-start text-sm text-[#555555]">
+                              <div key={`${service.id}-item-${index}`} className="flex items-start text-sm text-[#555555]">
                                 <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#F47A21]" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
@@ -1408,7 +1408,7 @@ export default function AdminPanel() {
                         .filter(h => h.isActive)
                         .sort((a, b) => a.displayOrder - b.displayOrder)
                         .map((heading, index) => (
-                          <div key={index} className="border border-gray-200 rounded-lg p-4 bg-[#F7F9FC]">
+                          <div key={`heading-${heading.displayOrder}-${index}`} className="border border-gray-200 rounded-lg p-4 bg-[#F7F9FC]">
                             <div className="flex justify-between items-start mb-3">
                               <h4 className="text-sm font-semibold text-[#1C1C1C]">Heading {index + 1}</h4>
                               <span className={`text-xs px-2 py-1 rounded-full ${
@@ -1486,7 +1486,7 @@ export default function AdminPanel() {
                               <div className="mt-2 grid grid-cols-2 gap-2">
                                 {hero.backgroundImages.slice(0, 4).map((url, index) => (
                                   <Image 
-                                    key={index}
+                                    key={`hero-bg-${index}-${url.slice(-10)}`}
                                     src={url} 
                                     alt={`Background ${index + 1}`}
                                     width={200}

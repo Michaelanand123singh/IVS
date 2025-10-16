@@ -30,7 +30,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File is required' }, { status: 400 });
     }
 
-    const { apiKey, apiSecret, apiBaseUrl, cloudName } = getCloudinaryConfig();
+    // Check if file is too large (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 });
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'File type not supported. Please upload JPEG, PNG, WebP, GIF, or SVG' }, { status: 400 });
+    }
+
+    let cloudinaryConfig;
+    try {
+      cloudinaryConfig = getCloudinaryConfig();
+    } catch (err) {
+      console.error('Cloudinary configuration error:', err);
+      return NextResponse.json({ error: 'Cloudinary configuration error. Please check CLOUDINARY_URL environment variable.' }, { status: 500 });
+    }
+
+    const { apiKey, apiSecret, apiBaseUrl, cloudName } = cloudinaryConfig;
 
     // Prepare upload
     const timestamp = Math.floor(Date.now() / 1000);
@@ -49,8 +68,12 @@ export async function POST(request: NextRequest) {
     const uploadUrl = `${apiBaseUrl}/image/upload`;
     const res = await fetch(uploadUrl, { method: 'POST', body: form });
     const json = await res.json();
+    
     if (!res.ok) {
-      return NextResponse.json({ error: json.error?.message || 'Upload failed' }, { status: 500 });
+      console.error('Cloudinary upload failed:', json);
+      return NextResponse.json({ 
+        error: json.error?.message || `Upload failed with status ${res.status}` 
+      }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -62,9 +85,11 @@ export async function POST(request: NextRequest) {
       resource_type: json.resource_type,
       cloud_name: cloudName,
     });
-  } catch {
-    console.error('Cloudinary upload failed');
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+  } catch (err) {
+    console.error('Cloudinary upload failed:', err);
+    return NextResponse.json({ 
+      error: err instanceof Error ? err.message : 'Failed to upload image' 
+    }, { status: 500 });
   }
 }
 
