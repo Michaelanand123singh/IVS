@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IContact extends Document {
   name: string;
   email: string;
+  mobile?: string;
   company?: string;
   service: string;
   message: string;
@@ -23,6 +24,12 @@ const ContactSchema = new Schema<IContact>({
     trim: true,
     lowercase: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email address']
+  },
+  mobile: {
+    type: String,
+    trim: true,
+    match: [/^[\+]?[1-9][\d]{0,15}$/, 'Please provide a valid mobile number'],
+    maxlength: [20, 'Mobile number cannot be more than 20 characters']
   },
   company: {
     type: String,

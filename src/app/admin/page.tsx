@@ -12,6 +12,7 @@ interface Contact {
   id: string;
   name: string;
   email: string;
+  mobile?: string;
   company?: string;
   service: string;
   message: string;
@@ -919,6 +920,9 @@ export default function AdminPanel() {
                                 <span className="text-xs flex-shrink-0">{getStatusIcon(contact.status)}</span>
                               </div>
                               <p className="text-xs sm:text-sm text-[#555555] truncate">{contact.email}</p>
+                              {contact.mobile && (
+                                <p className="text-xs text-[#555555] truncate">📱 {contact.mobile}</p>
+                              )}
                               <p className="text-xs text-[#F47A21] font-medium truncate">{contact.service}</p>
                               <p className="text-xs text-gray-400 mt-1">
                                 {new Date(contact.submitted_at).toLocaleString()}
@@ -950,6 +954,12 @@ export default function AdminPanel() {
                           <label className="block text-sm font-medium text-[#555555] mb-1">Email</label>
                           <p className="text-sm text-[#1C1C1C]">{selectedContact.email}</p>
                         </div>
+                        {selectedContact.mobile && (
+                          <div>
+                            <label className="block text-sm font-medium text-[#555555] mb-1">Mobile</label>
+                            <p className="text-sm text-[#1C1C1C]">📱 {selectedContact.mobile}</p>
+                          </div>
+                        )}
                         {selectedContact.company && (
                           <div>
                             <label className="block text-sm font-medium text-[#555555] mb-1">Company</label>

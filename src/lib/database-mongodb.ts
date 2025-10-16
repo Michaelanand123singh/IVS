@@ -9,6 +9,7 @@ export interface ContactSubmission {
   id?: string;
   name: string;
   email: string;
+  mobile?: string;
   company?: string;
   service: string;
   message: string;
@@ -22,6 +23,7 @@ export async function createContact(contact: Omit<ContactSubmission, 'id' | 'sub
   const newContact = new Contact({
     name: contact.name,
     email: contact.email,
+    mobile: contact.mobile || '',
     company: contact.company || '',
     service: contact.service,
     message: contact.message,
@@ -45,6 +47,7 @@ export async function getAllContacts(): Promise<ContactSubmission[]> {
       id: String(contactData._id),
       name: contactData.name,
       email: contactData.email,
+      mobile: contactData.mobile,
       company: contactData.company,
       service: contactData.service,
       message: contactData.message,

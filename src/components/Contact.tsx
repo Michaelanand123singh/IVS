@@ -6,6 +6,7 @@ export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    mobile: '',
     company: '',
     service: '',
     message: ''
@@ -33,7 +34,7 @@ export default function Contact() {
 
       if (response.ok) {
         setSuccess(true);
-        setFormData({ name: '', email: '', company: '', service: '', message: '' });
+        setFormData({ name: '', email: '', mobile: '', company: '', service: '', message: '' });
       } else {
         setError(data.error || 'Failed to send message. Please try again.');
       }
@@ -152,6 +153,16 @@ export default function Contact() {
                   name="email"
                   placeholder="Email Address" 
                   value={formData.email}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
+                />
+              </div>
+              <div>
+                <input 
+                  type="tel"
+                  name="mobile"
+                  placeholder="Mobile Number (Optional)" 
+                  value={formData.mobile}
                   onChange={handleChange}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />

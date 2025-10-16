@@ -5,7 +5,7 @@ import { sendUserConfirmationEmail, sendAdminNotificationEmail } from '@/lib/ema
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, company, service, message } = body;
+    const { name, email, mobile, company, service, message } = body;
 
     // Validate required fields
     if (!name || !email || !service || !message) {
@@ -24,10 +24,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate mobile number format if provided
+    if (mobile && mobile.trim()) {
+      const mobileRegex = /^[\+]?[1-9][\d]{0,15}$/;
+      if (!mobileRegex.test(mobile.trim())) {
+        return NextResponse.json(
+          { error: 'Invalid mobile number format' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Save to database
     const contactData = {
       name: name.trim(),
       email: email.trim().toLowerCase(),
+      mobile: mobile?.trim() || '',
       company: company?.trim() || '',
       service: service.trim(),
       message: message.trim(),
