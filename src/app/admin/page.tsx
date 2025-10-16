@@ -589,10 +589,13 @@ export default function AdminPanel() {
           setTestimonials(testimonialsData.testimonials || []);
         }
       } else {
-        console.error('Failed to delete testimonial');
+        const errorData = await response.json();
+        console.error('Failed to delete testimonial:', errorData);
+        alert(`Failed to delete testimonial: ${errorData.error || 'Unknown error'}`);
       }
     } catch (err) {
       console.error('Failed to delete testimonial:', err);
+      alert('Failed to delete testimonial. Please try again.');
     }
   };
 

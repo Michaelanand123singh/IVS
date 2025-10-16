@@ -21,11 +21,18 @@ export async function GET(request: NextRequest) {
 
     await connectToDatabase();
     
-    const testimonials = await Testimonial.find({ isActive: true })
+    const testimonials = await Testimonial.find({})
       .sort({ displayOrder: 1, created_at: -1 })
       .lean();
 
-    return NextResponse.json({ testimonials });
+    // Transform _id to id for frontend compatibility
+    const transformedTestimonials = testimonials.map(testimonial => ({
+      ...testimonial,
+      id: (testimonial as { _id: { toString(): string } })._id.toString(),
+      _id: undefined
+    }));
+
+    return NextResponse.json({ testimonials: transformedTestimonials });
   } catch (err) {
     console.error('Error fetching testimonials from database:', err);
     
@@ -86,7 +93,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       message: 'Testimonial created successfully', 
       testimonial: {
-        id: testimonial._id,
+        id: testimonial._id.toString(),
         quote: testimonial.quote,
         author: testimonial.author,
         role: testimonial.role,

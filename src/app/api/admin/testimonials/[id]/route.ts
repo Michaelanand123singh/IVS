@@ -89,7 +89,7 @@ export async function PATCH(
     return NextResponse.json({ 
       message: 'Testimonial updated successfully', 
       testimonial: {
-        id: testimonial._id,
+        id: testimonial._id.toString(),
         quote: testimonial.quote,
         author: testimonial.author,
         role: testimonial.role,
