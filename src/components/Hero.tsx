@@ -149,7 +149,7 @@ export default function Hero() {
       // Change both background image and heading content simultaneously
       setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
-    }, 5000); // 5 seconds for both to change together
+    }, 2000); // 2 seconds for both to change together
     
     return () => clearInterval(carouselInterval);
   }, [heroData?.backgroundImages, activeHeadings.length, isPaused]);
