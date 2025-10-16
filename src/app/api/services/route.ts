@@ -11,7 +11,14 @@ export async function GET() {
       .select('title description icon items learnMore')
       .lean();
 
-    return NextResponse.json({ services });
+    // Transform _id to id for frontend compatibility
+    const transformedServices = services.map(service => ({
+      ...service,
+      id: (service as { _id: { toString(): string } })._id.toString(),
+      _id: undefined
+    }));
+
+    return NextResponse.json({ services: transformedServices });
   } catch (err) {
     console.error('Error fetching services from database:', err);
     

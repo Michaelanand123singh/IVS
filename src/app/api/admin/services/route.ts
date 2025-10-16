@@ -25,7 +25,14 @@ export async function GET(request: NextRequest) {
       .sort({ displayOrder: 1, created_at: -1 })
       .lean();
 
-    return NextResponse.json({ services });
+    // Transform _id to id for frontend compatibility
+    const transformedServices = services.map(service => ({
+      ...service,
+      id: (service as { _id: { toString(): string } })._id.toString(),
+      _id: undefined
+    }));
+
+    return NextResponse.json({ services: transformedServices });
   } catch (err) {
     console.error('Error fetching services:', err);
     return NextResponse.json({ error: 'Failed to fetch services' }, { status: 500 });
@@ -76,7 +83,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       message: 'Service created successfully', 
       service: {
-        id: service._id,
+        id: service._id.toString(),
         title: service.title,
         description: service.description,
         icon: service.icon,

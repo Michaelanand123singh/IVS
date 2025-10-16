@@ -417,6 +417,9 @@ export default function AdminPanel() {
           const servicesData = await servicesResponse.json();
           setServices(servicesData.services || []);
         }
+      } else {
+        const errorData = await response.json();
+        console.error('Update failed:', errorData);
       }
     } catch (err) {
       console.error('Failed to update service:', err);

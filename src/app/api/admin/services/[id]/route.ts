@@ -99,7 +99,7 @@ export async function PATCH(
     return NextResponse.json({ 
       message: 'Service updated successfully', 
       service: {
-        id: service._id,
+        id: service._id.toString(),
         title: service.title,
         description: service.description,
         icon: service.icon,
