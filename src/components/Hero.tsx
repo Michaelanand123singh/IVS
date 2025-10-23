@@ -148,11 +148,11 @@ export default function Hero() {
     const carouselInterval = setInterval(() => {
       setBgIndex((prev) => {
         // Never reset - just keep incrementing for true infinite scroll
-        // The 400 sets ensure we have enough images for a very long time
+        // The 10 sets ensure we have enough images for a very long time
         return prev + 1;
       });
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
-    }, 2000); // 2 seconds for both to change together
+    }, 3000); // 3 seconds for smoother, more premium feel
     
     return () => clearInterval(carouselInterval);
   }, [heroData?.backgroundImages, activeHeadings.length, isPaused]);
@@ -234,11 +234,15 @@ export default function Hero() {
           className="flex h-full w-full"
           animate={{ 
             x: `${-bgIndex * 100}%`,
-            transition: { duration: 1.2, ease: "easeInOut" }
+            transition: { 
+              duration: 1.5, 
+              ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
+              type: "tween"
+            }
           }}
         >
-          {/* Create multiple copies for true infinite effect */}
-          {Array.from({ length: 400 }, (_, setIndex) => 
+          {/* Create many copies for true infinite effect */}
+          {Array.from({ length: 10 }, (_, setIndex) => 
             heroData.backgroundImages.map((image, index) => (
               <div
                 key={`set-${setIndex}-image-${index}`}
@@ -251,8 +255,20 @@ export default function Hero() {
           )}
         </motion.div>
 
-        {/* Dark overlay for readability */}
-        <div className="absolute inset-0 bg-black/60" aria-hidden="true"></div>
+        {/* Premium gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
+        
+        {/* Subtle animated overlay for premium feel */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
+          animate={{ x: ['-100%', '100%'] }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          aria-hidden="true"
+        />
         
       </div>
 
@@ -263,23 +279,41 @@ export default function Hero() {
           {activeHeadings.length > 0 ? (
             <motion.div
               key={headingIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 1.05 }}
+              transition={{ 
+                duration: 0.8,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                type: "tween"
+              }}
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+              <motion.h1 
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+              >
                 {activeHeadings[headingIndex].title}
-                <span className="block text-amber-400 mt-2 sm:mt-4">
+                <motion.span 
+                  className="block text-amber-400 mt-2 sm:mt-4"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                >
                   {activeHeadings[headingIndex].subtitle}
-                </span>
-              </h1>
+                </motion.span>
+              </motion.h1>
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 0.8,
+                ease: [0.25, 0.46, 0.45, 0.94],
+                type: "tween"
+              }}
             >
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 Welcome to Our Platform
@@ -290,41 +324,57 @@ export default function Hero() {
             </motion.div>
           )}
 
-          {/* Static Description */}
+          {/* Dynamic Description */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            key={`desc-${headingIndex}`}
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 1.02 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: 0.3,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
           >
             <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200 max-w-4xl mx-auto leading-relaxed">
               {activeHeadings.length > 0 
-                ? activeHeadings[0].description // Use first heading's description as static
+                ? activeHeadings[headingIndex].description // Use current heading's description
                 : 'We help businesses transform and grow with cutting-edge technology solutions.'
               }
             </p>
           </motion.div>
           
-          {/* Static Buttons */}
+          {/* Dynamic Buttons */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            key={`buttons-${headingIndex}`}
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -50, scale: 1.05 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: 0.5,
+              ease: [0.25, 0.46, 0.45, 0.94]
+            }}
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mt-8 sm:mt-12"
           >
-            <a
-              href={activeHeadings.length > 0 ? activeHeadings[0].primaryButtonLink : '#contact'}
-              className="bg-amber-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-700 transition text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px]"
-              aria-label={activeHeadings.length > 0 ? activeHeadings[0].primaryButtonText : 'Get Started'}
+            <motion.a
+              href={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonLink : '#contact'}
+              className="bg-amber-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-700 transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {activeHeadings.length > 0 ? activeHeadings[0].primaryButtonText : 'Get Started'}
-            </a>
-            <a
-              href={activeHeadings.length > 0 ? activeHeadings[0].secondaryButtonLink : '#services'}
-              className="border-2 border-amber-500 text-amber-400 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-500 hover:text-white transition text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px]"
-              aria-label={activeHeadings.length > 0 ? activeHeadings[0].secondaryButtonText : 'Learn More'}
+              {activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
+            </motion.a>
+            <motion.a
+              href={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonLink : '#services'}
+              className="border-2 border-amber-500 text-amber-400 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-500 hover:text-white transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
             >
-              {activeHeadings.length > 0 ? activeHeadings[0].secondaryButtonText : 'Learn More'}
-            </a>
+              {activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
+            </motion.a>
           </motion.div>
         </div>
 
