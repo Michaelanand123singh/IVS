@@ -86,7 +86,7 @@ export default function Contact() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-[#555555]">Phone</p>
-                  <p className="text-[#1C1C1C]">+971561498035</p>
+                  <p className="text-[#1C1C1C]">+971 XXXXXXX</p>
                 </div>
               </div>
               <div className="flex items-center p-3 rounded-lg bg-[#F7F9FC]">

@@ -146,8 +146,16 @@ export default function Hero() {
     if (!heroData?.backgroundImages?.length || !activeHeadings.length || isPaused) return;
     
     const carouselInterval = setInterval(() => {
-      // Change both background image and heading content simultaneously
-      setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
+      setBgIndex((prev) => {
+        const nextIndex = prev + 1;
+        // When we reach the end of the first set, continue to the second set
+        // The second set is identical to the first, creating seamless loop
+        if (nextIndex >= heroData.backgroundImages.length * 2) {
+          // Reset to the beginning of the first set without animation
+          return 0;
+        }
+        return nextIndex;
+      });
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
     }, 2000); // 2 seconds for both to change together
     
@@ -174,10 +182,23 @@ export default function Hero() {
         e.preventDefault();
         if (deltaX > 0) {
           // Swipe right - go to previous image
-          setBgIndex((prev) => prev === 0 ? heroData!.backgroundImages.length - 1 : prev - 1);
+          setBgIndex((prev) => {
+            if (prev === 0) {
+              // If at first image, go to last image of the second set
+              return heroData!.backgroundImages.length * 2 - 1;
+            }
+            return prev - 1;
+          });
         } else {
           // Swipe left - go to next image
-          setBgIndex((prev) => (prev + 1) % heroData!.backgroundImages.length);
+          setBgIndex((prev) => {
+            const nextIndex = prev + 1;
+            if (nextIndex >= heroData!.backgroundImages.length * 2) {
+              // Reset to beginning of first set for seamless loop
+              return 0;
+            }
+            return nextIndex;
+          });
         }
       }
     };
@@ -222,16 +243,17 @@ export default function Hero() {
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
     >
-      {/* --- BACKGROUND IMAGE CAROUSEL - HORIZONTAL SCROLL --- */}
+      {/* --- BACKGROUND IMAGE CAROUSEL - INFINITE LOOP --- */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <motion.div 
           className="flex h-full w-full"
           animate={{ x: `${-bgIndex * 100}%` }}
           transition={{ duration: 1.2, ease: "easeInOut" }}
         >
-          {heroData.backgroundImages.map((image, index) => (
+          {/* Create infinite loop by duplicating the entire image set */}
+          {[...heroData.backgroundImages, ...heroData.backgroundImages].map((image, index) => (
             <div
-              key={index}
+              key={`image-${index}`}
               className="flex-shrink-0 w-full h-full bg-cover bg-center"
               style={{
                 backgroundImage: `url(${image})`,

@@ -50,7 +50,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-[#1C1C1C] mb-3">Contact</h4>
             <ul className="space-y-2 text-sm text-[#555555]">
               <li>info@ivsdxb.com</li>
-              <li>+971561498035</li>
+              <li>+971 XXXXXXX</li>
               <li>www.ivsdxb.com</li>
             </ul>
           </div>
