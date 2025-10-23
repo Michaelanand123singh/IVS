@@ -147,14 +147,9 @@ export default function Hero() {
     
     const carouselInterval = setInterval(() => {
       setBgIndex((prev) => {
-        const nextIndex = prev + 1;
-        // When we reach the end of the first set, continue to the second set
-        // The second set is identical to the first, creating seamless loop
-        if (nextIndex >= heroData.backgroundImages.length * 2) {
-          // Reset to the beginning of the first set without animation
-          return 0;
-        }
-        return nextIndex;
+        // Never reset - just keep incrementing for true infinite scroll
+        // The 400 sets ensure we have enough images for a very long time
+        return prev + 1;
       });
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
     }, 2000); // 2 seconds for both to change together
@@ -183,22 +178,12 @@ export default function Hero() {
         if (deltaX > 0) {
           // Swipe right - go to previous image
           setBgIndex((prev) => {
-            if (prev === 0) {
-              // If at first image, go to last image of the second set
-              return heroData!.backgroundImages.length * 2 - 1;
-            }
-            return prev - 1;
+            // Allow going back, but don't go below 0
+            return Math.max(0, prev - 1);
           });
         } else {
           // Swipe left - go to next image
-          setBgIndex((prev) => {
-            const nextIndex = prev + 1;
-            if (nextIndex >= heroData!.backgroundImages.length * 2) {
-              // Reset to beginning of first set for seamless loop
-              return 0;
-            }
-            return nextIndex;
-          });
+          setBgIndex((prev) => prev + 1);
         }
       }
     };
@@ -243,23 +228,27 @@ export default function Hero() {
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
     >
-      {/* --- BACKGROUND IMAGE CAROUSEL - INFINITE LOOP --- */}
+      {/* --- BACKGROUND IMAGE CAROUSEL - TRUE INFINITE LOOP --- */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <motion.div 
           className="flex h-full w-full"
-          animate={{ x: `${-bgIndex * 100}%` }}
-          transition={{ duration: 1.2, ease: "easeInOut" }}
+          animate={{ 
+            x: `${-bgIndex * 100}%`,
+            transition: { duration: 1.2, ease: "easeInOut" }
+          }}
         >
-          {/* Create infinite loop by duplicating the entire image set */}
-          {[...heroData.backgroundImages, ...heroData.backgroundImages].map((image, index) => (
-            <div
-              key={`image-${index}`}
-              className="flex-shrink-0 w-full h-full bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${image})`,
-              }}
-            />
-          ))}
+          {/* Create multiple copies for true infinite effect */}
+          {Array.from({ length: 400 }, (_, setIndex) => 
+            heroData.backgroundImages.map((image, index) => (
+              <div
+                key={`set-${setIndex}-image-${index}`}
+                className="flex-shrink-0 w-full h-full bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${image})`,
+                }}
+              />
+            ))
+          )}
         </motion.div>
 
         {/* Dark overlay for readability */}
