@@ -6,7 +6,6 @@ export default function Contact() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    mobile: '',
     company: '',
     service: '',
     message: ''
@@ -34,7 +33,7 @@ export default function Contact() {
 
       if (response.ok) {
         setSuccess(true);
-        setFormData({ name: '', email: '', mobile: '', company: '', service: '', message: '' });
+        setFormData({ name: '', email: '', company: '', service: '', message: '' });
       } else {
         setError(data.error || 'Failed to send message. Please try again.');
       }
@@ -76,17 +75,6 @@ export default function Contact() {
                 <div className="ml-3">
                   <p className="text-sm font-medium text-[#555555]">Email</p>
                   <p className="text-[#1C1C1C]">info@ivsdxb.com</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 rounded-lg bg-[#F7F9FC]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1F4E79]/10 text-[#1F4E79]">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-[#555555]">Phone</p>
-                  <p className="text-[#1C1C1C]">+971 XXXXXXX</p>
                 </div>
               </div>
               <div className="flex items-center p-3 rounded-lg bg-[#F7F9FC]">
@@ -153,16 +141,6 @@ export default function Contact() {
                   name="email"
                   placeholder="Email Address" 
                   value={formData.email}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
-                />
-              </div>
-              <div>
-                <input 
-                  type="tel"
-                  name="mobile"
-                  placeholder="Mobile Number (Optional)" 
-                  value={formData.mobile}
                   onChange={handleChange}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
