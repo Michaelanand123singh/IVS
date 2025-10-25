@@ -76,12 +76,11 @@ export default function Services() {
   return (
     <section id="services" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="services-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow="What we do"
-          title="Our Services"
-          subtitle="Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services. Our suite of services spans implementation, support, customization, advanced analytics, cloud based applications, and AI solutions, ensuring your ERP and applications investment delivers maximum value from day one through long-term optimization."
-          align="left"
-        />
+        <div className="flex flex-col items-start text-left">
+          <span className="text-sm font-semibold uppercase tracking-wider text-[#ee8034]">What we do</span>
+          <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#1C1C1C] sm:text-3xl lg:text-4xl">Our Services</h2>
+          <p className="mt-3 w-full text-[#555555] leading-relaxed">Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services. Our suite of services spans implementation, support, customization, advanced analytics, cloud based applications, and AI solutions, ensuring your ERP and applications investment delivers maximum value from day one through long-term optimization.</p>
+        </div>
         <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="List of services offered">
           {displayedServices.map((s) => (
             <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
