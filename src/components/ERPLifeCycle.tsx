@@ -154,7 +154,7 @@ export default function ERPLifeCycle() {
             <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px] xl:h-[600px]">
               
               {/* Central Timeline Line */}
-              <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-300 transform -translate-y-1/2"></div>
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-300 transform -translate-y-1/2 z-0"></div>
               
               {/* Icons on Timeline */}
             {lifeCycleSteps.map((step, index) => {
@@ -164,7 +164,7 @@ export default function ERPLifeCycle() {
               return (
                   <div
                     key={`icon-${step.id}`}
-                    className={`absolute transition-all duration-1000 ease-out ${
+                    className={`absolute transition-all duration-1000 ease-out z-30 ${
                       isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
                     }`}
                     style={{
@@ -198,7 +198,7 @@ export default function ERPLifeCycle() {
                 return (
                   <div
                     key={`line-${step.id}`}
-                    className={`absolute w-0.5 bg-gray-300 transition-all duration-1000 ${
+                    className={`absolute w-0.5 bg-gray-300 transition-all duration-1000 z-10 ${
                       isVisible ? 'opacity-100' : 'opacity-0'
                     }`}
                     style={{ 
@@ -222,7 +222,7 @@ export default function ERPLifeCycle() {
                 return (
                   <div
                     key={`card-${step.id}`}
-                    className={`absolute transition-all duration-1000 ease-out group ${
+                    className={`absolute transition-all duration-1000 ease-out group z-20 ${
                       isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
                     }`}
                     style={{

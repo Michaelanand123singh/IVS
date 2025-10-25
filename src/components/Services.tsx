@@ -130,7 +130,7 @@ export default function Services() {
                   <div className="mt-4">
                     <button
                       onClick={() => handleLearnMore(s)}
-                      className="text-[#1F4E79] hover:text-[#1a4268] font-medium underline decoration-2 underline-offset-2 hover:decoration-[#1a4268] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-1 rounded-sm"
+                      className="text-[#1F4E79] hover:text-[#1a4268] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-1 rounded-sm"
                     >
                       Read more
                     </button>
