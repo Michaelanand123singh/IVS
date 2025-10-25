@@ -86,13 +86,13 @@ export default function Services() {
           {displayedServices.map((s) => (
             <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
               <div className="relative">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden mx-auto">
                   {s.icon ? (
                     <Image
                       src={s.icon}
                       alt={`${s.title} icon`}
-                      width={32}
-                      height={32}
+                      width={40}
+                      height={40}
                       className="object-contain"
                       onError={(e) => {
                         // Fallback to default icon if image fails to load
@@ -102,7 +102,7 @@ export default function Services() {
                     />
                   ) : null}
                   <svg 
-                    className={`h-6 w-6 ${s.icon ? 'hidden' : 'block'}`} 
+                    className={`h-8 w-8 ${s.icon ? 'hidden' : 'block'}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
