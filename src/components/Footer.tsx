@@ -55,7 +55,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-6 sm:mt-8 border-t border-gray-200 pt-4 sm:pt-6 text-center text-xs sm:text-sm text-[#888888]">
-          © {new Date().getFullYear()} Integrated Value Solutions. All rights reserved. | Microsoft Dynamics 365 Business Central Partner
+          © {new Date().getFullYear()} Integrated Value Solutions. All rights reserved. | Microsoft Dynamics Partner
         </div>
       </div>
     </footer>

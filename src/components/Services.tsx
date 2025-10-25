@@ -129,9 +129,17 @@ export default function Services() {
                   <div className="mt-4">
                     <button
                       onClick={() => handleLearnMore(s)}
-                      className="text-[#1F4E79] hover:text-[#1a4268] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-1 rounded-sm"
+                      className="text-[#ee8034] hover:text-[#d66d2a] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#ee8034] focus:ring-offset-1 rounded-sm flex items-center gap-1 group"
                     >
                       Read more
+                      <svg 
+                        className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </button>
                   </div>
                 )}
@@ -144,7 +152,7 @@ export default function Services() {
           <div className="mt-8 sm:mt-12 text-center">
             <button
               onClick={() => setShowAll(!showAll)}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#1F4E79] px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-white font-medium transition-all hover:bg-[#1F4E79]/90 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#ee8034] px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base text-white font-medium transition-all hover:bg-[#d66d2a] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#ee8034] focus:ring-offset-2"
             >
               {showAll ? (
                 <>
