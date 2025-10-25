@@ -104,7 +104,7 @@ export default function EmailTemplateModal({
         
         <p>Our team of certified consultants will review your requirements and get back to you within 24 hours to discuss how we can help transform your business operations.</p>
         
-        <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #F47A21;">
+        <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ee8034;">
             <h3 style="margin-top: 0; color: #1F4E79;">Your Inquiry Details:</h3>
             <p><strong>Service Interest:</strong> {{service}}</p>
             <p><strong>Company:</strong> {{company}}</p>
@@ -193,7 +193,7 @@ export default function EmailTemplateModal({
         
         <p>We're excited to help you transform your business with Microsoft Dynamics 365 Business Central. Your inquiry about <strong>{{service}}</strong> has been received and our expert team is already reviewing your requirements.</p>
         
-        <div style="background-color: #F7F9FC; padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 5px solid #F47A21;">
+        <div style="background-color: #F7F9FC; padding: 25px; border-radius: 10px; margin: 25px 0; border-left: 5px solid #ee8034;">
             <h3 style="margin-top: 0; color: #1F4E79; font-size: 18px;">Your Inquiry Summary</h3>
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
@@ -325,13 +325,13 @@ export default function EmailTemplateModal({
     <title>New Contact Form Submission</title>
 </head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb;">
-    <div style="background-color: #F47A21; color: white; padding: 20px; text-align: center;">
+    <div style="background-color: #ee8034; color: white; padding: 20px; text-align: center;">
         <h1 style="margin: 0;">New Contact Form Submission</h1>
         <p style="margin: 5px 0 0 0;">Integrated Value Solutions</p>
     </div>
     
     <div style="padding: 30px 20px; background-color: white;">
-        <h2 style="color: #F47A21;">Contact Details</h2>
+        <h2 style="color: #ee8034;">Contact Details</h2>
         
         <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1F4E79;">
             <p><strong>Name:</strong> {{name}}</p>
@@ -395,7 +395,7 @@ export default function EmailTemplateModal({
             )}
             <button
               onClick={() => setPreviewMode(!previewMode)}
-              className="px-3 py-1 text-sm bg-[#F47A21] text-white rounded hover:bg-[#e06a1a] transition-colors"
+              className="px-3 py-1 text-sm bg-[#ee8034] text-white rounded hover:bg-[#d66d2a] transition-colors"
             >
               {previewMode ? 'Edit' : 'Preview'}
             </button>
@@ -431,7 +431,7 @@ export default function EmailTemplateModal({
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         template.type === 'user_confirmation' 
                           ? 'bg-blue-100 text-blue-800' 
-                          : 'bg-orange-100 text-orange-800'
+                          : 'bg-[#ee8034]/10 text-[#ee8034]'
                       }`}>
                         {template.type === 'user_confirmation' ? 'User Email' : 'Admin Email'}
                       </span>

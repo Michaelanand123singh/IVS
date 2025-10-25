@@ -90,7 +90,7 @@ export default function Contact() {
               </div>
             </div>
             
-            <div className="mt-6 rounded-lg border border-[#F47A21]/20 bg-[#F47A21]/5 p-4 sm:p-6">
+            <div className="mt-6 rounded-lg border border-[#ee8034]/20 bg-[#ee8034]/5 p-4 sm:p-6">
               <h4 className="text-base font-semibold text-[#1C1C1C] mb-2">Schedule a Free Consultation</h4>
               <p className="text-[#555555] text-sm">
                 Let&apos;s discuss your business requirements and explore how our Dynamics 365 solutions can deliver measurable value for your organization.

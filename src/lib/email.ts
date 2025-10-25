@@ -70,7 +70,7 @@ function getDefaultUserConfirmationTemplate(contactData: ContactFormData): strin
         
         <p>Our team of certified consultants will review your requirements and get back to you within 24 hours to discuss how we can help transform your business operations.</p>
         
-        <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #F47A21;">
+        <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ee8034;">
           <h3 style="margin-top: 0; color: #1F4E79;">Your Inquiry Details:</h3>
           <p><strong>Service Interest:</strong> ${contactData.service}</p>
           ${contactData.company ? `<p><strong>Company:</strong> ${contactData.company}</p>` : ''}
@@ -138,13 +138,13 @@ export async function sendAdminNotificationEmail(contactData: ContactFormData) {
 function getDefaultAdminNotificationTemplate(contactData: ContactFormData): string {
   return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #F47A21; color: white; padding: 20px; text-align: center;">
+      <div style="background-color: #ee8034; color: white; padding: 20px; text-align: center;">
         <h1 style="margin: 0;">New Contact Form Submission</h1>
         <p style="margin: 5px 0 0 0;">Integrated Value Solutions</p>
       </div>
       
       <div style="padding: 30px 20px;">
-        <h2 style="color: #F47A21;">Contact Details</h2>
+        <h2 style="color: #ee8034;">Contact Details</h2>
         
         <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1F4E79;">
           <p><strong>Name:</strong> ${contactData.name}</p>
@@ -158,7 +158,7 @@ function getDefaultAdminNotificationTemplate(contactData: ContactFormData): stri
           <p><strong>Submitted:</strong> ${new Date().toLocaleString()}</p>
         </div>
         
-        <div style="background-color: #F47A21/10; padding: 15px; border-radius: 8px; border-left: 4px solid #F47A21;">
+        <div style="background-color: #ee8034/10; padding: 15px; border-radius: 8px; border-left: 4px solid #ee8034;">
           <p style="margin: 0; color: #1C1C1C;"><strong>Action Required:</strong> Please respond to this inquiry within 24 hours.</p>
         </div>
       </div>

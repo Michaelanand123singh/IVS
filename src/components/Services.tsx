@@ -86,7 +86,7 @@ export default function Services() {
           {displayedServices.map((s) => (
             <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
               <div className="relative">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#1F4E79]/10 to-[#1F4E79]/20 text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden">
                   {s.icon ? (
                     <Image
                       src={s.icon}
@@ -116,7 +116,7 @@ export default function Services() {
                   <ul className="mt-4 space-y-2">
                     {s.items.map((item) => (
                       <li key={item} className="flex items-start text-sm text-[#555555]">
-                        <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#F47A21]" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#ee8034]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {item}

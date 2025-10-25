@@ -719,7 +719,7 @@ export default function AdminPanel() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-red-100 text-red-800 border-red-200';
-      case 'contacted': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'contacted': return 'bg-[#ee8034]/10 text-[#ee8034] border-[#ee8034]/20';
       case 'closed': return 'bg-green-100 text-green-800 border-green-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -821,14 +821,14 @@ export default function AdminPanel() {
 
             <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 shadow-sm border border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-2 sm:mb-0">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-[#ee8034]/10 rounded-lg flex items-center justify-center mb-2 sm:mb-0">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-[#ee8034]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
                 <div className="sm:ml-3 lg:ml-4">
                   <p className="text-xs sm:text-sm font-medium text-[#555555]">Contacted</p>
-                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-yellow-600">{stats.contactedContacts}</p>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-[#ee8034]">{stats.contactedContacts}</p>
                 </div>
               </div>
             </div>
@@ -923,7 +923,7 @@ export default function AdminPanel() {
                               {contact.mobile && (
                                 <p className="text-xs text-[#555555] truncate">📱 {contact.mobile}</p>
                               )}
-                              <p className="text-xs text-[#F47A21] font-medium truncate">{contact.service}</p>
+                              <p className="text-xs text-[#ee8034] font-medium truncate">{contact.service}</p>
                               <p className="text-xs text-gray-400 mt-1">
                                 {new Date(contact.submitted_at).toLocaleString()}
                               </p>
@@ -968,7 +968,7 @@ export default function AdminPanel() {
                         )}
                         <div>
                           <label className="block text-sm font-medium text-[#555555] mb-1">Service Interest</label>
-                          <p className="text-sm text-[#F47A21] font-medium">{selectedContact.service}</p>
+                          <p className="text-sm text-[#ee8034] font-medium">{selectedContact.service}</p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-[#555555] mb-1">Message</label>
@@ -1114,7 +1114,7 @@ export default function AdminPanel() {
                             setEditingTemplate(template);
                             setShowEmailModal(true);
                           }}
-                          className="flex-1 border border-[#F47A21] text-[#F47A21] px-3 py-2 rounded text-xs sm:text-sm hover:bg-[#F47A21]/10 transition-colors"
+                          className="flex-1 border border-[#ee8034] text-[#ee8034] px-3 py-2 rounded text-xs sm:text-sm hover:bg-[#ee8034]/10 transition-colors"
                         >
                           Preview
                         </button>
@@ -1222,7 +1222,7 @@ export default function AdminPanel() {
                           <div className="space-y-1">
                             {service.items.slice(0, 3).map((item, index) => (
                               <div key={`${service.id}-item-${index}`} className="flex items-start text-sm text-[#555555]">
-                                <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#F47A21]" fill="currentColor" viewBox="0 0 20 20">
+                                <svg className="mr-2 mt-0.5 h-3 w-3 flex-shrink-0 text-[#ee8034]" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
                                 <span className="truncate">{item}</span>

@@ -35,7 +35,7 @@ const lifeCycleSteps: LifeCycleStep[] = [
     id: 3,
     title: "Execution",
     icon: "⚙️",
-    color: "bg-orange-500",
+    color: "bg-[#ee8034]",
     description: "Implement ERP system, configure modules, and integrate with existing systems",
     duration: "",
     phase: "Execution"
@@ -266,7 +266,7 @@ export default function ERPLifeCycle() {
                 <span className="text-sm font-medium text-gray-700">
                   Complete ERP Implementation Journey
                 </span>
-                <div className="w-3 h-3 bg-[#F47A21] rounded-full"></div>
+                <div className="w-3 h-3 bg-[#ee8034] rounded-full"></div>
               </div>
           </div>
         </div>

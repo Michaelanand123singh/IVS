@@ -34,19 +34,19 @@ export default function Header() {
         <nav className="hidden items-center gap-8 md:flex text-sm font-medium" role="navigation" aria-label="Main navigation">
           <a href="#services" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="View our services">
             Services
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#ee8034] transition-all duration-300 group-hover:w-full"></span>
           </a>
           <a href="#about" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Learn about Integrated Value Solutions">
             About
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#ee8034] transition-all duration-300 group-hover:w-full"></span>
           </a>
           <a href="#testimonials" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Read client testimonials">
             Testimonials
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#ee8034] transition-all duration-300 group-hover:w-full"></span>
           </a>
           <a href="#contact" className="text-gray-600 transition-all duration-300 hover:text-[#1F4E79] hover:font-semibold relative group" aria-label="Contact us for consultation">
             Contact
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#F47A21] transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-[#1F4E79] to-[#ee8034] transition-all duration-300 group-hover:w-full"></span>
           </a>
         </nav>
 

@@ -22,7 +22,7 @@
   --accent-200: #fed7aa;
   --accent-300: #fdba74;
   --accent-400: #fb923c;
-  --accent-500: #F47A21;
+  --accent-500: #ee8034;
   --accent-600: #ea580c;
   --accent-700: #c2410c;
   --accent-800: #9a3412;
@@ -101,7 +101,7 @@ body {
 }
 
 .bg-gradient-accent {
-  background: linear-gradient(135deg, #F47A21 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #ee8034 0%, #ea580c 100%);
 }
 
 .bg-gradient-light {
@@ -116,7 +116,7 @@ body {
 }
 
 .text-gradient-accent {
-  background: linear-gradient(135deg, #F47A21 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #ee8034 0%, #ea580c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

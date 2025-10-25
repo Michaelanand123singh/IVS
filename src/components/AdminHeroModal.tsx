@@ -595,7 +595,7 @@ export default function AdminHeroModal({
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="px-4 py-2 bg-amber-600 text-white rounded-md hover:bg-amber-700 cursor-pointer">
+                    <label className="px-4 py-2 bg-[#ee8034] text-white rounded-md hover:bg-[#d66d2a] cursor-pointer">
                       <input
                         type="file"
                         accept="image/*"

@@ -296,7 +296,7 @@ export default function Hero() {
               >
                 {activeHeadings[headingIndex].title}
                 <motion.span 
-                  className="block text-amber-400 mt-2 sm:mt-4"
+                  className="block text-[#ee8034] mt-2 sm:mt-4"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.6 }}
@@ -317,7 +317,7 @@ export default function Hero() {
             >
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 Welcome to Our Platform
-                <span className="block text-amber-400 mt-2 sm:mt-4">
+                <span className="block text-[#ee8034] mt-2 sm:mt-4">
                   Your Digital Transformation Partner
                 </span>
               </h1>
@@ -359,7 +359,7 @@ export default function Hero() {
           >
             <motion.a
               href={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonLink : '#contact'}
-              className="bg-amber-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-700 transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="bg-[#ee8034] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#d66d2a] transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
               aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -368,7 +368,7 @@ export default function Hero() {
             </motion.a>
             <motion.a
               href={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonLink : '#services'}
-              className="border-2 border-amber-500 text-amber-400 px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-amber-500 hover:text-white transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="border-2 border-[#ee8034] text-[#ee8034] px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#ee8034] hover:text-white transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
               aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
