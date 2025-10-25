@@ -86,13 +86,13 @@ export default function Services() {
           {displayedServices.map((s) => (
             <article key={s.title} className="group relative overflow-hidden rounded-xl border-professional bg-white p-4 sm:p-6 shadow-professional transition-all duration-300 hover:border-[#1F4E79] hover:shadow-professional-lg hover:-translate-y-1" role="listitem">
               <div className="relative">
-                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden mx-auto">
+                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden mx-auto">
                   {s.icon ? (
                     <Image
                       src={s.icon}
                       alt={`${s.title} icon`}
-                      width={40}
-                      height={40}
+                      width={80}
+                      height={80}
                       className="object-contain"
                       onError={(e) => {
                         // Fallback to default icon if image fails to load
