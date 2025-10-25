@@ -79,7 +79,7 @@ export default function Services() {
         <SectionHeading
           eyebrow="What we do"
           title="Our Services"
-          subtitle="Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services."
+          subtitle="Comprehensive technology solutions for business transformation, from ERP implementation to cutting-edge AI and cloud services. Our suite of services spans implementation, support, customization, advanced analytics, cloud based applications, and AI solutions, ensuring your ERP and applications investment delivers maximum value from day one through long-term optimization."
           align="left"
         />
         <div className="mt-8 sm:mt-12 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="List of services offered">
@@ -130,17 +130,9 @@ export default function Services() {
                   <div className="mt-4">
                     <button
                       onClick={() => handleLearnMore(s)}
-                      className="text-[#ee8034] hover:text-[#d66d2a] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#ee8034] focus:ring-offset-1 rounded-sm flex items-center gap-1 group"
+                      className="text-[#1F4E79] hover:text-[#1a4268] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#1F4E79] focus:ring-offset-1 rounded-sm"
                     >
                       Read more
-                      <svg 
-                        className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
                     </button>
                   </div>
                 )}
