@@ -7,7 +7,6 @@ const logos = [
   { src: "/icon3.png", alt: "Cloud Computing - Scalable Infrastructure" },
   { src: "/icon4.png", alt: "Digital Transformation - Modern Solutions" },
   { src: "/icon5.png", alt: "ERP Implementation - Business Process Automation" },
-  { src: "/icon6.webp", alt: "AI & Machine Learning - Intelligent Systems" },
 ];
 
 export default function LogoStrip() {

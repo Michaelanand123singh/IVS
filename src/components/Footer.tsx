@@ -18,7 +18,7 @@ export default function Footer() {
               />
             </div>
             <p className="text-[#555555] mb-4 text-sm">
-              Your trusted partner for Microsoft Dynamics 365 Business Central success with over 20 years of ERP implementation experience.
+            Your trusted partner for Enterprise Business Solutions with over 20 years of ERP and related Applications implementation experience.
             </p>
             <div className="flex space-x-3">
               <a href="#" className="text-gray-400 hover:text-[#1F4E79] transition-colors">
@@ -36,9 +36,9 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[#1C1C1C] mb-3">Services</h4>
             <ul className="space-y-2 text-sm text-[#555555]">
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Business Central Implementation services">Business Central Implementation</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Business Central Implementation services">Enterprise Business Solutions</a></li>
               <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Support Services for ERP systems">Support Services</a></li>
-              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="LS Central Solutions for retail and hospitality">LS Central Solutions</a></li>
+              <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="LS Central Solutions for retail and hospitality">Point of Sale Solutions</a></li>
               <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Upgrade Services from legacy systems">Upgrade Services</a></li>
               <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="Power BI Integration services">Power BI Integration</a></li>
               <li><a href="#services" className="hover:text-[#1F4E79] transition-colors" aria-label="AI and Machine Learning solutions">AI & ML Solutions</a></li>

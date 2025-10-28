@@ -55,19 +55,12 @@ export default function Contact() {
     <section id="contact" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="contact-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
-          <div className="flex flex-col justify-center">
-            <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C] mb-6">Get Started with Integrated Value Solutions</h2>
+          <div>
+            <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C] mb-6">Get Started with <br /><b>Integrated Value Solutions</b></h2>
             <p className="text-sm sm:text-base text-[#555555] mb-8">
-              Ready to transform your business with Integrated Value Solutions? 
+              Ready to transform your business with Integrated Value Solutions? <br />
               Contact our expert consultants today to discuss your requirements and discover how our comprehensive services can drive operational excellence and business growth.
             </p>
-            
-            <div className="rounded-lg border border-[#ee8034]/20 bg-[#ee8034]/5 p-4 sm:p-6">
-              <h4 className="text-base font-semibold text-[#1C1C1C] mb-2">Schedule a Free Consultation</h4>
-              <p className="text-[#555555] text-sm">
-                Let&apos;s discuss your business requirements and explore how our Dynamics 365 solutions can deliver measurable value for your organization.
-              </p>
-            </div>
           </div>
           
           <div>
