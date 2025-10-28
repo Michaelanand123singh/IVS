@@ -146,11 +146,7 @@ export default function Hero() {
     if (!heroData?.backgroundImages?.length || !activeHeadings.length || isPaused) return;
     
     const carouselInterval = setInterval(() => {
-      setBgIndex((prev) => {
-        // Never reset - just keep incrementing for true infinite scroll
-        // The 10 sets ensure we have enough images for a very long time
-        return prev + 1;
-      });
+      setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
     }, 3000); // 3 seconds for smoother, more premium feel
     
@@ -178,12 +174,12 @@ export default function Hero() {
         if (deltaX > 0) {
           // Swipe right - go to previous image
           setBgIndex((prev) => {
-            // Allow going back, but don't go below 0
-            return Math.max(0, prev - 1);
+            const newIndex = prev - 1;
+            return newIndex < 0 ? (heroData?.backgroundImages?.length || 1) - 1 : newIndex;
           });
         } else {
           // Swipe left - go to next image
-          setBgIndex((prev) => prev + 1);
+          setBgIndex((prev) => (prev + 1) % (heroData?.backgroundImages.length || 1));
         }
       }
     };
@@ -228,32 +224,27 @@ export default function Hero() {
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
     >
-      {/* --- BACKGROUND IMAGE CAROUSEL - TRUE INFINITE LOOP --- */}
+      {/* --- BACKGROUND IMAGE CAROUSEL - FADE IN/FADE OUT --- */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <motion.div 
-          className="flex h-full w-full"
-          animate={{ 
-            x: `${-bgIndex * 100}%`,
-            transition: { 
-              duration: 1.5, 
-              ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
-              type: "tween"
-            }
-          }}
-        >
-          {/* Create many copies for true infinite effect */}
-          {Array.from({ length: 10 }, (_, setIndex) => 
-            heroData.backgroundImages.map((image, index) => (
-              <div
-                key={`set-${setIndex}-image-${index}`}
-                className="flex-shrink-0 w-full h-full bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${image})`,
-                }}
-              />
-            ))
-          )}
-        </motion.div>
+        {heroData.backgroundImages.map((image, index) => (
+          <motion.div
+            key={`image-${index}`}
+            className="absolute inset-0 w-full h-full bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${image})`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: bgIndex % heroData.backgroundImages.length === index ? 1 : 0,
+              transition: { 
+                duration: 1.5, 
+                ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
+                type: "tween"
+              }
+            }}
+            exit={{ opacity: 0 }}
+          />
+        ))}
 
         {/* Premium gradient overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
