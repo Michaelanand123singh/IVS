@@ -10,12 +10,11 @@ export default function About() {
               eyebrow="Who we are"
               title="About Integrated Value Solutions"
               subtitle={
-                "Your trusted partner for Microsoft Dynamics 365 Business Central success with over 20 years of ERP implementation experience."
+                "Your trusted partner for Enterprise Business Solutions with over 20 years of ERP and related Applications implementation experience."
               }
             />
             <p className="mt-4 text-[#555555] leading-relaxed">
-              We specialize in delivering end-to-end Microsoft Dynamics 365 Business Central solutions that drive operational excellence and business transformation. 
-              As your trusted technology partner, we combine deep industry expertise with cutting-edge implementation methodologies to help organizations streamline their business processes, enhance productivity, and achieve sustainable growth.
+            We specialize in delivering end-to-end Enterprise Business Solutions including Microsoft Dynamics 365 Business Central, that drive operational excellence and business transformation. As your trusted technology partner, we combine deep industry expertise with cutting-edge implementation methodologies to help organizations streamline their business processes, enhance productivity, and achieve sustainable growth.
             </p>
           </div>
           <div className="relative">
