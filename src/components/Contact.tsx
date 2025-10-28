@@ -57,7 +57,7 @@ export default function Contact() {
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
           <div>
             <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C] mb-6">Get Started with <br /><b>Integrated Value Solutions</b></h2>
-            <p className="text-sm sm:text-base text-[#555555] mb-8">
+            <p className="text-sm sm:text-base text-[#555555] mb-8 text-justify">
               Ready to transform your business with Integrated Value Solutions? <br />
               Contact our expert consultants today to discuss your requirements and discover how our comprehensive services can drive operational excellence and business growth.
             </p>

@@ -13,7 +13,7 @@ export default function About() {
                 "Your trusted partner for Enterprise Business Solutions with over 20 years of ERP and related Applications implementation experience."
               }
             />
-            <p className="mt-4 text-[#555555] leading-relaxed">
+            <p className="mt-4 text-[#555555] leading-relaxed text-justify">
             We specialize in delivering end-to-end Enterprise Business Solutions including Microsoft Dynamics 365 Business Central, that drive operational excellence and business transformation. As your trusted technology partner, we combine deep industry expertise with cutting-edge implementation methodologies to help organizations streamline their business processes, enhance productivity, and achieve sustainable growth.
             </p>
           </div>
