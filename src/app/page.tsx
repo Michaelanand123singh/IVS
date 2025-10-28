@@ -16,8 +16,8 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
-        <ERPLifeCycle />
         <Services />
+        <ERPLifeCycle />
         <About />
         <StatsBand />
         <Testimonials />

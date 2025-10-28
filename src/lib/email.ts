@@ -15,7 +15,6 @@ export interface ContactFormData {
   name: string;
   email: string;
   company?: string;
-  service: string;
   message: string;
 }
 
@@ -34,7 +33,6 @@ export async function sendUserConfirmationEmail(contactData: ContactFormData) {
         .replace(/\{\{name\}\}/g, contactData.name)
         .replace(/\{\{email\}\}/g, contactData.email)
         .replace(/\{\{company\}\}/g, contactData.company || '')
-        .replace(/\{\{service\}\}/g, contactData.service)
         .replace(/\{\{message\}\}/g, contactData.message);
     }
 
@@ -66,13 +64,12 @@ function getDefaultUserConfirmationTemplate(contactData: ContactFormData): strin
         
         <p>Dear ${contactData.name},</p>
         
-        <p>We have received your inquiry regarding <strong>${contactData.service}</strong> and appreciate your interest in our Microsoft Dynamics 365 Business Central solutions.</p>
+        <p>We have received your inquiry and appreciate your interest in our Microsoft Dynamics 365 Business Central solutions.</p>
         
         <p>Our team of certified consultants will review your requirements and get back to you within 24 hours to discuss how we can help transform your business operations.</p>
         
         <div style="background-color: #F7F9FC; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ee8034;">
           <h3 style="margin-top: 0; color: #1F4E79;">Your Inquiry Details:</h3>
-          <p><strong>Service Interest:</strong> ${contactData.service}</p>
           ${contactData.company ? `<p><strong>Company:</strong> ${contactData.company}</p>` : ''}
           <p><strong>Message:</strong> ${contactData.message}</p>
         </div>
@@ -107,7 +104,7 @@ export async function sendAdminNotificationEmail(contactData: ContactFormData) {
     // Try to get custom template from database
     const template = await getActiveEmailTemplate('admin_notification');
     
-    let subject = `New Contact Form Submission - ${contactData.service}`;
+    let subject = `New Contact Form Submission`;
     let htmlContent = getDefaultAdminNotificationTemplate(contactData);
     
     if (template) {
@@ -116,7 +113,6 @@ export async function sendAdminNotificationEmail(contactData: ContactFormData) {
         .replace(/\{\{name\}\}/g, contactData.name)
         .replace(/\{\{email\}\}/g, contactData.email)
         .replace(/\{\{company\}\}/g, contactData.company || '')
-        .replace(/\{\{service\}\}/g, contactData.service)
         .replace(/\{\{message\}\}/g, contactData.message);
     }
 
@@ -150,7 +146,6 @@ function getDefaultAdminNotificationTemplate(contactData: ContactFormData): stri
           <p><strong>Name:</strong> ${contactData.name}</p>
           <p><strong>Email:</strong> ${contactData.email}</p>
           ${contactData.company ? `<p><strong>Company:</strong> ${contactData.company}</p>` : ''}
-          <p><strong>Service Interest:</strong> ${contactData.service}</p>
           <p><strong>Message:</strong></p>
           <div style="background-color: white; padding: 15px; border-radius: 4px; border-left: 4px solid #1F4E79;">
             ${contactData.message}

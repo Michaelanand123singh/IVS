@@ -8,7 +8,6 @@ export default function Contact() {
     email: '',
     mobile: '',
     company: '',
-    service: '',
     message: ''
   });
   const [loading, setLoading] = useState(false);
@@ -34,7 +33,7 @@ export default function Contact() {
 
       if (response.ok) {
         setSuccess(true);
-        setFormData({ name: '', email: '', mobile: '', company: '', service: '', message: '' });
+        setFormData({ name: '', email: '', mobile: '', company: '', message: '' });
       } else {
         setError(data.error || 'Failed to send message. Please try again.');
       }
@@ -55,43 +54,15 @@ export default function Contact() {
   return (
     <section id="contact" className="bg-gradient-light py-12 sm:py-16" role="region" aria-labelledby="contact-heading">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="text-center mb-8 sm:mb-12">
-          <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C]">Get Started with Integrated Value Solutions</h2>
-          <p className="mt-3 max-w-2xl mx-auto text-sm sm:text-base text-[#555555]">
-            Ready to transform your business with Microsoft Dynamics 365 Business Central? 
-            Contact our expert consultants today to discuss your requirements and discover how our comprehensive services can drive operational excellence and business growth.
-          </p>
-        </div>
-        
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-2">
-          <div>
-            <h3 className="text-lg font-semibold text-[#1C1C1C] mb-6">Contact Information</h3>
-            <div className="space-y-4">
-              <div className="flex items-center p-3 rounded-lg bg-[#F7F9FC]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1F4E79]/10 text-[#1F4E79]">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-[#555555]">Email</p>
-                  <p className="text-[#1C1C1C]">info@ivsdxb.com</p>
-                </div>
-              </div>
-              <div className="flex items-center p-3 rounded-lg bg-[#F7F9FC]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#1F4E79]/10 text-[#1F4E79]">
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-[#555555]">Website</p>
-                  <p className="text-[#1C1C1C]">www.ivsdxb.com</p>
-                </div>
-              </div>
-            </div>
+          <div className="flex flex-col justify-center">
+            <h2 id="contact-heading" className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1C1C1C] mb-6">Get Started with Integrated Value Solutions</h2>
+            <p className="text-sm sm:text-base text-[#555555] mb-8">
+              Ready to transform your business with Integrated Value Solutions? 
+              Contact our expert consultants today to discuss your requirements and discover how our comprehensive services can drive operational excellence and business growth.
+            </p>
             
-            <div className="mt-6 rounded-lg border border-[#ee8034]/20 bg-[#ee8034]/5 p-4 sm:p-6">
+            <div className="rounded-lg border border-[#ee8034]/20 bg-[#ee8034]/5 p-4 sm:p-6">
               <h4 className="text-base font-semibold text-[#1C1C1C] mb-2">Schedule a Free Consultation</h4>
               <p className="text-[#555555] text-sm">
                 Let&apos;s discuss your business requirements and explore how our Dynamics 365 solutions can deliver measurable value for your organization.
@@ -150,7 +121,7 @@ export default function Contact() {
                 <input 
                   type="tel"
                   name="mobile"
-                  placeholder="Mobile Number (Optional)" 
+                  placeholder="Mobile Number" 
                   value={formData.mobile}
                   onChange={handleChange}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
@@ -164,23 +135,6 @@ export default function Contact() {
                   onChange={handleChange}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] placeholder-gray-500 focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20 transition-all duration-300 shadow-sm hover:shadow-md" 
                 />
-              </div>
-              <div>
-                <select 
-                  required
-                  name="service"
-                  value={formData.service}
-                  onChange={handleChange}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-[#1C1C1C] focus:border-[#1F4E79] focus:ring-2 focus:ring-[#1F4E79]/20"
-                >
-                  <option value="">Select Service Interest</option>
-                  <option value="Business Central Implementation">Business Central Implementation</option>
-                  <option value="Support Services">Support Services</option>
-                  <option value="LS Central Solutions">LS Central Solutions</option>
-                  <option value="Upgrade Services">Upgrade Services</option>
-                  <option value="Power BI Integration">Power BI Integration</option>
-                  <option value="System Audit & Optimization">System Audit & Optimization</option>
-                </select>
               </div>
               <div>
                 <textarea 

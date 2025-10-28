@@ -5,10 +5,10 @@ import { sendUserConfirmationEmail, sendAdminNotificationEmail } from '@/lib/ema
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, mobile, company, service, message } = body;
+    const { name, email, mobile, company, message } = body;
 
     // Validate required fields
-    if (!name || !email || !service || !message) {
+    if (!name || !email || !message) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
       email: email.trim().toLowerCase(),
       mobile: mobile?.trim() || '',
       company: company?.trim() || '',
-      service: service.trim(),
       message: message.trim(),
     };
 

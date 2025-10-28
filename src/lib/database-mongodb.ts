@@ -11,7 +11,6 @@ export interface ContactSubmission {
   email: string;
   mobile?: string;
   company?: string;
-  service: string;
   message: string;
   submitted_at: string;
   status: 'new' | 'contacted' | 'closed';
@@ -25,7 +24,6 @@ export async function createContact(contact: Omit<ContactSubmission, 'id' | 'sub
     email: contact.email,
     mobile: contact.mobile || '',
     company: contact.company || '',
-    service: contact.service,
     message: contact.message,
     status: 'new'
   });
@@ -49,7 +47,6 @@ export async function getAllContacts(): Promise<ContactSubmission[]> {
       email: contactData.email,
       mobile: contactData.mobile,
       company: contactData.company,
-      service: contactData.service,
       message: contactData.message,
       submitted_at: contactData.submitted_at.toISOString(),
       status: contactData.status
@@ -69,7 +66,6 @@ export async function getContactById(id: string): Promise<ContactSubmission | nu
     name: contactData.name,
     email: contactData.email,
     company: contactData.company,
-    service: contactData.service,
     message: contactData.message,
     submitted_at: contactData.submitted_at.toISOString(),
     status: contactData.status

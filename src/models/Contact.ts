@@ -5,7 +5,6 @@ export interface IContact extends Document {
   email: string;
   mobile?: string;
   company?: string;
-  service: string;
   message: string;
   submitted_at: Date;
   status: 'new' | 'contacted' | 'closed';
@@ -35,12 +34,6 @@ const ContactSchema = new Schema<IContact>({
     type: String,
     trim: true,
     maxlength: [100, 'Company name cannot be more than 100 characters']
-  },
-  service: {
-    type: String,
-    required: [true, 'Service is required'],
-    trim: true,
-    maxlength: [100, 'Service cannot be more than 100 characters']
   },
   message: {
     type: String,
