@@ -1,0 +1,17 @@
+# Modern browsers only - no legacy support
+# This removes polyfills for older browsers and reduces bundle size
+
+# Last 2 versions of modern browsers
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+
+# Modern mobile browsers
+last 2 iOS versions
+
+# Exclude older browsers
+not IE 11
+not dead
+not op_mini all
+

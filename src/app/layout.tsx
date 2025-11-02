@@ -8,12 +8,18 @@ const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
+  fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
+  preload: false, // Only preload the primary font
+  adjustFontFallback: true,
+  fallback: ['Menlo', 'Monaco', 'Consolas', 'monospace'],
 });
 
 export const metadata: Metadata = generateSEOMetadata();
@@ -29,9 +35,12 @@ export default function RootLayout({
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />
         <StructuredData type="LocalBusiness" />
-        {/* Preconnect to Cloudinary for faster image loading */}
-        <link rel="preconnect" href="https://res.cloudinary.com" />
+        {/* Preconnect to external resources for faster loading */}
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+        {/* Prefetch critical resources */}
+        <link rel="prefetch" href="/api/hero" as="fetch" crossOrigin="anonymous" />
+        <link rel="prefetch" href="/api/services" as="fetch" crossOrigin="anonymous" />
         <link rel="canonical" href="https://www.ivsdxb.com" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
