@@ -225,16 +225,23 @@ export default function Hero() {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
+      style={{ minHeight: '100vh' }}
     >
       {/* --- BACKGROUND IMAGE CAROUSEL - FADE IN/FADE OUT --- */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         {heroData.backgroundImages.map((image, index) => {
           const isActive = bgIndex % heroData.backgroundImages.length === index;
           const isFirstImage = index === 0;
-          // Optimize first image (LCP) more aggressively
-          const optimizedUrl = isFirstImage 
-            ? optimizeHeroImage(image, 1920)
-            : optimizeHeroImage(image, 1600);
+          const isCloudinary = image.includes('res.cloudinary.com');
+          
+          // Calculate optimal size based on common desktop viewports
+          // Most desktop screens are 1920px or less, so optimize for that
+          // But use 1440px for non-first images to save bandwidth
+          const optimizedUrl = isCloudinary
+            ? (isFirstImage 
+                ? optimizeHeroImage(image, 1920)
+                : optimizeHeroImage(image, 1440))
+            : image;
           
           return (
             <motion.div
@@ -252,7 +259,12 @@ export default function Hero() {
               exit={{ opacity: 0 }}
               style={{ 
                 willChange: isActive ? 'opacity' : 'auto',
-                transform: 'translateZ(0)' // Force GPU acceleration
+                transform: 'translateZ(0)', // Force GPU acceleration
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%'
               }}
             >
               <Image
@@ -262,7 +274,8 @@ export default function Hero() {
                 priority={isFirstImage} // Prioritize first image for LCP
                 fetchPriority={isFirstImage ? "high" : "auto"}
                 sizes="100vw"
-                quality={isFirstImage ? 90 : 85}
+                quality={isFirstImage ? 82 : 80}
+                unoptimized={isCloudinary}
                 className="object-cover"
                 style={{
                   objectFit: 'cover',

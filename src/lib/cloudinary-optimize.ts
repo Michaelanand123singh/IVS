@@ -144,11 +144,12 @@ export function getCloudinarySrcSet(
 /**
  * Optimize service icon URL - small icons don't need large images
  * @param url - Original icon URL
- * @param displayWidth - Display width (default: 160 for retina)
+ * @param displayWidth - Display width (default: 160 for retina 2x)
  * @returns Optimized URL
  */
 export function optimizeServiceIcon(url: string, displayWidth: number = 160): string {
-  return optimizeCloudinaryUrl(url, displayWidth, displayWidth, 85, 'auto');
+  // Use 75 quality for icons since they're small, and ensure proper sizing
+  return optimizeCloudinaryUrl(url, displayWidth, displayWidth, 75, 'auto');
 }
 
 /**
@@ -159,6 +160,8 @@ export function optimizeServiceIcon(url: string, displayWidth: number = 160): st
  */
 export function optimizeHeroImage(url: string, viewportWidth: number = 1920): string {
   // Hero images should be high quality but optimized for viewport
-  return optimizeCloudinaryUrl(url, viewportWidth, 1080, 85, 'auto');
+  // Use actual viewport width to avoid oversized images
+  // Limit height to 1080 for desktop (FHD standard)
+  return optimizeCloudinaryUrl(url, viewportWidth, 1080, 82, 'auto');
 }
 

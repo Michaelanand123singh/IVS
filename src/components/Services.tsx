@@ -96,7 +96,8 @@ export default function Services() {
                       className="object-contain"
                       loading="lazy"
                       sizes="80px"
-                      quality={85}
+                      quality={75}
+                      unoptimized={s.icon.includes('res.cloudinary.com')}
                       onError={(e) => {
                         // Fallback to default icon if image fails to load
                         (e.currentTarget as HTMLImageElement).style.display = 'none';
