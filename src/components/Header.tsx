@@ -22,11 +22,13 @@ export default function Header() {
           <Image
             src="/logo.png"
             alt="Integrated Value Solutions - Microsoft Dynamics 365 Business Central Partner"
-            width={160}
-            height={45}
+            width={180}
+            height={50}
             className="h-10 sm:h-12 w-auto"
             priority
-            quality={90}
+            quality={85}
+            sizes="(max-width: 640px) 160px, 180px"
+            fetchPriority="high"
           />
         </Link>
         

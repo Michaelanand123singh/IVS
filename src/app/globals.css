@@ -156,9 +156,20 @@ body {
   background: var(--secondary-400);
 }
 
-/* Smooth transitions */
+/* Smooth transitions - optimized to avoid layout recalculation */
 * {
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Optimize animations to use GPU acceleration */
+.animate-scroll,
+.animate-fade-in-out,
+.animate-fade-in-out-delayed,
+.animate-fade-in-out-delayed-2 {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 /* Hero section animations */
@@ -266,18 +277,42 @@ body {
   animation: pulse 2s ease-in-out infinite;
 }
 
-/* Logo strip scrolling animation */
-@keyframes scroll {
+/* Logo strip scrolling animation - Optimized for smooth performance */
+@keyframes logoScroll {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-33.333%);
+    transform: translate3d(-33.333%, 0, 0);
   }
 }
 
+.logo-scroll-container {
+  width: max-content;
+  animation: logoScroll 30s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize logo items for better performance */
+.logo-item {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth pause on hover */
+.logo-scroll-container:hover {
+  animation-play-state: paused;
+}
+
+/* Legacy support for old class name */
 .animate-scroll {
-  animation: scroll 30s linear infinite;
+  animation: logoScroll 30s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .hover\:pause-animation:hover {

@@ -5,6 +5,7 @@ import SectionHeading from "@/components/SectionHeading";
 import ServiceModal from "@/components/ServiceModal";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { optimizeServiceIcon } from "@/lib/cloudinary-optimize";
 
 export default function Services() {
   const [services, setServices] = useState<Service[]>([]);
@@ -88,11 +89,14 @@ export default function Services() {
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-xl text-[#1F4E79] shadow-sm group-hover:shadow-md transition-all duration-300 overflow-hidden mx-auto">
                   {s.icon ? (
                     <Image
-                      src={s.icon}
+                      src={s.icon.includes('res.cloudinary.com') ? optimizeServiceIcon(s.icon, 160) : s.icon}
                       alt={`${s.title} icon`}
                       width={80}
                       height={80}
                       className="object-contain"
+                      loading="lazy"
+                      sizes="80px"
+                      quality={85}
                       onError={(e) => {
                         // Fallback to default icon if image fails to load
                         (e.currentTarget as HTMLImageElement).style.display = 'none';

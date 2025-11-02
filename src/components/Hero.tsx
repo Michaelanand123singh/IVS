@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { optimizeHeroImage } from "@/lib/cloudinary-optimize";
 
 interface HeroHeading {
   title: string;
@@ -226,37 +228,68 @@ export default function Hero() {
     >
       {/* --- BACKGROUND IMAGE CAROUSEL - FADE IN/FADE OUT --- */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        {heroData.backgroundImages.map((image, index) => (
-          <motion.div
-            key={`image-${index}`}
-            className="absolute inset-0 w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${image})`,
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: bgIndex % heroData.backgroundImages.length === index ? 1 : 0,
-              transition: { 
-                duration: 1.5, 
-                ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
-                type: "tween"
-              }
-            }}
-            exit={{ opacity: 0 }}
-          />
-        ))}
+        {heroData.backgroundImages.map((image, index) => {
+          const isActive = bgIndex % heroData.backgroundImages.length === index;
+          const isFirstImage = index === 0;
+          // Optimize first image (LCP) more aggressively
+          const optimizedUrl = isFirstImage 
+            ? optimizeHeroImage(image, 1920)
+            : optimizeHeroImage(image, 1600);
+          
+          return (
+            <motion.div
+              key={`image-${index}`}
+              className="absolute inset-0 w-full h-full"
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: isActive ? 1 : 0,
+                transition: { 
+                  duration: 1.5, 
+                  ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
+                  type: "tween"
+                }
+              }}
+              exit={{ opacity: 0 }}
+              style={{ 
+                willChange: isActive ? 'opacity' : 'auto',
+                transform: 'translateZ(0)' // Force GPU acceleration
+              }}
+            >
+              <Image
+                src={optimizedUrl}
+                alt=""
+                fill
+                priority={isFirstImage} // Prioritize first image for LCP
+                fetchPriority={isFirstImage ? "high" : "auto"}
+                sizes="100vw"
+                quality={isFirstImage ? 90 : 85}
+                className="object-cover"
+                style={{
+                  objectFit: 'cover',
+                  objectPosition: 'center',
+                }}
+              />
+            </motion.div>
+          );
+        })}
 
         {/* Premium gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true" style={{ pointerEvents: 'none' }}></div>
         
-        {/* Subtle animated overlay for premium feel */}
+        {/* Subtle animated overlay for premium feel - optimized with transform */}
         <motion.div 
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-          animate={{ x: ['-100%', '100%'] }}
+          animate={{ 
+            x: ['-100%', '100%'],
+          }}
           transition={{ 
             duration: 8,
             repeat: Infinity,
             ease: "linear"
+          }}
+          style={{
+            willChange: 'transform',
+            transform: 'translateZ(0)', // Force GPU acceleration
           }}
           aria-hidden="true"
         />

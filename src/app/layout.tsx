@@ -29,6 +29,9 @@ export default function RootLayout({
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />
         <StructuredData type="LocalBusiness" />
+        {/* Preconnect to Cloudinary for faster image loading */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="canonical" href="https://www.ivsdxb.com" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
