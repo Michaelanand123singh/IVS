@@ -2,7 +2,7 @@ import SectionHeading from "@/components/SectionHeading";
 
 export default function About() {
   return (
-    <section id="about" className="bg-white py-12 sm:py-16">
+    <section id="about" className="bg-gradient-light py-12 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-center">
           <div>
@@ -27,7 +27,9 @@ export default function About() {
                   "Industry expertise across retail, hospitality, and services",
                   "Proven implementation methodology",
                   "Comprehensive service portfolio",
-                  "Long-term strategic partnership"
+                  "Long-term strategic partnership",
+                  "Seamless cloud migration and integration support",
+                  "Robust post-implementation support and training"
                 ].map((item, index) => (
                   <li key={index} className="flex items-start">
                     <div className="mr-3 mt-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#1F4E79]/10">

@@ -133,7 +133,7 @@ export default function Contact() {
                 <textarea 
                   required 
                   name="message"
-                  placeholder="Tell us about your business requirements and current challenges..." 
+                  placeholder="Let us know your business requirement...." 
                   rows={4} 
                   value={formData.message}
                   onChange={handleChange}
