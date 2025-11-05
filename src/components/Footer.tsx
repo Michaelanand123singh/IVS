@@ -49,8 +49,12 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-[#1C1C1C] mb-3">Contact</h4>
             <ul className="space-y-2 text-sm text-[#555555]">
+              <li>Integrated Value Solutions</li>
+              <li>OFFICE BLDG - OF 201</li>
+              <li>Dubai Investment Park First</li>
+              <li>Dubai, United Arab Emirates</li>
               <li>info@ivsdxb.com</li>
-              <li>www.ivsdxb.com</li>
+              <li><a href="https://www.ivsdxb.com" className="hover:text-[#1F4E79] transition-colors" aria-label="Integrated Value Solutions website">www.ivsdxb.com</a></li>
             </ul>
           </div>
         </div>
