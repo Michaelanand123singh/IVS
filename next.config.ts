@@ -36,6 +36,14 @@ const nextConfig: NextConfig = {
     ],
     // Enable image optimization
     formats: ['image/avif', 'image/webp'],
+    // Configure allowed quality values (required in Next.js 16+)
+    // These values are used across the application:
+    // 75: Service icons (small images, lower quality acceptable)
+    // 80: Standard images (Hero non-first, Header)
+    // 82: Hero first image (LCP optimization - balance quality/performance)
+    // 85: Logo strip images (medium quality for branding)
+    // 90: Footer logo (high quality for branding)
+    qualities: [75, 80, 82, 85, 90],
     // Set minimum quality for better compression
     minimumCacheTTL: 60,
     // Device sizes for responsive images

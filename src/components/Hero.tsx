@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { optimizeHeroImage } from "@/lib/cloudinary-optimize";
+import { getHeroImageSrcSet } from "@/lib/cloudinary-optimize";
 
 interface HeroHeading {
   title: string;
@@ -29,6 +29,36 @@ export default function Hero() {
   const [heroData, setHeroData] = useState<HeroData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // Track loaded images
+
+  // Preload first hero image for faster LCP
+  useEffect(() => {
+    const firstImageUrl = heroData?.backgroundImages?.[0];
+    if (!firstImageUrl) return;
+    
+    const isCloudinary = firstImageUrl.includes('res.cloudinary.com');
+    
+    // Get optimized URL for preload
+    const preloadUrl = isCloudinary 
+      ? getHeroImageSrcSet(firstImageUrl, 82).src
+      : firstImageUrl;
+    
+    // Create and add preload link
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = preloadUrl;
+    link.setAttribute('fetchpriority', 'high');
+    document.head.appendChild(link);
+    
+    return () => {
+      // Cleanup: remove preload link when component unmounts
+      const existingLink = document.querySelector(`link[href="${preloadUrl}"]`);
+      if (existingLink) {
+        document.head.removeChild(existingLink);
+      }
+    };
+  }, [heroData?.backgroundImages]);
 
   // Fetch hero data from API
   useEffect(() => {
@@ -148,12 +178,19 @@ export default function Hero() {
     if (!heroData?.backgroundImages?.length || !activeHeadings.length || isPaused) return;
     
     const carouselInterval = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
+      setBgIndex((prev) => {
+        const nextIndex = (prev + 1) % heroData.backgroundImages.length;
+        // Preload next image when carousel is about to change
+        if (!loadedImages.has(nextIndex)) {
+          setLoadedImages(prev => new Set(prev).add(nextIndex));
+        }
+        return nextIndex;
+      });
       setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
     }, 3000); // 3 seconds for smoother, more premium feel
     
     return () => clearInterval(carouselInterval);
-  }, [heroData?.backgroundImages, activeHeadings.length, isPaused]);
+  }, [heroData?.backgroundImages, activeHeadings.length, isPaused, loadedImages]);
 
   // Handle mouse events for pause on hover
   const handleMouseEnter = () => setIsPaused(true);
@@ -234,14 +271,27 @@ export default function Hero() {
           const isFirstImage = index === 0;
           const isCloudinary = image.includes('res.cloudinary.com');
           
-          // Calculate optimal size based on common desktop viewports
-          // Most desktop screens are 1920px or less, so optimize for that
-          // But use 1440px for non-first images to save bandwidth
-          const optimizedUrl = isCloudinary
-            ? (isFirstImage 
-                ? optimizeHeroImage(image, 1920)
-                : optimizeHeroImage(image, 1440))
+          // Only render current image, next image (for smooth transition), and first image
+          // This prevents loading all images at once, significantly improving initial load time
+          const nextIndex = (bgIndex + 1) % heroData.backgroundImages.length;
+          const shouldRender = isActive || index === nextIndex || isFirstImage;
+          
+          // Don't render if image shouldn't be loaded yet
+          if (!shouldRender && !loadedImages.has(index)) {
+            return null;
+          }
+          
+          // Get optimized URL for the image
+          // For Cloudinary: use responsive sizing with auto format (WebP/AVIF)
+          // For non-Cloudinary: use as-is
+          const optimizedUrl = isCloudinary 
+            ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80).src
             : image;
+          
+          // Mark image as loaded when it mounts
+          const handleImageLoad = () => {
+            setLoadedImages(prev => new Set(prev).add(index));
+          };
           
           return (
             <motion.div
@@ -264,7 +314,8 @@ export default function Hero() {
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: '100%'
+                height: '100%',
+                display: shouldRender ? 'block' : 'none' // Hide if not needed
               }}
             >
               <Image
@@ -272,10 +323,12 @@ export default function Hero() {
                 alt=""
                 fill
                 priority={isFirstImage} // Prioritize first image for LCP
-                fetchPriority={isFirstImage ? "high" : "auto"}
-                sizes="100vw"
+                fetchPriority={isFirstImage ? "high" : "low"} // Use low priority for non-first images
+                sizes="100vw" // Full viewport width for hero images
                 quality={isFirstImage ? 82 : 80}
-                unoptimized={isCloudinary}
+                loading={isFirstImage ? "eager" : "lazy"} // Lazy load non-first images
+                unoptimized={isCloudinary} // Cloudinary handles optimization (format, quality, sizing)
+                onLoad={handleImageLoad}
                 className="object-cover"
                 style={{
                   objectFit: 'cover',

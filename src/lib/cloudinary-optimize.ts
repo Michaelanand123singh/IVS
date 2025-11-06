@@ -165,3 +165,44 @@ export function optimizeHeroImage(url: string, viewportWidth: number = 1920): st
   return optimizeCloudinaryUrl(url, viewportWidth, 1080, 82, 'auto');
 }
 
+/**
+ * Get responsive srcSet for hero background images
+ * Optimized for full-width hero sections with proper viewport-based sizing
+ * @param url - Original hero image URL
+ * @param quality - Image quality (default: 82 for hero images)
+ * @returns Object with src, srcSet, and sizes attribute
+ */
+export function getHeroImageSrcSet(
+  url: string,
+  quality: number = 82
+): { src: string; srcSet: string; sizes: string } {
+  // If not a Cloudinary URL, return basic srcSet
+  if (!url.includes('res.cloudinary.com')) {
+    return {
+      src: url,
+      srcSet: '',
+      sizes: '100vw'
+    };
+  }
+
+  // Responsive breakpoints for hero images
+  // Mobile: 640px, Tablet: 1024px, Desktop: 1920px, Large Desktop: 2560px
+  const heroSizes = [640, 768, 1024, 1280, 1920, 2560];
+  
+  const src = optimizeCloudinaryUrl(url, 1920, 1080, quality, 'auto');
+  const srcSet = heroSizes
+    .map((width) => {
+      // Calculate height maintaining 16:9 aspect ratio for hero images
+      const height = Math.round((width * 9) / 16);
+      const optimizedUrl = optimizeCloudinaryUrl(url, width, height, quality, 'auto');
+      return `${optimizedUrl} ${width}w`;
+    })
+    .join(', ');
+
+  return {
+    src,
+    srcSet,
+    sizes: '100vw' // Hero images always take full viewport width
+  };
+}
+
