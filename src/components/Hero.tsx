@@ -264,14 +264,33 @@ export default function Hero() {
         className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed" 
         role="banner"
       >
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 z-10 text-white text-center">
-          <div className="animate-pulse">
-            <div className="h-16 bg-gray-300 rounded mb-4"></div>
-            <div className="h-8 bg-gray-300 rounded mb-6"></div>
-            <div className="h-6 bg-gray-300 rounded mb-8"></div>
-            <div className="flex gap-4 justify-center">
-              <div className="h-12 w-48 bg-gray-300 rounded"></div>
-              <div className="h-12 w-48 bg-gray-300 rounded"></div>
+        {/* Background placeholder with same dimensions */}
+        <div className="absolute inset-0 overflow-hidden hero-bg-container" aria-hidden="true">
+          <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
+        </div>
+        {/* Content skeleton matching final dimensions exactly */}
+        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
+          <div className="space-y-6 sm:space-y-8 hero-content-inner">
+            <div className="hero-heading-container">
+              <div className="animate-pulse">
+                <div className="h-16 sm:h-20 md:h-24 lg:h-28 xl:h-32 bg-gray-300/30 rounded mb-2"></div>
+                <div className="h-12 sm:h-16 md:h-20 lg:h-24 xl:h-28 bg-gray-300/30 rounded"></div>
+              </div>
+            </div>
+            <div className="hero-description-container">
+              <div className="animate-pulse">
+                <div className="h-6 sm:h-8 md:h-10 lg:h-12 bg-gray-300/30 rounded max-w-4xl mx-auto"></div>
+              </div>
+            </div>
+            <div className="hero-buttons-container">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mt-8 sm:mt-12">
+                <div className="animate-pulse">
+                  <div className="h-12 w-48 sm:w-64 bg-gray-300/30 rounded"></div>
+                </div>
+                <div className="animate-pulse">
+                  <div className="h-12 w-48 sm:w-64 bg-gray-300/30 rounded"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -415,40 +434,40 @@ export default function Hero() {
           {activeHeadings.length > 0 ? (
             <motion.div
               key={headingIndex}
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -30, scale: 1.05 }}
+              className="hero-heading-container"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ 
-                duration: 0.8,
+                duration: 0.6,
                 ease: [0.25, 0.46, 0.45, 0.94],
                 type: "tween"
               }}
+              style={{
+                willChange: 'opacity',
+                transform: 'translateZ(0)', // GPU acceleration - doesn't cause layout shifts
+              }}
             >
-              <motion.h1 
-                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6 }}
-              >
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
                 {activeHeadings[headingIndex].title}
-                <motion.span 
-                  className="block text-[#ee8034] mt-2 sm:mt-4"
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                >
+                <span className="block text-[#ee8034] mt-2 sm:mt-4">
                   {activeHeadings[headingIndex].subtitle}
-                </motion.span>
-              </motion.h1>
+                </span>
+              </h1>
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="hero-heading-container"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ 
-                duration: 0.8,
+                duration: 0.6,
                 ease: [0.25, 0.46, 0.45, 0.94],
                 type: "tween"
+              }}
+              style={{
+                willChange: 'opacity',
+                transform: 'translateZ(0)',
               }}
             >
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
@@ -463,13 +482,18 @@ export default function Hero() {
           {/* Dynamic Description */}
           <motion.div
             key={`desc-${headingIndex}`}
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -40, scale: 1.02 }}
+            className="hero-description-container"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ 
-              duration: 0.8, 
-              delay: 0.3,
+              duration: 0.6, 
+              delay: 0.2,
               ease: [0.25, 0.46, 0.45, 0.94]
+            }}
+            style={{
+              willChange: 'opacity',
+              transform: 'translateZ(0)',
             }}
           >
             <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-200 max-w-4xl mx-auto leading-relaxed">
@@ -483,34 +507,34 @@ export default function Hero() {
           {/* Dynamic Buttons */}
           <motion.div
             key={`buttons-${headingIndex}`}
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 1.05 }}
+            className="hero-buttons-container flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mt-8 sm:mt-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ 
-              duration: 0.8, 
-              delay: 0.5,
+              duration: 0.6, 
+              delay: 0.3,
               ease: [0.25, 0.46, 0.45, 0.94]
             }}
-            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mt-8 sm:mt-12"
+            style={{
+              willChange: 'opacity',
+              transform: 'translateZ(0)',
+            }}
           >
-            <motion.a
+            <a
               href={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonLink : '#contact'}
-              className="bg-[#ee8034] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#d66d2a] transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="bg-[#ee8034] text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#d66d2a] transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl"
               aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
             >
               {activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
-            </motion.a>
-            <motion.a
+            </a>
+            <a
               href={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonLink : '#services'}
-              className="border-2 border-[#ee8034] text-[#ee8034] px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#ee8034] hover:text-white transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="border-2 border-[#ee8034] text-[#ee8034] px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#ee8034] hover:text-white transition-all duration-300 text-center text-base sm:text-lg min-w-[200px] sm:min-w-[250px] shadow-lg hover:shadow-xl"
               aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
             >
               {activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
-            </motion.a>
+            </a>
           </motion.div>
         </div>
 

@@ -380,17 +380,97 @@ section[role="banner"] [data-nimg] {
   max-height: 100vh !important;
   object-fit: cover !important;
   object-position: center !important;
-  contain: layout style paint;
+  contain: layout style paint !important;
+  background-color: rgba(31, 78, 121, 0.8) !important; /* Fallback color while loading */
+  /* Note: aspect-ratio removed as it conflicts with 100vh height requirement */
+}
+
+/* Ensure Next.js Image wrapper doesn't cause shifts */
+section[role="banner"] [data-nimg] {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Hero content container - prevent layout shifts */
 .hero-content-container {
   min-height: 60vh !important;
+  height: 60vh !important;
+  max-height: 60vh !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  position: relative !important;
+  contain: layout style paint !important;
+  overflow: hidden !important; /* Prevent content overflow from causing shifts */
 }
 
 .hero-content-inner {
   width: 100% !important;
+  position: relative !important;
+  contain: layout style paint !important;
+}
+
+/* Hero content sections - reserve space to prevent shifts */
+.hero-heading-container,
+.hero-description-container,
+.hero-buttons-container {
+  position: relative !important;
+  contain: layout style paint !important;
+  will-change: opacity, transform !important;
+  transform: translateZ(0) !important; /* Force GPU acceleration */
+}
+
+/* Reserve space for heading - prevent shifts when text changes */
+.hero-heading-container {
+  min-height: 12rem !important; /* Reserve space for largest heading */
+  height: auto !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Reserve space for description - prevent shifts */
+.hero-description-container {
+  min-height: 4rem !important; /* Reserve space for description */
+  height: auto !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Reserve space for buttons - prevent shifts */
+.hero-buttons-container {
+  min-height: 3.5rem !important; /* Reserve space for buttons */
+  height: auto !important;
+}
+
+/* Prevent layout shifts from motion animations */
+.hero-content-inner [data-framer-component] {
+  position: relative !important;
+  contain: layout style paint !important;
+  will-change: opacity, transform !important;
+  transform: translateZ(0) !important;
+}
+
+/* Ensure text elements don't cause shifts */
+.hero-content-inner h1,
+.hero-content-inner p {
+  position: relative !important;
+  contain: layout style paint !important;
+  font-display: swap !important; /* Prevent font loading shifts */
+}
+
+/* Prevent font loading shifts */
+.hero-content-inner {
+  font-display: swap !important;
+}
+
+/* Prevent any overflow that could cause shifts */
+.hero-section-fixed {
+  overflow: hidden !important;
+}
+
+/* Ensure motion divs don't cause layout shifts - images should not interfere with interactions */
+.hero-image-wrapper img,
+.hero-image-wrapper [data-nimg] {
+  pointer-events: none !important; /* Images don't need pointer events - section handles interactions */
 }
