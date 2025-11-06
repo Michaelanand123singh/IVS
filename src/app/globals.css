@@ -318,3 +318,79 @@ body {
 .hover\:pause-animation:hover {
   animation-play-state: paused;
 }
+
+/* Hero Section CLS Prevention - Root Level Optimization */
+/* Ensure hero section maintains dimensions to prevent layout shifts */
+/* Using CSS classes instead of inline styles to prevent hydration mismatches */
+section[role="banner"] {
+  contain: layout style paint;
+  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+/* Hero section fixed dimensions class - prevents hydration mismatch */
+.hero-section-fixed {
+  min-height: 100vh !important;
+  height: 100vh !important;
+  width: 100% !important;
+  position: relative !important;
+  contain: layout style paint;
+}
+
+/* Hero background image container - prevent layout shifts */
+.hero-bg-container {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  contain: layout style paint;
+  box-sizing: border-box;
+  background-color: rgba(31, 78, 121, 0.8); /* Fallback background color - prevents white flash */
+}
+
+/* Hero image wrapper - prevent layout shifts */
+.hero-image-wrapper {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  contain: layout style paint;
+}
+
+/* Hero image elements - prevent layout shifts */
+.hero-image,
+section[role="banner"] img,
+section[role="banner"] [data-nimg] {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  contain: layout style paint;
+}
+
+/* Hero content container - prevent layout shifts */
+.hero-content-container {
+  min-height: 60vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.hero-content-inner {
+  width: 100% !important;
+}

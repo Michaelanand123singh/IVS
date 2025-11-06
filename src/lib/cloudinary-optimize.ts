@@ -196,8 +196,10 @@ export function getHeroImageSrcSet(
   // Large Desktop (>1920px): 2560px
   const heroSizes = [375, 428, 640, 768, 1024, 1280, 1920, 2560];
   
-  // Default src for fallback (desktop size, but will be overridden by srcSet)
-  const defaultSrc = optimizeCloudinaryUrl(url, 1920, 1080, quality, 'auto');
+  // Default src for fallback - use 1280px instead of 1920px for faster initial load
+  // This is a good balance: smaller file size (~40% smaller) but still high quality
+  // Browser will select appropriate size from srcSet anyway
+  const defaultSrc = optimizeCloudinaryUrl(url, 1280, 720, quality, 'auto');
   
   // Generate srcSet with mobile-optimized quality
   const srcSet = heroSizes

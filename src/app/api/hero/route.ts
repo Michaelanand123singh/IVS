@@ -11,7 +11,13 @@ export async function GET() {
       .select('headings backgroundImages')
       .lean();
 
-    return NextResponse.json({ hero });
+    // Add cache headers for faster subsequent loads
+    // Cache for 5 minutes, revalidate in background
+    return NextResponse.json({ hero }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (err) {
     console.error('Error fetching hero from database:', err);
     
@@ -61,7 +67,12 @@ export async function GET() {
           'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80'
         ]
       };
-      return NextResponse.json({ hero: staticHero });
+      // Add cache headers for static fallback data
+      return NextResponse.json({ hero: staticHero }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      });
     } catch (err) {
       console.error('Error loading static hero:', err);
       return NextResponse.json({ error: 'Failed to fetch hero' }, { status: 500 });

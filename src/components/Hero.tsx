@@ -31,46 +31,63 @@ export default function Hero() {
   const [isPaused, setIsPaused] = useState(false);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // Track loaded images
 
-  // Preload first hero image for faster LCP
-  // Use responsive srcSet default (browser will select appropriate size)
-  // Avoid client-side viewport detection to prevent hydration mismatches
+  // Preload first hero image IMMEDIATELY for faster LCP
+  // Start preloading as soon as we have the URL (don't wait for full data load)
   useEffect(() => {
     const firstImageUrl = heroData?.backgroundImages?.[0];
     if (!firstImageUrl) return;
     
     const isCloudinary = firstImageUrl.includes('res.cloudinary.com');
     
-    // Use desktop default for preload (browser will select from srcSet if available)
-    // This prevents hydration mismatch while still allowing responsive selection
-    const preloadUrl = isCloudinary 
-      ? getHeroImageSrcSet(firstImageUrl, 82, true).src
-      : firstImageUrl;
+    // Use optimized 1280px default for preload (faster than 1920px, ~40% smaller)
+    // Browser will still select appropriate size from srcSet when image renders
+    // This provides faster initial load while maintaining quality
+    const imageSrcSet = isCloudinary ? getHeroImageSrcSet(firstImageUrl, 82, true) : null;
+    const preloadUrl = imageSrcSet ? imageSrcSet.src : firstImageUrl;
     
-    // Create and add preload link
+    // Check if preload link already exists to avoid duplicates
+    const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
+    if (existingPreload) return;
+    
+    // Create and add preload link immediately
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
     link.href = preloadUrl;
     link.setAttribute('fetchpriority', 'high');
+    if (imageSrcSet?.srcSet) {
+      link.setAttribute('imagesrcset', imageSrcSet.srcSet);
+      link.setAttribute('imagesizes', imageSrcSet.sizes);
+    }
     document.head.appendChild(link);
     
     return () => {
       // Cleanup: remove preload link when component unmounts
       const existingLink = document.querySelector(`link[href="${preloadUrl}"]`);
-      if (existingLink) {
-        document.head.removeChild(existingLink);
+      if (existingLink && existingLink.parentNode) {
+        existingLink.parentNode.removeChild(existingLink);
       }
     };
-  }, [heroData?.backgroundImages]);
+  }, [heroData?.backgroundImages]); // Depend on backgroundImages array
 
-  // Fetch hero data from API
+  // Fetch hero data from API with optimized loading
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchHeroData = async () => {
       try {
-        const response = await fetch('/api/hero');
+        // Fetch hero data - browser will cache based on Cache-Control headers
+        // The API route should set appropriate cache headers for optimal performance
+        const response = await fetch('/api/hero', {
+          // Use default cache behavior - browser will handle caching
+          // For faster loads, ensure API route sets proper Cache-Control headers
+        });
+        
         if (response.ok) {
           const data = await response.json();
-          setHeroData(data.hero);
+          if (isMounted) {
+            setHeroData(data.hero);
+          }
         } else {
           // Fallback to static data if API fails
           setHeroData({
@@ -166,11 +183,17 @@ export default function Hero() {
           ]
         });
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchHeroData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Get active headings sorted by display order
@@ -237,7 +260,10 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <section className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center" role="banner">
+      <section 
+        className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed" 
+        role="banner"
+      >
         <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 z-10 text-white text-center">
           <div className="animate-pulse">
             <div className="h-16 bg-gray-300 rounded mb-4"></div>
@@ -259,16 +285,18 @@ export default function Hero() {
 
   return (
     <section 
-      className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center" 
+      className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed" 
       role="banner" 
       aria-label="Hero section with business transformation solutions"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
-      style={{ minHeight: '100vh' }}
     >
       {/* --- BACKGROUND IMAGE CAROUSEL - FADE IN/FADE OUT --- */}
-      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+      <div 
+        className="absolute inset-0 overflow-hidden hero-bg-container" 
+        aria-hidden="true"
+      >
         {heroData.backgroundImages.map((image, index) => {
           const isActive = bgIndex % heroData.backgroundImages.length === index;
           const isFirstImage = index === 0;
@@ -279,8 +307,9 @@ export default function Hero() {
           const nextIndex = (bgIndex + 1) % heroData.backgroundImages.length;
           const shouldRender = isActive || index === nextIndex || isFirstImage;
           
-          // Don't render if image shouldn't be loaded yet
-          if (!shouldRender && !loadedImages.has(index)) {
+          // Don't render if image shouldn't be loaded yet (prevents hydration mismatch)
+          // Always render first image (index 0) to ensure consistent server/client rendering
+          if (!shouldRender && !loadedImages.has(index) && index !== 0) {
             return null;
           }
           
@@ -299,7 +328,7 @@ export default function Hero() {
           return (
             <motion.div
               key={`image-${index}`}
-              className="absolute inset-0 w-full h-full"
+              className="absolute inset-0 w-full h-full hero-image-wrapper"
               initial={{ opacity: 0 }}
               animate={{ 
                 opacity: isActive ? 1 : 0,
@@ -312,13 +341,10 @@ export default function Hero() {
               exit={{ opacity: 0 }}
               style={{ 
                 willChange: isActive ? 'opacity' : 'auto',
-                transform: 'translateZ(0)', // Force GPU acceleration
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                display: shouldRender ? 'block' : 'none' // Hide if not needed
+                transform: 'translateZ(0)', // Force GPU acceleration - dynamic, safe for hydration
+                // Only use dynamic visibility for non-first images to prevent hydration mismatch
+                // First image (index 0) always renders with visibility: visible
+                ...(index === 0 ? {} : { visibility: shouldRender ? 'visible' : 'hidden' }),
               }}
             >
               {isCloudinary && imageData.srcSet ? (
@@ -334,14 +360,9 @@ export default function Hero() {
                   alt=""
                   loading={isFirstImage ? "eager" : "lazy"}
                   fetchPriority={isFirstImage ? "high" : "low"}
+                  decoding={isFirstImage ? "sync" : "async"} // Sync decoding for first image for faster render
                   onLoad={handleImageLoad}
-                  className="object-cover w-full h-full"
-                  style={{
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    width: '100%',
-                    height: '100%',
-                  }}
+                  className="object-cover w-full h-full hero-image"
                 />
               ) : (
                 // Use Next.js Image for non-Cloudinary images
@@ -355,11 +376,7 @@ export default function Hero() {
                   quality={isFirstImage ? 82 : 80}
                   loading={isFirstImage ? "eager" : "lazy"} // Lazy load non-first images
                   onLoad={handleImageLoad}
-                  className="object-cover"
-                  style={{
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                  }}
+                  className="object-cover hero-image"
                 />
               )}
             </motion.div>
@@ -390,8 +407,10 @@ export default function Hero() {
       </div>
 
       {/* --- CENTERED CONTENT --- */}
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 z-10 text-white text-center">
-        <div className="space-y-6 sm:space-y-8">
+      <div 
+        className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 z-10 text-white text-center hero-content-container"
+      >
+        <div className="space-y-6 sm:space-y-8 hero-content-inner">
           {/* Dynamic Heading and Subheading */}
           {activeHeadings.length > 0 ? (
             <motion.div
