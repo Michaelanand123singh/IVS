@@ -32,15 +32,18 @@ export default function Hero() {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // Track loaded images
 
   // Preload first hero image for faster LCP
+  // Use responsive srcSet default (browser will select appropriate size)
+  // Avoid client-side viewport detection to prevent hydration mismatches
   useEffect(() => {
     const firstImageUrl = heroData?.backgroundImages?.[0];
     if (!firstImageUrl) return;
     
     const isCloudinary = firstImageUrl.includes('res.cloudinary.com');
     
-    // Get optimized URL for preload
+    // Use desktop default for preload (browser will select from srcSet if available)
+    // This prevents hydration mismatch while still allowing responsive selection
     const preloadUrl = isCloudinary 
-      ? getHeroImageSrcSet(firstImageUrl, 82).src
+      ? getHeroImageSrcSet(firstImageUrl, 82, true).src
       : firstImageUrl;
     
     // Create and add preload link
@@ -281,12 +284,12 @@ export default function Hero() {
             return null;
           }
           
-          // Get optimized URL for the image
-          // For Cloudinary: use responsive sizing with auto format (WebP/AVIF)
-          // For non-Cloudinary: use as-is
-          const optimizedUrl = isCloudinary 
-            ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80).src
-            : image;
+          // Get responsive image data with mobile optimization
+          // For Cloudinary: use srcSet for proper responsive images
+          // For non-Cloudinary: use Next.js Image optimization
+          const imageData = isCloudinary 
+            ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80, isFirstImage)
+            : { src: image, srcSet: '', sizes: '100vw' };
           
           // Mark image as loaded when it mounts
           const handleImageLoad = () => {
@@ -318,23 +321,47 @@ export default function Hero() {
                 display: shouldRender ? 'block' : 'none' // Hide if not needed
               }}
             >
-              <Image
-                src={optimizedUrl}
-                alt=""
-                fill
-                priority={isFirstImage} // Prioritize first image for LCP
-                fetchPriority={isFirstImage ? "high" : "low"} // Use low priority for non-first images
-                sizes="100vw" // Full viewport width for hero images
-                quality={isFirstImage ? 82 : 80}
-                loading={isFirstImage ? "eager" : "lazy"} // Lazy load non-first images
-                unoptimized={isCloudinary} // Cloudinary handles optimization (format, quality, sizing)
-                onLoad={handleImageLoad}
-                className="object-cover"
-                style={{
-                  objectFit: 'cover',
-                  objectPosition: 'center',
-                }}
-              />
+              {isCloudinary && imageData.srcSet ? (
+                // Use native img tag with srcSet for Cloudinary images
+                // Next.js Image with unoptimized doesn't support srcSet properly
+                // Native img with srcSet enables browser-native responsive image selection
+                // This is essential for mobile optimization (serves 375px-428px images on mobile vs 1920px)
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageData.src}
+                  srcSet={imageData.srcSet}
+                  sizes={imageData.sizes}
+                  alt=""
+                  loading={isFirstImage ? "eager" : "lazy"}
+                  fetchPriority={isFirstImage ? "high" : "low"}
+                  onLoad={handleImageLoad}
+                  className="object-cover w-full h-full"
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+              ) : (
+                // Use Next.js Image for non-Cloudinary images
+                <Image
+                  src={imageData.src}
+                  alt=""
+                  fill
+                  priority={isFirstImage} // Prioritize first image for LCP
+                  fetchPriority={isFirstImage ? "high" : "low"} // Use low priority for non-first images
+                  sizes={imageData.sizes} // Full viewport width for hero images
+                  quality={isFirstImage ? 82 : 80}
+                  loading={isFirstImage ? "eager" : "lazy"} // Lazy load non-first images
+                  onLoad={handleImageLoad}
+                  className="object-cover"
+                  style={{
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                  }}
+                />
+              )}
             </motion.div>
           );
         })}
