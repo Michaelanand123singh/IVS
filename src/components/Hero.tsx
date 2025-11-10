@@ -210,25 +210,33 @@ export default function Hero() {
     // Only require active headings to start carousel, background images are optional
     if (!activeHeadings.length || isPaused) return;
     
+    // Store references to avoid stale closures
+    const backgroundImagesLength = heroData?.backgroundImages?.length || 0;
+    const headingsLength = activeHeadings.length;
+    
     const carouselInterval = setInterval(() => {
       // Update background image index only if background images exist
-      if (heroData?.backgroundImages?.length) {
+      if (backgroundImagesLength > 0) {
         setBgIndex((prev) => {
-          const nextIndex = (prev + 1) % heroData.backgroundImages.length;
+          const nextIndex = (prev + 1) % backgroundImagesLength;
           // Preload next image when carousel is about to change
-          if (!loadedImages.has(nextIndex)) {
-            setLoadedImages(prev => new Set(prev).add(nextIndex));
-          }
+          // Use functional update to access current loadedImages state without dependency
+          setLoadedImages((currentLoaded) => {
+            if (!currentLoaded.has(nextIndex)) {
+              return new Set(currentLoaded).add(nextIndex);
+            }
+            return currentLoaded;
+          });
           return nextIndex;
         });
       }
       
       // Always update heading index if there are active headings
-      setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
+      setHeadingIndex((prev) => (prev + 1) % headingsLength);
     }, 1500); // 1.5 seconds for smooth carousel rotation
     
     return () => clearInterval(carouselInterval);
-  }, [heroData?.backgroundImages, activeHeadings.length, isPaused, loadedImages]);
+  }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
 
   // Handle mouse events for pause on hover
   const handleMouseEnter = () => setIsPaused(true);
