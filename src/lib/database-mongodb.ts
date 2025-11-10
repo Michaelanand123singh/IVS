@@ -121,6 +121,21 @@ export async function getAdminByUsername(username: string): Promise<AdminUserDat
   };
 }
 
+export async function updateAdminPassword(username: string, newPassword: string) {
+  await connectDB();
+  
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  
+  await AdminUser.findOneAndUpdate(
+    { username },
+    { 
+      password: hashedPassword,
+      updatedAt: new Date()
+    },
+    { new: true }
+  );
+}
+
 // Email template operations
 export interface EmailTemplateData {
   id?: string;
