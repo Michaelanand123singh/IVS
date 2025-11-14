@@ -1,48 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import SectionHeading from "@/components/SectionHeading";
-
-interface Testimonial {
-  quote: string;
-  author: string;
-  role: string;
-}
+import { usePageData } from "@/contexts/PageDataContext";
 
 export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchTestimonials = async () => {
-      try {
-        const response = await fetch('/api/testimonials');
-        if (response.ok) {
-          const data = await response.json();
-          setTestimonials(data.testimonials || []);
-        } else {
-          // Fallback to static data if API fails
-          const { testimonials: staticTestimonials } = await import('@/data/testimonials');
-          setTestimonials(staticTestimonials);
-        }
-      } catch (err) {
-        console.error('Error fetching testimonials:', err);
-        // Fallback to static data
-        try {
-          const { testimonials: staticTestimonials } = await import('@/data/testimonials');
-          setTestimonials(staticTestimonials);
-        } catch {
-          setError('Failed to load testimonials');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    // Fetch from API
-    fetchTestimonials();
-  }, []);
+  const { testimonials: testimonialsData, loading, error: contextError } = usePageData();
+  
+  // Use data from context (already fetched in parallel with other data)
+  const testimonials = testimonialsData || [];
+  const error = contextError;
 
   if (loading) {
     return (

@@ -18,14 +18,24 @@ export async function GET() {
       _id: undefined
     }));
 
-    return NextResponse.json({ services: transformedServices });
+    // Add cache headers for faster subsequent loads
+    // Cache for 5 minutes, revalidate in background
+    return NextResponse.json({ services: transformedServices }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    });
   } catch (err) {
     console.error('Error fetching services from database:', err);
     
     // Fallback to static data when database is not available
     try {
       const { services: staticServices } = await import('@/data/services');
-      return NextResponse.json({ services: staticServices });
+      return NextResponse.json({ services: staticServices }, {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      });
     } catch (err) {
       console.error('Error loading static services:', err);
       return NextResponse.json({ error: 'Failed to fetch services' }, { status: 500 });

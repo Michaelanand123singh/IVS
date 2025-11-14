@@ -1,43 +1,21 @@
 "use client";
 
-import { Service } from "@/data/services";
+import { useState } from "react";
+import { usePageData } from "@/contexts/PageDataContext";
+import type { Service } from "@/data/services";
 import SectionHeading from "@/components/SectionHeading";
 import ServiceModal from "@/components/ServiceModal";
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import { optimizeServiceIcon } from "@/lib/cloudinary-optimize";
 
 export default function Services() {
-  const [services, setServices] = useState<Service[]>([]);
+  const { services: servicesData, loading } = usePageData();
   const [showAll, setShowAll] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const fetchServices = async () => {
-    try {
-      const response = await fetch('/api/services');
-      if (response.ok) {
-        const data = await response.json();
-        setServices(data.services || []);
-      } else {
-        // Fallback to static data if API fails
-        const { services: staticServices } = await import('@/data/services');
-        setServices(staticServices);
-      }
-    } catch (err) {
-      console.error('Error fetching services:', err);
-      // Fallback to static data
-      const { services: staticServices } = await import('@/data/services');
-      setServices(staticServices);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use data from context (already fetched in parallel with other data)
+  const services = servicesData || [];
   
   // Show first 6 services initially, all services when expanded
   const displayedServices = showAll ? services : services.slice(0, 6);

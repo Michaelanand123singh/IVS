@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import StructuredData from "@/components/StructuredData";
+import { LoadingProvider } from "@/contexts/LoadingContext";
+import { PageDataProvider } from "@/contexts/PageDataContext";
+import Loader from "@/components/Loader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,9 +41,8 @@ export default function RootLayout({
         {/* Preconnect to external resources for faster loading */}
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
-        {/* Prefetch critical resources */}
-        <link rel="prefetch" href="/api/hero" as="fetch" crossOrigin="anonymous" />
-        <link rel="prefetch" href="/api/services" as="fetch" crossOrigin="anonymous" />
+        {/* Prefetch critical resources - unified endpoint for faster loading */}
+        <link rel="prefetch" href="/api/page-data" as="fetch" crossOrigin="anonymous" />
         <link rel="canonical" href="https://www.ivsdxb.com" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -54,7 +56,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <LoadingProvider>
+          <PageDataProvider>
+            <Loader />
+            {children}
+          </PageDataProvider>
+        </LoadingProvider>
       </body>
     </html>
   );

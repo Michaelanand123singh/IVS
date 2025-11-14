@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { getHeroImageSrcSet } from "@/lib/cloudinary-optimize";
+import { useLoading } from "@/contexts/LoadingContext";
 
 interface HeroHeading {
   title: string;
@@ -22,305 +23,367 @@ interface HeroData {
   backgroundImages: string[];
 }
 
-// --- HERO --- //
 export default function Hero() {
+  const { startLoading, stopLoading } = useLoading(); // ensure LoadingProvider wraps app
+
   const [bgIndex, setBgIndex] = useState(0);
   const [headingIndex, setHeadingIndex] = useState(0);
   const [heroData, setHeroData] = useState<HeroData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // local skeleton flag
   const [isPaused, setIsPaused] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // Track loaded images
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // track loaded images
   const [mounted, setMounted] = useState(false);
 
-  // Ensure component is mounted on client to prevent hydration mismatch
+  // Safety fallback timer ref to avoid loader stuck forever
+  const safetyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didFetchRef = useRef(false); // 🔥 Prevent duplicate fetching
+
+  // refs to hold start/stop to avoid effect re-run if functions are not stable
+  const startLoadingRef = useRef(startLoading);
+  const stopLoadingRef = useRef(stopLoading);
+
+  useEffect(() => {
+    startLoadingRef.current = startLoading;
+    stopLoadingRef.current = stopLoading;
+  }, [startLoading, stopLoading]);
+
+  // mark mounted to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Preload first hero image IMMEDIATELY for faster LCP
-  // Start preloading as soon as we have the URL (don't wait for full data load)
+  // helper to clear safety timer
+  const clearSafetyTimer = () => {
+    if (safetyTimeoutRef.current) {
+      clearTimeout(safetyTimeoutRef.current);
+      safetyTimeoutRef.current = null;
+    }
+  };
+
+  // Called when any hero image finishes loading/decoding
+  const handleImageLoaded = useCallback(
+    (index: number) => {
+      console.log(`[Hero] handleImageLoaded — image ${index} loaded`);
+      setLoadedImages((prev) => {
+        if (prev.has(index)) return prev;
+        const next = new Set(prev);
+        next.add(index);
+        return next;
+      });
+
+      // If this is the LCP/first hero image, hide the global loader and local skeleton
+      if (index === 0) {
+        console.log('[Hero] handleImageLoaded — first image (index 0) loaded, stopping loader');
+        clearSafetyTimer();
+        // Use RAF to ensure paint happens before removing overlay in some edge-cases
+        requestAnimationFrame(() => {
+          stopLoadingRef.current();
+          setLoading(false);
+        });
+      }
+    },
+    []
+  );
+
+  // Preload first hero image for faster LCP (keeps your existing approach)
   useEffect(() => {
     const firstImageUrl = heroData?.backgroundImages?.[0];
     if (!firstImageUrl) return;
-    
-    const isCloudinary = firstImageUrl.includes('res.cloudinary.com');
-    
-    // Use optimized 1280px default for preload (faster than 1920px, ~40% smaller)
-    // Browser will still select appropriate size from srcSet when image renders
-    // This provides faster initial load while maintaining quality
+
+    const isCloudinary = firstImageUrl.includes("res.cloudinary.com");
     const imageSrcSet = isCloudinary ? getHeroImageSrcSet(firstImageUrl, 82, true) : null;
     const preloadUrl = imageSrcSet ? imageSrcSet.src : firstImageUrl;
-    
-    // Check if preload link already exists to avoid duplicates
+
+    // Avoid duplicate preloads
     const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
     if (existingPreload) return;
-    
-    // Create and add preload link immediately
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
     link.href = preloadUrl;
-    link.setAttribute('fetchpriority', 'high');
+    link.setAttribute("fetchpriority", "high");
     if (imageSrcSet?.srcSet) {
-      link.setAttribute('imagesrcset', imageSrcSet.srcSet);
-      link.setAttribute('imagesizes', imageSrcSet.sizes);
+      link.setAttribute("imagesrcset", imageSrcSet.srcSet);
+      link.setAttribute("imagesizes", imageSrcSet.sizes);
     }
     document.head.appendChild(link);
-    
+
     return () => {
-      // Cleanup: remove preload link when component unmounts
       const existingLink = document.querySelector(`link[href="${preloadUrl}"]`);
       if (existingLink && existingLink.parentNode) {
         existingLink.parentNode.removeChild(existingLink);
       }
     };
-  }, [heroData?.backgroundImages]); // Depend on backgroundImages array
+  }, [heroData?.backgroundImages]);
 
-  // Fetch hero data from API with optimized loading
+  // Fetch hero data — RUN ONCE on mount. Use refs for start/stop to avoid dependency loops.
   useEffect(() => {
-    let isMounted = true;
+    if (didFetchRef.current) return; // ⛔ Skip if already fetched
+    didFetchRef.current = true;
     
+    console.log('[Hero] useEffect — starting fetch');
+    let isActive = true;
+    console.log('[Hero] useEffect — calling startLoading');
+    startLoadingRef.current(); // show global loader immediately
+    setLoading(true);
+
+    // Setup safety timer to stop loader after X seconds to prevent stuck state (10s)
+    clearSafetyTimer();
+    safetyTimeoutRef.current = setTimeout(() => {
+      console.warn('[Hero] Safety timeout triggered — force stopping loader after 10 seconds');
+      // If first image didn't load for some reason, hide loader as fallback
+      requestAnimationFrame(() => {
+        stopLoadingRef.current();
+        setLoading(false);
+      });
+      safetyTimeoutRef.current = null;
+    }, 10000); // 10 seconds fallback
+
     const fetchHeroData = async () => {
       try {
-        // Fetch hero data - browser will cache based on Cache-Control headers
-        // The API route should set appropriate cache headers for optimal performance
-        const response = await fetch('/api/hero', {
-          // Use default cache behavior - browser will handle caching
-          // For faster loads, ensure API route sets proper Cache-Control headers
-        });
-        
+        console.log('[Hero] fetchHeroData — fetching from /api/hero');
+        const response = await fetch("/api/hero");
         if (response.ok) {
           const data = await response.json();
-          if (isMounted) {
+          console.log('[Hero] fetchHeroData — received data, headings count:', data.hero?.headings?.length || 0, 'images count:', data.hero?.backgroundImages?.length || 0);
+          if (isActive) {
             setHeroData(data.hero);
+            // DO NOT stop loading here; wait for first image's onLoad/onLoadingComplete
+            setLoading(true);
           }
         } else {
-          // Fallback to static data if API fails
+          console.log('[Hero] fetchHeroData — API failed, using static fallback');
+          // Fallback static data
+          if (isActive) {
+            setHeroData({
+              headings: [
+                {
+                  title: "Transform Your Business with",
+                  subtitle: "Expert Dynamics Solutions",
+                  description:
+                    "Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.",
+                  primaryButtonText: "Schedule Free Consultation",
+                  primaryButtonLink: "#contact",
+                  secondaryButtonText: "Explore Our Services",
+                  secondaryButtonLink: "#services",
+                  isActive: true,
+                  displayOrder: 0,
+                },
+                {
+                  title: "Accelerate Digital Transformation",
+                  subtitle: "With Microsoft Power Platform",
+                  description:
+                    "Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.",
+                  primaryButtonText: "Get Started Today",
+                  primaryButtonLink: "#contact",
+                  secondaryButtonText: "View Portfolio",
+                  secondaryButtonLink: "#services",
+                  isActive: true,
+                  displayOrder: 1,
+                },
+                {
+                  title: "Optimize Your Operations",
+                  subtitle: "With Custom ERP Solutions",
+                  description:
+                    "Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.",
+                  primaryButtonText: "Learn More",
+                  primaryButtonLink: "#services",
+                  secondaryButtonText: "Contact Us",
+                  secondaryButtonLink: "#contact",
+                  isActive: true,
+                  displayOrder: 2,
+                },
+              ],
+              backgroundImages: [
+                "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80",
+              ],
+            });
+            setLoading(true);
+          }
+        }
+      } catch (err) {
+        console.error("[Hero] fetchHeroData — Error fetching hero data:", err);
+        console.log('[Hero] fetchHeroData — using static fallback due to error');
+        if (isActive) {
           setHeroData({
             headings: [
               {
-                title: 'Transform Your Business with',
-                subtitle: 'Expert Dynamics Solutions',
-                description: 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
-                primaryButtonText: 'Schedule Free Consultation',
-                primaryButtonLink: '#contact',
-                secondaryButtonText: 'Explore Our Services',
-                secondaryButtonLink: '#services',
+                title: "Transform Your Business with",
+                subtitle: "Expert Dynamics Solutions",
+                description:
+                  "Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.",
+                primaryButtonText: "Schedule Free Consultation",
+                primaryButtonLink: "#contact",
+                secondaryButtonText: "Explore Our Services",
+                secondaryButtonLink: "#services",
                 isActive: true,
-                displayOrder: 0
+                displayOrder: 0,
               },
               {
-                title: 'Accelerate Digital Transformation',
-                subtitle: 'With Microsoft Power Platform',
-                description: 'Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.',
-                primaryButtonText: 'Get Started Today',
-                primaryButtonLink: '#contact',
-                secondaryButtonText: 'View Portfolio',
-                secondaryButtonLink: '#services',
+                title: "Accelerate Digital Transformation",
+                subtitle: "With Microsoft Power Platform",
+                description:
+                  "Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.",
+                primaryButtonText: "Get Started Today",
+                primaryButtonLink: "#contact",
+                secondaryButtonText: "View Portfolio",
+                secondaryButtonLink: "#services",
                 isActive: true,
-                displayOrder: 1
+                displayOrder: 1,
               },
               {
-                title: 'Optimize Your Operations',
-                subtitle: 'With Custom ERP Solutions',
-                description: 'Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.',
-                primaryButtonText: 'Learn More',
-                primaryButtonLink: '#services',
-                secondaryButtonText: 'Contact Us',
-                secondaryButtonLink: '#contact',
+                title: "Optimize Your Operations",
+                subtitle: "With Custom ERP Solutions",
+                description:
+                  "Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.",
+                primaryButtonText: "Learn More",
+                primaryButtonLink: "#services",
+                secondaryButtonText: "Contact Us",
+                secondaryButtonLink: "#contact",
                 isActive: true,
-                displayOrder: 2
-              }
+                displayOrder: 2,
+              },
             ],
             backgroundImages: [
-              'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80',
-              'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80',
-              'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80',
-              'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80',
-              'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80'
-            ]
+              "https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80",
+              "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80",
+              "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80",
+              "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80",
+              "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80",
+            ],
           });
-        }
-      } catch (err) {
-        console.error('Error fetching hero data:', err);
-        // Fallback to static data
-        setHeroData({
-          headings: [
-            {
-              title: 'Transform Your Business with',
-              subtitle: 'Expert Dynamics Solutions',
-              description: 'Streamline Operations, Accelerate Growth, and Maximize ROI with our Comprehensive Microsoft Dynamics 365 Services.',
-              primaryButtonText: 'Schedule Free Consultation',
-              primaryButtonLink: '#contact',
-              secondaryButtonText: 'Explore Our Services',
-              secondaryButtonLink: '#services',
-              isActive: true,
-              displayOrder: 0
-            },
-            {
-              title: 'Accelerate Digital Transformation',
-              subtitle: 'With Microsoft Power Platform',
-              description: 'Build powerful applications, automate workflows, and gain insights with our comprehensive Power Platform solutions.',
-              primaryButtonText: 'Get Started Today',
-              primaryButtonLink: '#contact',
-              secondaryButtonText: 'View Portfolio',
-              secondaryButtonLink: '#services',
-              isActive: true,
-              displayOrder: 1
-            },
-            {
-              title: 'Optimize Your Operations',
-              subtitle: 'With Custom ERP Solutions',
-              description: 'Streamline business processes, improve efficiency, and drive growth with our tailored ERP implementations.',
-              primaryButtonText: 'Learn More',
-              primaryButtonLink: '#services',
-              secondaryButtonText: 'Contact Us',
-              secondaryButtonLink: '#contact',
-              isActive: true,
-              displayOrder: 2
-            }
-          ],
-          backgroundImages: [
-            'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1920&q=80',
-            'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80'
-          ]
-        });
-      } finally {
-        if (isMounted) {
-          setLoading(false);
+          setLoading(true);
         }
       }
     };
 
     fetchHeroData();
-    
+
     return () => {
-      isMounted = false;
+      isActive = false;
+      clearSafetyTimer();
+      // Ensure loader isn't left on if component unmounts
+      requestAnimationFrame(() => {
+        stopLoadingRef.current();
+      });
     };
+    // run once on mount — intentionally empty deps to avoid repeated fetch/startLoading calls
   }, []);
 
-  // Get active headings sorted by display order
-  const activeHeadings = heroData?.headings?.filter(h => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) || [];
+  // Get active headings sorted
+  const activeHeadings =
+    heroData?.headings?.filter((h) => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) ?? [];
 
-  // Synchronized Carousel - Headings change every 1.5 seconds, background images change if available
+  // Carousel sync: headings change every 1.5s; background updates if images exist
   useEffect(() => {
-    // Only require active headings to start carousel, background images are optional
     if (!activeHeadings.length || isPaused) return;
-    
-    // Store references to avoid stale closures
-    const backgroundImagesLength = heroData?.backgroundImages?.length || 0;
-    const headingsLength = activeHeadings.length;
-    
-    const carouselInterval = setInterval(() => {
-      // Update background image index only if background images exist
-      if (backgroundImagesLength > 0) {
+
+    const bgLen = heroData?.backgroundImages?.length || 0;
+    const headingsLen = activeHeadings.length;
+
+    const interval = setInterval(() => {
+      if (bgLen > 0) {
         setBgIndex((prev) => {
-          const nextIndex = (prev + 1) % backgroundImagesLength;
-          // Preload next image when carousel is about to change
-          // Use functional update to access current loadedImages state without dependency
+          const nextIndex = (prev + 1) % bgLen;
+          // Preload/mark next image as requested to render
           setLoadedImages((currentLoaded) => {
             if (!currentLoaded.has(nextIndex)) {
-              return new Set(currentLoaded).add(nextIndex);
+              const s = new Set(currentLoaded);
+              s.add(nextIndex);
+              return s;
             }
             return currentLoaded;
           });
           return nextIndex;
         });
       }
-      
-      // Always update heading index if there are active headings
-      setHeadingIndex((prev) => (prev + 1) % headingsLength);
-    }, 1500); // 1.5 seconds for smooth carousel rotation
-    
-    return () => clearInterval(carouselInterval);
+
+      setHeadingIndex((prev) => (prev + 1) % headingsLen);
+    }, 1500);
+
+    return () => clearInterval(interval);
   }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
 
-  // Handle mouse events for pause on hover
+  // Mouse / touch handlers
   const handleMouseEnter = () => setIsPaused(true);
   const handleMouseLeave = () => setIsPaused(false);
 
-  // Handle touch events for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     const startX = touch.clientX;
     const startY = touch.clientY;
-    
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - startX;
-      const deltaY = touch.clientY - startY;
-      
-      // If horizontal swipe is more significant than vertical
+
+    const handleTouchMove = (ev: TouchEvent) => {
+      const t = ev.touches[0];
+      const deltaX = t.clientX - startX;
+      const deltaY = t.clientY - startY;
+
       if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-        e.preventDefault();
-        
-        // Update heading index on swipe (always works if there are headings)
+        ev.preventDefault();
+
+        // headings
         if (activeHeadings.length > 0) {
           if (deltaX > 0) {
-            // Swipe right - go to previous heading
             setHeadingIndex((prev) => {
               const newIndex = prev - 1;
               return newIndex < 0 ? activeHeadings.length - 1 : newIndex;
             });
           } else {
-            // Swipe left - go to next heading
             setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
           }
         }
-        
-        // Update background image index only if background images exist
+
+        // background images
         if (heroData?.backgroundImages?.length) {
           if (deltaX > 0) {
-            // Swipe right - go to previous image
             setBgIndex((prev) => {
               const newIndex = prev - 1;
               return newIndex < 0 ? heroData.backgroundImages.length - 1 : newIndex;
             });
           } else {
-            // Swipe left - go to next image
             setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
           }
         }
       }
     };
-    
+
     const handleTouchEnd = () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
-    
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
+
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
   };
 
-  // Render consistent structure on both server and client to prevent hydration mismatch
-  // Use CSS to hide content until mounted, then show loading or content
+  // Render control
   const shouldShowContent = mounted && !loading && heroData;
   const shouldShowLoading = mounted && loading;
 
   return (
-    <section 
-      className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed" 
-      role="banner" 
+    <section
+      className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed"
+      role="banner"
       aria-label="Hero section with business transformation solutions"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
       style={{
-        visibility: !mounted ? 'hidden' : 'visible',
+        visibility: !mounted ? "hidden" : "visible",
       }}
     >
-      {/* Show loading skeleton when mounted but still loading */}
+      {/* Loading skeleton */}
       {shouldShowLoading && (
         <>
-          {/* Background placeholder with same dimensions */}
           <div className="absolute inset-0 overflow-hidden hero-bg-container" aria-hidden="true">
             <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
           </div>
-          {/* Content skeleton matching final dimensions exactly */}
+
           <div className="relative mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
             <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
               <div className="hero-heading-container">
@@ -349,248 +412,178 @@ export default function Hero() {
         </>
       )}
 
-      {/* Show actual content when data is loaded */}
+      {/* Actual content */}
       {shouldShowContent && heroData && (
         <>
-          {/* --- BACKGROUND IMAGE CAROUSEL - FADE IN/FADE OUT --- */}
-          {/* Only render background images if they exist */}
+          {/* Background carousel when images exist */}
           {heroData.backgroundImages && heroData.backgroundImages.length > 0 && (
-            <div 
-              className="absolute inset-0 overflow-hidden hero-bg-container" 
-              aria-hidden="true"
-            >
+            <div className="absolute inset-0 overflow-hidden hero-bg-container" aria-hidden="true">
               {heroData.backgroundImages.map((image, index) => {
-              const isActive = bgIndex % heroData.backgroundImages.length === index;
-              const isFirstImage = index === 0;
-              const isCloudinary = image.includes('res.cloudinary.com');
-              
-              // Only render current image, next image (for smooth transition), and first image
-              // This prevents loading all images at once, significantly improving initial load time
-              const nextIndex = (bgIndex + 1) % heroData.backgroundImages.length;
-              const shouldRender = isActive || index === nextIndex || isFirstImage;
-              
-              // Don't render if image shouldn't be loaded yet (prevents hydration mismatch)
-              // Always render first image (index 0) to ensure consistent server/client rendering
-              if (!shouldRender && !loadedImages.has(index) && index !== 0) {
-                return null;
-              }
-              
-              // Get responsive image data with mobile optimization
-              // For Cloudinary: use srcSet for proper responsive images
-              // For non-Cloudinary: use Next.js Image optimization
-              const imageData = isCloudinary 
-                ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80, isFirstImage)
-                : { src: image, srcSet: '', sizes: '100vw' };
-              
-              // Mark image as loaded when it mounts
-              const handleImageLoad = () => {
-                setLoadedImages(prev => new Set(prev).add(index));
-              };
-              
-              return (
-                <motion.div
-                  key={`image-${index}`}
-                  className="absolute inset-0 w-full h-full hero-image-wrapper"
-                  initial={{ opacity: 0 }}
-                  animate={{ 
-                    opacity: isActive ? 1 : 0,
-                    transition: { 
-                      duration: 1.5, 
-                      ease: [0.25, 0.46, 0.45, 0.94], // Custom cubic-bezier for premium feel
-                      type: "tween"
-                    }
-                  }}
-                  exit={{ opacity: 0 }}
-                  style={{ 
-                    willChange: isActive ? 'opacity' : 'auto',
-                    transform: 'translateZ(0)', // Force GPU acceleration - dynamic, safe for hydration
-                    // Only use dynamic visibility for non-first images to prevent hydration mismatch
-                    // First image (index 0) always renders with visibility: visible
-                    ...(index === 0 ? {} : { visibility: shouldRender ? 'visible' : 'hidden' }),
-                  }}
-                >
-                  {isCloudinary && imageData.srcSet ? (
-                    // Use native img tag with srcSet for Cloudinary images
-                    // Next.js Image with unoptimized doesn't support srcSet properly
-                    // Native img with srcSet enables browser-native responsive image selection
-                    // This is essential for mobile optimization (serves 375px-428px images on mobile vs 1920px)
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={imageData.src}
-                      srcSet={imageData.srcSet}
-                      sizes={imageData.sizes}
-                      alt=""
-                      loading={isFirstImage ? "eager" : "lazy"}
-                      fetchPriority={isFirstImage ? "high" : "low"}
-                      decoding={isFirstImage ? "sync" : "async"} // Sync decoding for first image for faster render
-                      onLoad={handleImageLoad}
-                      className="object-cover w-full h-full hero-image"
-                    />
-                  ) : (
-                    // Use Next.js Image for non-Cloudinary images
-                    <Image
-                      src={imageData.src}
-                      alt=""
-                      fill
-                      priority={isFirstImage} // Prioritize first image for LCP
-                      fetchPriority={isFirstImage ? "high" : "low"} // Use low priority for non-first images
-                      sizes={imageData.sizes} // Full viewport width for hero images
-                      quality={isFirstImage ? 82 : 80}
-                      loading={isFirstImage ? "eager" : "lazy"} // Lazy load non-first images
-                      onLoad={handleImageLoad}
-                      className="object-cover hero-image"
-                    />
-                  )}
-                </motion.div>
-              );
-            })}
+                const total = heroData.backgroundImages.length;
+                const isActive = bgIndex % total === index;
+                const isFirstImage = index === 0;
+                const isCloudinary = image.includes("res.cloudinary.com");
 
-              {/* Premium gradient overlay for readability */}
-              <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true" style={{ pointerEvents: 'none' }}></div>
-              
-              {/* Subtle animated overlay for premium feel - optimized with transform */}
-              <motion.div 
+                // only render current, next and first to avoid loading all at once
+                const nextIndex = (bgIndex + 1) % total;
+                const shouldRender = isActive || index === nextIndex || isFirstImage;
+
+                // Avoid rendering unless requested or already loaded. Always render index 0 for consistent SSR.
+                if (!shouldRender && !loadedImages.has(index) && index !== 0) {
+                  return null;
+                }
+
+                const imageData = isCloudinary
+                  ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80, isFirstImage)
+                  : { src: image, srcSet: "", sizes: "100vw" };
+
+                return (
+                  <motion.div
+                    key={`image-${index}`}
+                    className="absolute inset-0 w-full h-full hero-image-wrapper"
+                    initial={{ opacity: 0 }}
+                    animate={{
+                      opacity: isActive ? 1 : 0,
+                      transition: {
+                        duration: 1.5,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                        type: "tween",
+                      },
+                    }}
+                    exit={{ opacity: 0 }}
+                    style={{
+                      willChange: isActive ? "opacity" : "auto",
+                      transform: "translateZ(0)",
+                      ...(index === 0 ? {} : { visibility: shouldRender ? "visible" : "hidden" }),
+                    }}
+                  >
+                    {isCloudinary && imageData.srcSet ? (
+                      // native img with srcset for Cloudinary
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={imageData.src}
+                        srcSet={imageData.srcSet}
+                        sizes={imageData.sizes}
+                        alt=""
+                        loading={isFirstImage ? "eager" : "lazy"}
+                        fetchPriority={isFirstImage ? "high" : "low"}
+                        decoding={isFirstImage ? "sync" : "async"}
+                        onLoad={() => handleImageLoaded(index)}
+                        className="object-cover w-full h-full hero-image"
+                      />
+                    ) : (
+                      // Next/Image for non-cloudinary
+                      <Image
+                        src={imageData.src}
+                        alt=""
+                        fill
+                        priority={isFirstImage}
+                        fetchPriority={isFirstImage ? "high" : "low"}
+                        sizes={imageData.sizes}
+                        quality={isFirstImage ? 82 : 80}
+                        loading={isFirstImage ? "eager" : "lazy"}
+                        onLoadingComplete={() => handleImageLoaded(index)}
+                        className="object-cover hero-image"
+                      />
+                    )}
+                  </motion.div>
+                );
+              })}
+
+              {/* gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true" style={{ pointerEvents: "none" }}></div>
+
+              {/* subtle animated overlay */}
+              <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
-                animate={{ 
-                  x: ['-100%', '100%'],
-                }}
-                transition={{ 
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                style={{
-                  willChange: 'transform',
-                  transform: 'translateZ(0)', // Force GPU acceleration
-                }}
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                style={{ willChange: "transform", transform: "translateZ(0)" }}
                 aria-hidden="true"
               />
             </div>
           )}
-          
-          {/* Fallback gradient background when no background images */}
+
+          {/* fallback gradient when no images */}
           {(!heroData.backgroundImages || heroData.backgroundImages.length === 0) && (
-            <div 
-              className="absolute inset-0 overflow-hidden hero-bg-container bg-gradient-to-br from-[#1F4E79] via-[#2a5f8f] to-[#1F4E79]" 
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true" style={{ pointerEvents: 'none' }}></div>
+            <div className="absolute inset-0 overflow-hidden hero-bg-container bg-gradient-to-br from-[#1F4E79] via-[#2a5f8f] to-[#1F4E79]" aria-hidden="true">
+              <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true" style={{ pointerEvents: "none" }}></div>
             </div>
           )}
 
-      {/* --- CENTERED CONTENT --- */}
-      <div 
-        className="relative mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container"
-      >
-        <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
-          {/* Dynamic Heading and Subheading */}
-          {activeHeadings.length > 0 ? (
-            <motion.div
-              key={headingIndex}
-              className="hero-heading-container"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ 
-                duration: 0.6,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                type: "tween"
-              }}
-              style={{
-                willChange: 'opacity',
-                transform: 'translateZ(0)', // GPU acceleration - doesn't cause layout shifts
-              }}
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.1] sm:leading-[1.15] md:leading-tight break-words">
-                <span className="block">{activeHeadings[headingIndex].title}</span>
-                <span className="block text-[#ee8034] mt-1.5 sm:mt-2 md:mt-3 lg:mt-4">
-                  {activeHeadings[headingIndex].subtitle}
-                </span>
-              </h1>
-            </motion.div>
-          ) : (
-            <motion.div
-              className="hero-heading-container"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ 
-                duration: 0.6,
-                ease: [0.25, 0.46, 0.45, 0.94],
-                type: "tween"
-              }}
-              style={{
-                willChange: 'opacity',
-                transform: 'translateZ(0)',
-              }}
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.1] sm:leading-[1.15] md:leading-tight break-words">
-                <span className="block">Welcome to Our Platform</span>
-                <span className="block text-[#ee8034] mt-1.5 sm:mt-2 md:mt-3 lg:mt-4">
-                  Your Digital Transformation Partner
-                </span>
-              </h1>
-            </motion.div>
-          )}
+          {/* Centered content */}
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
+            <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
+              {activeHeadings.length > 0 ? (
+                <motion.div
+                  key={headingIndex}
+                  className="hero-heading-container"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: "tween" }}
+                  style={{ willChange: "opacity", transform: "translateZ(0)" }}
+                >
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.1] sm:leading-[1.15] md:leading-tight break-words">
+                    <span className="block">{activeHeadings[headingIndex].title}</span>
+                    <span className="block text-[#ee8034] mt-1.5 sm:mt-2 md:mt-3 lg:mt-4">{activeHeadings[headingIndex].subtitle}</span>
+                  </h1>
+                </motion.div>
+              ) : (
+                <motion.div
+                  className="hero-heading-container"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94], type: "tween" }}
+                  style={{ willChange: "opacity", transform: "translateZ(0)" }}
+                >
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold leading-[1.1] sm:leading-[1.15] md:leading-tight break-words">
+                    <span className="block">Welcome to Our Platform</span>
+                    <span className="block text-[#ee8034] mt-1.5 sm:mt-2 md:mt-3 lg:mt-4">Your Digital Transformation Partner</span>
+                  </h1>
+                </motion.div>
+              )}
 
-          {/* Dynamic Description */}
-          <motion.div
-            key={`desc-${headingIndex}`}
-            className="hero-description-container"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 0.6, 
-              delay: 0.2,
-              ease: [0.25, 0.46, 0.45, 0.94]
-            }}
-            style={{
-              willChange: 'opacity',
-              transform: 'translateZ(0)',
-            }}
-          >
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-gray-200 max-w-3xl sm:max-w-4xl mx-auto leading-relaxed sm:leading-relaxed px-2 sm:px-0 break-words">
-              {activeHeadings.length > 0 
-                ? activeHeadings[headingIndex].description // Use current heading's description
-                : 'We help businesses transform and grow with cutting-edge technology solutions.'
-              }
-            </p>
-          </motion.div>
-          
-          {/* Dynamic Buttons */}
-          <motion.div
-            key={`buttons-${headingIndex}`}
-            className="hero-buttons-container flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center mt-6 sm:mt-8 md:mt-10 lg:mt-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ 
-              duration: 0.6, 
-              delay: 0.3,
-              ease: [0.25, 0.46, 0.45, 0.94]
-            }}
-            style={{
-              willChange: 'opacity',
-              transform: 'translateZ(0)',
-            }}
-          >
-            <a
-              href={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonLink : '#contact'}
-              className="bg-[#ee8034] text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-lg font-semibold hover:bg-[#d66d2a] transition-all duration-300 text-center text-sm sm:text-base md:text-lg w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[250px] shadow-lg hover:shadow-xl"
-              aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
-            >
-              {activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : 'Get Started'}
-            </a>
-            <a
-              href={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonLink : '#services'}
-              className="border-2 border-[#ee8034] text-[#ee8034] px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-lg font-semibold hover:bg-[#ee8034] hover:text-white transition-all duration-300 text-center text-sm sm:text-base md:text-lg w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[250px] shadow-lg hover:shadow-xl"
-              aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
-            >
-              {activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : 'Learn More'}
-            </a>
-          </motion.div>
-        </div>
-      </div>
+              <motion.div
+                key={`desc-${headingIndex}`}
+                className="hero-description-container"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                style={{ willChange: "opacity", transform: "translateZ(0)" }}
+              >
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-gray-200 max-w-3xl sm:max-w-4xl mx-auto leading-relaxed sm:leading-relaxed px-2 sm:px-0 break-words">
+                  {activeHeadings.length > 0 ? activeHeadings[headingIndex].description : "We help businesses transform and grow with cutting-edge technology solutions."}
+                </p>
+              </motion.div>
+
+              <motion.div
+                key={`buttons-${headingIndex}`}
+                className="hero-buttons-container flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-6 justify-center items-center mt-6 sm:mt-8 md:mt-10 lg:mt-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                style={{ willChange: "opacity", transform: "translateZ(0)" }}
+              >
+                <a
+                  href={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonLink : "#contact"}
+                  className="bg-[#ee8034] text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-lg font-semibold hover:bg-[#d66d2a] transition-all duration-300 text-center text-sm sm:text-base md:text-lg w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[250px] shadow-lg hover:shadow-xl"
+                  aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : "Get Started"}
+                >
+                  {activeHeadings.length > 0 ? activeHeadings[headingIndex].primaryButtonText : "Get Started"}
+                </a>
+                <a
+                  href={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonLink : "#services"}
+                  className="border-2 border-[#ee8034] text-[#ee8034] px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 rounded-lg font-semibold hover:bg-[#ee8034] hover:text-white transition-all duration-300 text-center text-sm sm:text-base md:text-lg w-full sm:w-auto min-w-[180px] sm:min-w-[200px] md:min-w-[250px] shadow-lg hover:shadow-xl"
+                  aria-label={activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : "Learn More"}
+                >
+                  {activeHeadings.length > 0 ? activeHeadings[headingIndex].secondaryButtonText : "Learn More"}
+                </a>
+              </motion.div>
+            </div>
+          </div>
         </>
       )}
     </section>
