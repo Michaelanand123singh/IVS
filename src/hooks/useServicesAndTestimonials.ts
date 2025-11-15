@@ -84,7 +84,13 @@ export function useServicesAndTestimonials() {
           console.error("[useServicesAndTestimonials] Services fetch error:", err);
           // Fallback to static data
           return import("@/data/services")
-            .then((module) => module.services || [])
+            .then((module) => {
+              // Transform static services to add 'id' property
+              return (module.services || []).map((service, index) => ({
+                ...service,
+                id: `static-${index}-${service.title.toLowerCase().replace(/\s+/g, '-')}`,
+              }));
+            })
             .catch(() => []);
         }),
 
@@ -160,10 +166,10 @@ export function useServicesAndTestimonials() {
             import("@/data/testimonials").catch(() => ({ testimonials: [] })),
           ]);
 
-          // Transform static services to add id property (required by Service interface)
+          // Transform static services to add 'id' property (required by Service interface)
           const staticServices = (servicesModule.services || []).map((service, index) => ({
             ...service,
-            id: `static-service-${index}`,
+            id: `static-${index}-${service.title.toLowerCase().replace(/\s+/g, '-')}`,
           }));
 
           setServices(staticServices);

@@ -186,10 +186,10 @@ export function usePageData(): UsePageDataReturn {
             import("@/data/testimonials").catch(() => null),
           ]);
 
-          // Transform static services to add id property (required by Service interface)
+          // Transform static services to add 'id' property (required by Service interface)
           const staticServices = (servicesModule?.services || []).map((service, index) => ({
             ...service,
-            id: `static-service-${index}`,
+            id: `static-${index}-${service.title.toLowerCase().replace(/\s+/g, '-')}`,
           }));
 
           setData({

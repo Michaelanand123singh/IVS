@@ -51,14 +51,13 @@ export async function GET() {
     ]);
 
     // Transform services data
-    const transformedServices = (servicesResult || []).map((service) => {
-      const serviceObj = service as { _id?: { toString(): string } } & Record<string, unknown>;
-      return {
-        ...serviceObj,
-        id: serviceObj._id?.toString() || '',
-        _id: undefined
-      };
-    });
+    const transformedServices = (servicesResult || []).map((service: { _id?: unknown; [key: string]: unknown }) => ({
+      ...service,
+      id: service._id && typeof service._id === 'object' && 'toString' in service._id 
+        ? (service._id as { toString(): string }).toString() 
+        : '',
+      _id: undefined
+    }));
 
     const endTime = performance.now();
     console.log(`[page-data] All data fetched in parallel in ${(endTime - startTime).toFixed(2)}ms`);

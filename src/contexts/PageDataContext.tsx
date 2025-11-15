@@ -56,7 +56,7 @@ const defaultContextValue: PageDataContextType = {
 
 const PageDataContext = createContext<PageDataContextType>(defaultContextValue);
 
-interface PageDataResponse {
+interface PageDataCache {
   hero: HeroData | null;
   services: Service[];
   testimonials: Testimonial[];
@@ -64,8 +64,8 @@ interface PageDataResponse {
 
 // Global cache to prevent duplicate requests
 const fetchCache = {
-  promise: null as Promise<PageDataResponse> | null,
-  data: null as PageDataResponse | null,
+  promise: null as Promise<PageDataCache> | null,
+  data: null as PageDataCache | null,
   timestamp: 0,
   CACHE_DURATION: 30000, // 30 seconds
 };

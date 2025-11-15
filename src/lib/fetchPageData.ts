@@ -3,14 +3,14 @@
  * This ensures that multiple components can request the same data without duplicate API calls
  */
 
-interface CacheEntry<T> {
+interface FetchCacheEntry<T = unknown> {
   promise: Promise<T> | null;
   data: T | null;
   timestamp: number;
 }
 
 interface FetchCache {
-  [key: string]: CacheEntry<unknown>;
+  [key: string]: FetchCacheEntry;
 }
 
 const cache: FetchCache = {};
@@ -28,22 +28,23 @@ export async function fetchWithCache<T>(
   const cacheKey = endpoint;
 
   // Return cached data if available and fresh
-  if (cache[cacheKey]?.data && (now - cache[cacheKey].timestamp) < CACHE_DURATION) {
+  const cachedEntry = cache[cacheKey] as FetchCacheEntry<T> | undefined;
+  if (cachedEntry?.data && (now - cachedEntry.timestamp) < CACHE_DURATION) {
     console.log(`[fetchWithCache] Returning cached data for ${endpoint}`);
-    return cache[cacheKey].data as T;
+    return cachedEntry.data;
   }
 
   // If a fetch is already in progress, return that promise (request deduplication)
-  if (cache[cacheKey]?.promise) {
+  if (cachedEntry?.promise) {
     console.log(`[fetchWithCache] Reusing existing fetch promise for ${endpoint} (deduplication)`);
-    return cache[cacheKey].promise as Promise<T>;
+    return cachedEntry.promise;
   }
 
   console.log(`[fetchWithCache] Starting fetch for ${endpoint}`);
   const startTime = performance.now();
 
   // Create the fetch promise
-  cache[cacheKey] = {
+  const cacheEntry: FetchCacheEntry<T> = {
     promise: fetch(endpoint)
       .then(async (res) => {
         if (!res.ok) {
@@ -65,7 +66,7 @@ export async function fetchWithCache<T>(
           throw err;
         }
       })
-      .then((data) => {
+      .then((data: T) => {
         // Cache the result
         cache[cacheKey] = {
           promise: null,
@@ -76,8 +77,9 @@ export async function fetchWithCache<T>(
       })
       .catch((err) => {
         // Clear promise on error
-        if (cache[cacheKey]) {
-          cache[cacheKey].promise = null;
+        const entry = cache[cacheKey] as FetchCacheEntry<T> | undefined;
+        if (entry) {
+          entry.promise = null;
         }
         throw err;
       }),
@@ -85,7 +87,8 @@ export async function fetchWithCache<T>(
     timestamp: 0,
   };
 
-  return cache[cacheKey].promise as Promise<T>;
+  cache[cacheKey] = cacheEntry;
+  return cacheEntry.promise as Promise<T>;
 }
 
 /**
@@ -93,7 +96,7 @@ export async function fetchWithCache<T>(
  * This is the key optimization: instead of sequential fetching, all APIs are called simultaneously
  */
 export async function fetchAllInParallel<T extends Record<string, unknown>>(
-  endpoints: { [K in keyof T]: { url: string; fallback: () => Promise<unknown> } }
+  endpoints: { [K in keyof T]: { url: string; fallback: () => Promise<T[K]> } }
 ): Promise<T> {
   const startTime = performance.now();
   console.log('[fetchAllInParallel] Starting parallel fetch of', Object.keys(endpoints).length, 'endpoints');
