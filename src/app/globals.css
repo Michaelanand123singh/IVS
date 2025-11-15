@@ -396,21 +396,18 @@ section[role="banner"] [data-nimg] {
 
 /* Hero content container - prevent layout shifts */
 .hero-content-container {
-  min-height: 60vh !important;
-  height: 60vh !important;
-  max-height: 60vh !important;
   display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
   position: relative !important;
-  contain: layout style paint !important;
-  overflow: hidden !important; /* Prevent content overflow from causing shifts */
+  height: unset !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  overflow: unset !important;
+  contain: unset !important;
 }
 
 .hero-content-inner {
   width: 100% !important;
   position: relative !important;
-  contain: layout style paint !important;
 }
 
 /* Hero content sections - reserve space to prevent shifts */
@@ -418,22 +415,17 @@ section[role="banner"] [data-nimg] {
 .hero-description-container,
 .hero-buttons-container {
   position: relative !important;
-  contain: layout style paint !important;
   will-change: opacity, transform !important;
   transform: translateZ(0) !important; /* Force GPU acceleration */
 }
 
 /* Reserve space for heading - prevent shifts when text changes */
 .hero-heading-container {
-  min-height: 12rem !important; /* Reserve space for largest heading */
-  height: auto !important;
   margin-bottom: 1.5rem !important;
 }
 
 /* Reserve space for description - prevent shifts */
 .hero-description-container {
-  min-height: 4rem !important; /* Reserve space for description */
-  height: auto !important;
   margin-bottom: 2rem !important;
 }
 
@@ -446,7 +438,6 @@ section[role="banner"] [data-nimg] {
 /* Prevent layout shifts from motion animations */
 .hero-content-inner [data-framer-component] {
   position: relative !important;
-  contain: layout style paint !important;
   will-change: opacity, transform !important;
   transform: translateZ(0) !important;
 }
@@ -455,7 +446,6 @@ section[role="banner"] [data-nimg] {
 .hero-content-inner h1,
 .hero-content-inner p {
   position: relative !important;
-  contain: layout style paint !important;
   font-display: swap !important; /* Prevent font loading shifts */
 }
 
