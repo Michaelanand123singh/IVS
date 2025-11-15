@@ -304,7 +304,7 @@ export default function Hero() {
       }
 
       setHeadingIndex((prev) => (prev + 1) % headingsLen);
-    }, 60000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
