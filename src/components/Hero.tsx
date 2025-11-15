@@ -279,7 +279,7 @@ export default function Hero() {
   const activeHeadings =
     heroData?.headings?.filter((h) => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) ?? [];
 
-  // Carousel sync: headings change every 1.5s; background updates if images exist
+  // Carousel sync: headings change every 15s; background updates if images exist
   useEffect(() => {
     if (!activeHeadings.length || isPaused) return;
 
@@ -304,7 +304,7 @@ export default function Hero() {
       }
 
       setHeadingIndex((prev) => (prev + 1) % headingsLen);
-    }, 1500);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
@@ -445,7 +445,7 @@ export default function Hero() {
                     animate={{
                       opacity: isActive ? 1 : 0,
                       transition: {
-                        duration: 1.5,
+                        duration: 2.5,
                         ease: [0.25, 0.46, 0.45, 0.94],
                         type: "tween",
                       },

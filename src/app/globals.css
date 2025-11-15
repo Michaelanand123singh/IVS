@@ -398,11 +398,6 @@ section[role="banner"] [data-nimg] {
 .hero-content-container {
   display: flex !important;
   position: relative !important;
-  height: unset !important;
-  min-height: unset !important;
-  max-height: unset !important;
-  overflow: unset !important;
-  contain: unset !important;
 }
 
 .hero-content-inner {
