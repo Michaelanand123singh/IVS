@@ -512,7 +512,7 @@ export default function Hero() {
           )}
 
           {/* Centered content */}
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-3 md:px-3 lg:px-4 z-10 text-white text-center hero-content-container">
+          <div className="relative  max-w-6xl px-4 sm:px-3 md:px-3 lg:px-4 z-10 text-white text-center hero-content-container">
             <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
               {activeHeadings.length > 0 ? (
                 <motion.div
