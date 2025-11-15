@@ -384,7 +384,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
+          <div className="relative  max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
             <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
               <div className="hero-heading-container">
                 <div className="animate-pulse">
