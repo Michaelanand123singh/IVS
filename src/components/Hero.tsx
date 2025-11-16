@@ -82,36 +82,46 @@ export default function Hero() {
     []
   );
 
-  // Preload first hero image for faster LCP (keeps your existing approach)
+  // Preload first hero image and next carousel image for faster LCP and smooth transitions
   useEffect(() => {
-    const firstImageUrl = heroData?.backgroundImages?.[0];
-    if (!firstImageUrl) return;
+    const images = heroData?.backgroundImages;
+    if (!images || images.length === 0) return;
 
-    const isCloudinary = firstImageUrl.includes("res.cloudinary.com");
-    const imageSrcSet = isCloudinary ? getHeroImageSrcSet(firstImageUrl, 82, true) : null;
-    const preloadUrl = imageSrcSet ? imageSrcSet.src : firstImageUrl;
+    const preloadImages = (index: number, priority: 'high' | 'low' = 'low') => {
+      const imageUrl = images[index];
+      if (!imageUrl) return;
 
-    // Avoid duplicate preloads
-    const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
-    if (existingPreload) return;
+      const isCloudinary = imageUrl.includes("res.cloudinary.com");
+      const imageSrcSet = isCloudinary ? getHeroImageSrcSet(imageUrl, index === 0 ? 82 : 80, index === 0) : null;
+      const preloadUrl = imageSrcSet ? imageSrcSet.src : imageUrl;
 
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.as = "image";
-    link.href = preloadUrl;
-    link.setAttribute("fetchpriority", "high");
-    if (imageSrcSet?.srcSet) {
-      link.setAttribute("imagesrcset", imageSrcSet.srcSet);
-      link.setAttribute("imagesizes", imageSrcSet.sizes);
-    }
-    document.head.appendChild(link);
+      // Avoid duplicate preloads
+      const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
+      if (existingPreload) return;
 
-    return () => {
-      const existingLink = document.querySelector(`link[href="${preloadUrl}"]`);
-      if (existingLink && existingLink.parentNode) {
-        existingLink.parentNode.removeChild(existingLink);
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = preloadUrl;
+      link.setAttribute("fetchpriority", priority);
+      if (imageSrcSet?.srcSet) {
+        link.setAttribute("imagesrcset", imageSrcSet.srcSet);
+        link.setAttribute("imagesizes", imageSrcSet.sizes);
       }
+      document.head.appendChild(link);
     };
+
+    // Preload first image with high priority
+    preloadImages(0, 'high');
+
+    // Preload second image with low priority (next in carousel)
+    if (images.length > 1) {
+      // Delay second image preload slightly to prioritize first
+      const timeoutId = setTimeout(() => {
+        preloadImages(1, 'low');
+      }, 100);
+      return () => clearTimeout(timeoutId);
+    }
   }, [heroData?.backgroundImages]);
 
   // Fetch hero data — RUN ONCE on mount. Use refs for start/stop to avoid dependency loops.
@@ -291,7 +301,50 @@ export default function Hero() {
   const activeHeadings =
     heroData?.headings?.filter((h) => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) ?? [];
 
-  // Carousel sync: headings change every 15s; background updates if images exist
+  // Preload next carousel image before transition for smooth loading
+  useEffect(() => {
+    if (!heroData?.backgroundImages?.length || isPaused) return;
+
+    const bgLen = heroData.backgroundImages.length;
+    const nextIndex = (bgIndex + 1) % bgLen;
+    
+    // Preload next image 1 second before transition (carousel changes every 1.5s)
+    const preloadTimeout = setTimeout(() => {
+      const nextImageUrl = heroData.backgroundImages[nextIndex];
+      if (nextImageUrl && !loadedImages.has(nextIndex)) {
+        const isCloudinary = nextImageUrl.includes("res.cloudinary.com");
+        const imageSrcSet = isCloudinary ? getHeroImageSrcSet(nextImageUrl, 80, false) : null;
+        const preloadUrl = imageSrcSet ? imageSrcSet.src : nextImageUrl;
+
+        // Check if already preloaded
+        const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
+        if (!existingPreload) {
+          const link = document.createElement("link");
+          link.rel = "preload";
+          link.as = "image";
+          link.href = preloadUrl;
+          link.setAttribute("fetchpriority", "low");
+          if (imageSrcSet?.srcSet) {
+            link.setAttribute("imagesrcset", imageSrcSet.srcSet);
+            link.setAttribute("imagesizes", imageSrcSet.sizes);
+          }
+          document.head.appendChild(link);
+        }
+
+        // Mark as loaded to trigger render
+        setLoadedImages((prev) => {
+          if (!prev.has(nextIndex)) {
+            return new Set([...prev, nextIndex]);
+          }
+          return prev;
+        });
+      }
+    }, 500); // Preload 500ms before transition (carousel changes every 1.5s)
+
+    return () => clearTimeout(preloadTimeout);
+  }, [bgIndex, heroData?.backgroundImages, isPaused, loadedImages]);
+
+  // Carousel sync: headings change every 1.5s; background updates if images exist
   useEffect(() => {
     if (!activeHeadings.length || isPaused) return;
 
@@ -302,21 +355,12 @@ export default function Hero() {
       if (bgLen > 0) {
         setBgIndex((prev) => {
           const nextIndex = (prev + 1) % bgLen;
-          // Preload/mark next image as requested to render
-          setLoadedImages((currentLoaded) => {
-            if (!currentLoaded.has(nextIndex)) {
-              const s = new Set(currentLoaded);
-              s.add(nextIndex);
-              return s;
-            }
-            return currentLoaded;
-          });
           return nextIndex;
         });
       }
 
       setHeadingIndex((prev) => (prev + 1) % headingsLen);
-    }, 6000);
+    }, 1500); // Faster carousel for better engagement
 
     return () => clearInterval(interval);
   }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
@@ -445,8 +489,11 @@ export default function Hero() {
                   return null;
                 }
 
+                // Optimize image based on viewport and position
+                // First image gets higher quality, others get optimized quality
+                const imageQuality = isFirstImage ? 82 : 80;
                 const imageData = isCloudinary
-                  ? getHeroImageSrcSet(image, isFirstImage ? 82 : 80, isFirstImage)
+                  ? getHeroImageSrcSet(image, imageQuality, isFirstImage)
                   : { src: image, srcSet: "", sizes: "100vw" };
 
                 return (
@@ -457,7 +504,7 @@ export default function Hero() {
                     animate={{
                       opacity: isActive ? 1 : 0,
                       transition: {
-                        duration: 2.5,
+                        duration: 1.5, // Faster transition for better UX
                         ease: [0.25, 0.46, 0.45, 0.94],
                         type: "tween",
                       },
@@ -470,18 +517,23 @@ export default function Hero() {
                     }}
                   >
                     {isCloudinary && imageData.srcSet ? (
-                      // native img with srcset for Cloudinary
+                      // native img with srcset for Cloudinary - optimized for performance
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={imageData.src}
                         srcSet={imageData.srcSet}
                         sizes={imageData.sizes}
                         alt=""
-                        loading={isFirstImage ? "eager" : "lazy"}
-                        fetchPriority={isFirstImage ? "high" : "low"}
+                        loading={isFirstImage ? "eager" : isActive ? "eager" : "lazy"}
+                        fetchPriority={isFirstImage ? "high" : isActive ? "high" : "low"}
                         decoding={isFirstImage ? "sync" : "async"}
                         onLoad={() => handleImageLoaded(index)}
                         className="object-cover w-full h-full hero-image"
+                        style={{
+                          // Optimize rendering performance
+                          contentVisibility: isActive ? "auto" : "hidden",
+                          willChange: isActive ? "opacity" : "auto",
+                        }}
                       />
                     ) : (
                       // Next/Image for non-cloudinary
@@ -489,13 +541,17 @@ export default function Hero() {
                         src={imageData.src}
                         alt=""
                         fill
-                        priority={isFirstImage}
-                        fetchPriority={isFirstImage ? "high" : "low"}
+                        priority={isFirstImage || isActive}
+                        fetchPriority={isFirstImage ? "high" : isActive ? "high" : "low"}
                         sizes={imageData.sizes}
                         quality={isFirstImage ? 82 : 80}
-                        loading={isFirstImage ? "eager" : "lazy"}
+                        loading={isFirstImage ? "eager" : isActive ? "eager" : "lazy"}
                         onLoadingComplete={() => handleImageLoaded(index)}
                         className="object-cover hero-image"
+                        style={{
+                          contentVisibility: isActive ? "auto" : "hidden",
+                          willChange: isActive ? "opacity" : "auto",
+                        }}
                       />
                     )}
                   </motion.div>
