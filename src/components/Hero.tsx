@@ -71,15 +71,12 @@ export default function Hero() {
         return next;
       });
 
-      // If this is the LCP/first hero image, hide the global loader and local skeleton
+      // Image loaded callback - loader should already be hidden by now
+      // This is just for tracking/logging purposes
       if (index === 0) {
-        console.log('[Hero] handleImageLoaded — first image (index 0) loaded, stopping loader');
+        console.log('[Hero] handleImageLoaded — first image (index 0) loaded');
+        // Loader should already be stopped, but clear safety timer just in case
         clearSafetyTimer();
-        // Use RAF to ensure paint happens before removing overlay in some edge-cases
-        requestAnimationFrame(() => {
-          stopLoadingRef.current();
-          setLoading(false);
-        });
       }
     },
     []
@@ -128,17 +125,17 @@ export default function Hero() {
     startLoadingRef.current(); // show global loader immediately
     setLoading(true);
 
-    // Setup safety timer to stop loader after X seconds to prevent stuck state (10s)
+    // Setup safety timer to stop loader after X seconds to prevent stuck state (2s max)
     clearSafetyTimer();
     safetyTimeoutRef.current = setTimeout(() => {
-      console.warn('[Hero] Safety timeout triggered — force stopping loader after 10 seconds');
+      console.warn('[Hero] Safety timeout triggered — force stopping loader after 2 seconds');
       // If first image didn't load for some reason, hide loader as fallback
       requestAnimationFrame(() => {
         stopLoadingRef.current();
         setLoading(false);
       });
       safetyTimeoutRef.current = null;
-    }, 10000); // 10 seconds fallback
+    }, 2000); // 2 seconds max - don't block site for slow images
 
     const fetchHeroData = async () => {
       try {
@@ -149,8 +146,13 @@ export default function Hero() {
           console.log('[Hero] fetchHeroData — received data, headings count:', data.hero?.headings?.length || 0, 'images count:', data.hero?.backgroundImages?.length || 0);
           if (isActive) {
             setHeroData(data.hero);
-            // DO NOT stop loading here; wait for first image's onLoad/onLoadingComplete
-            setLoading(true);
+            // Stop loading immediately after data is fetched - don't wait for images
+            // Images will load progressively in background without blocking the site
+            clearSafetyTimer();
+            requestAnimationFrame(() => {
+              stopLoadingRef.current();
+              setLoading(false);
+            });
           }
         } else {
           console.log('[Hero] fetchHeroData — API failed, using static fallback');
@@ -203,7 +205,12 @@ export default function Hero() {
                 "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80",
               ],
             });
-            setLoading(true);
+            // Stop loading immediately for fallback data too
+            clearSafetyTimer();
+            requestAnimationFrame(() => {
+              stopLoadingRef.current();
+              setLoading(false);
+            });
           }
         }
       } catch (err) {
@@ -257,7 +264,12 @@ export default function Hero() {
               "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80",
             ],
           });
-          setLoading(true);
+          // Stop loading immediately for error fallback too
+          clearSafetyTimer();
+          requestAnimationFrame(() => {
+            stopLoadingRef.current();
+            setLoading(false);
+          });
         }
       }
     };

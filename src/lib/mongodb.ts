@@ -31,6 +31,15 @@ async function connectDB() {
 
     const opts = {
       bufferCommands: false,
+      // Optimize for Vercel serverless functions
+      serverSelectionTimeoutMS: 5000, // 5 second timeout for server selection
+      socketTimeoutMS: 45000, // 45 second socket timeout
+      connectTimeoutMS: 10000, // 10 second connection timeout
+      maxPoolSize: 1, // Reduce pool size for serverless (each function instance)
+      minPoolSize: 0, // Allow connection pool to close when idle
+      // Enable keep-alive for better connection reuse
+      keepAlive: true,
+      keepAliveInitialDelay: 30000,
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {

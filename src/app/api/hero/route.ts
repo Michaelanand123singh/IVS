@@ -3,13 +3,33 @@ import connectToDatabase from '@/lib/mongodb';
 import Hero from '@/models/Hero';
 
 export async function GET() {
+  // Fast timeout for Vercel - return fallback if DB is slow (3 seconds max)
+  const DB_TIMEOUT = 3000;
+  const startTime = Date.now();
+
   try {
-    await connectToDatabase();
+    // Try to connect with timeout
+    const connectPromise = connectToDatabase();
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database connection timeout')), DB_TIMEOUT)
+    );
     
-    const hero = await Hero.findOne({ isActive: true })
+    await Promise.race([connectPromise, timeoutPromise]);
+    
+    // Check if we still have time for the query
+    const timeElapsed = Date.now() - startTime;
+    const remainingTime = Math.max(500, DB_TIMEOUT - timeElapsed);
+    
+    const queryPromise = Hero.findOne({ isActive: true })
       .sort({ displayOrder: 1, created_at: -1 })
       .select('headings backgroundImages')
       .lean();
+    
+    const queryTimeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Database query timeout')), remainingTime)
+    );
+    
+    const hero = await Promise.race([queryPromise, queryTimeoutPromise]) as Awaited<typeof queryPromise> | null;
 
     // Add cache headers for faster subsequent loads
     // Cache for 5 minutes, revalidate in background
@@ -19,9 +39,12 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error('Error fetching hero from database:', err);
+    // Log error but don't block - use fast fallback
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error fetching hero from database:', err);
+    }
     
-    // Fallback to static data when database is not available
+    // Fast fallback to static data - don't wait for DB on Vercel cold starts
     try {
       const staticHero = {
         headings: [
