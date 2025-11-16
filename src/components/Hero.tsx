@@ -291,7 +291,7 @@ export default function Hero() {
   const activeHeadings =
     heroData?.headings?.filter((h) => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) ?? [];
 
-  // Carousel sync: headings change every 1.5s; background updates if images exist
+  // Carousel sync: headings change every 15s; background updates if images exist
   useEffect(() => {
     if (!activeHeadings.length || isPaused) return;
 
@@ -316,7 +316,7 @@ export default function Hero() {
       }
 
       setHeadingIndex((prev) => (prev + 1) % headingsLen);
-    }, 1500);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
@@ -396,7 +396,7 @@ export default function Hero() {
             <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/60 to-black/70" aria-hidden="true"></div>
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
+          <div className="relative  max-w-6xl px-4 sm:px-5 md:px-6 lg:px-8 z-10 text-white text-center hero-content-container">
             <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
               <div className="hero-heading-container">
                 <div className="animate-pulse">
@@ -457,7 +457,7 @@ export default function Hero() {
                     animate={{
                       opacity: isActive ? 1 : 0,
                       transition: {
-                        duration: 1.5,
+                        duration: 2.5,
                         ease: [0.25, 0.46, 0.45, 0.94],
                         type: "tween",
                       },
@@ -524,7 +524,7 @@ export default function Hero() {
           )}
 
           {/* Centered content */}
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-3 md:px-3 lg:px-4 z-10 text-white text-center hero-content-container">
+          <div className="relative  max-w-6xl px-4 sm:px-3 md:px-3 lg:px-4 z-10 text-white text-center hero-content-container">
             <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 hero-content-inner">
               {activeHeadings.length > 0 ? (
                 <motion.div
