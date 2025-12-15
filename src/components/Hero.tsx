@@ -30,8 +30,6 @@ export default function Hero() {
   const [headingIndex, setHeadingIndex] = useState(0);
   const [heroData, setHeroData] = useState<HeroData | null>(null);
   const [loading, setLoading] = useState(true); // local skeleton flag
-  const [isPaused, setIsPaused] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set([0])); // track loaded images
   const [mounted, setMounted] = useState(false);
 
   // Safety fallback timer ref to avoid loader stuck forever
@@ -60,75 +58,15 @@ export default function Hero() {
     }
   };
 
-  // Called when any hero image finishes loading/decoding
-  const handleImageLoaded = useCallback(
-    (index: number) => {
-      console.log(`[Hero] handleImageLoaded — image ${index} loaded`);
-      setLoadedImages((prev) => {
-        if (prev.has(index)) return prev;
-        const next = new Set(prev);
-        next.add(index);
-        return next;
-      });
 
-      // Image loaded callback - loader should already be hidden by now
-      // This is just for tracking/logging purposes
-      if (index === 0) {
-        console.log('[Hero] handleImageLoaded — first image (index 0) loaded');
-        // Loader should already be stopped, but clear safety timer just in case
-        clearSafetyTimer();
-      }
-    },
-    []
-  );
 
-  // Preload first hero image and next carousel image for faster LCP and smooth transitions
-  useEffect(() => {
-    const images = heroData?.backgroundImages;
-    if (!images || images.length === 0) return;
 
-    const preloadImages = (index: number, priority: 'high' | 'low' = 'low') => {
-      const imageUrl = images[index];
-      if (!imageUrl) return;
-
-      const isCloudinary = imageUrl.includes("res.cloudinary.com");
-      const imageSrcSet = isCloudinary ? getHeroImageSrcSet(imageUrl, index === 0 ? 82 : 80, index === 0) : null;
-      const preloadUrl = imageSrcSet ? imageSrcSet.src : imageUrl;
-
-      // Avoid duplicate preloads
-      const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
-      if (existingPreload) return;
-
-      const link = document.createElement("link");
-      link.rel = "preload";
-      link.as = "image";
-      link.href = preloadUrl;
-      link.setAttribute("fetchpriority", priority);
-      if (imageSrcSet?.srcSet) {
-        link.setAttribute("imagesrcset", imageSrcSet.srcSet);
-        link.setAttribute("imagesizes", imageSrcSet.sizes);
-      }
-      document.head.appendChild(link);
-    };
-
-    // Preload first image with high priority
-    preloadImages(0, 'high');
-
-    // Preload second image with low priority (next in carousel)
-    if (images.length > 1) {
-      // Delay second image preload slightly to prioritize first
-      const timeoutId = setTimeout(() => {
-        preloadImages(1, 'low');
-      }, 100);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [heroData?.backgroundImages]);
 
   // Fetch hero data — RUN ONCE on mount. Use refs for start/stop to avoid dependency loops.
   useEffect(() => {
     if (didFetchRef.current) return; // ⛔ Skip if already fetched
     didFetchRef.current = true;
-    
+
     console.log('[Hero] useEffect — starting fetch');
     let isActive = true;
     console.log('[Hero] useEffect — calling startLoading');
@@ -301,52 +239,9 @@ export default function Hero() {
   const activeHeadings =
     heroData?.headings?.filter((h) => h.isActive).sort((a, b) => a.displayOrder - b.displayOrder) ?? [];
 
-  // Preload next carousel image before transition for smooth loading
+  // Carousel sync: headings change every 3s; background updates if images exist
   useEffect(() => {
-    if (!heroData?.backgroundImages?.length || isPaused) return;
-
-    const bgLen = heroData.backgroundImages.length;
-    const nextIndex = (bgIndex + 1) % bgLen;
-    
-    // Preload next image 1 second before transition (carousel changes every 1.5s)
-    const preloadTimeout = setTimeout(() => {
-      const nextImageUrl = heroData.backgroundImages[nextIndex];
-      if (nextImageUrl && !loadedImages.has(nextIndex)) {
-        const isCloudinary = nextImageUrl.includes("res.cloudinary.com");
-        const imageSrcSet = isCloudinary ? getHeroImageSrcSet(nextImageUrl, 80, false) : null;
-        const preloadUrl = imageSrcSet ? imageSrcSet.src : nextImageUrl;
-
-        // Check if already preloaded
-        const existingPreload = document.querySelector(`link[rel="preload"][as="image"][href="${preloadUrl}"]`);
-        if (!existingPreload) {
-          const link = document.createElement("link");
-          link.rel = "preload";
-          link.as = "image";
-          link.href = preloadUrl;
-          link.setAttribute("fetchpriority", "low");
-          if (imageSrcSet?.srcSet) {
-            link.setAttribute("imagesrcset", imageSrcSet.srcSet);
-            link.setAttribute("imagesizes", imageSrcSet.sizes);
-          }
-          document.head.appendChild(link);
-        }
-
-        // Mark as loaded to trigger render
-        setLoadedImages((prev) => {
-          if (!prev.has(nextIndex)) {
-            return new Set([...prev, nextIndex]);
-          }
-          return prev;
-        });
-      }
-    }, 500); // Preload 500ms before transition (carousel changes every 1.5s)
-
-    return () => clearTimeout(preloadTimeout);
-  }, [bgIndex, heroData?.backgroundImages, isPaused, loadedImages]);
-
-  // Carousel sync: headings change every 1.5s; background updates if images exist
-  useEffect(() => {
-    if (!activeHeadings.length || isPaused) return;
+    if (!activeHeadings.length) return;
 
     const bgLen = heroData?.backgroundImages?.length || 0;
     const headingsLen = activeHeadings.length;
@@ -360,62 +255,10 @@ export default function Hero() {
       }
 
       setHeadingIndex((prev) => (prev + 1) % headingsLen);
-    }, 1500); // Faster carousel for better engagement
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [heroData?.backgroundImages?.length, activeHeadings.length, isPaused]);
-
-  // Mouse / touch handlers
-  const handleMouseEnter = () => setIsPaused(true);
-  const handleMouseLeave = () => setIsPaused(false);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    const startX = touch.clientX;
-    const startY = touch.clientY;
-
-    const handleTouchMove = (ev: TouchEvent) => {
-      const t = ev.touches[0];
-      const deltaX = t.clientX - startX;
-      const deltaY = t.clientY - startY;
-
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
-        ev.preventDefault();
-
-        // headings
-        if (activeHeadings.length > 0) {
-          if (deltaX > 0) {
-            setHeadingIndex((prev) => {
-              const newIndex = prev - 1;
-              return newIndex < 0 ? activeHeadings.length - 1 : newIndex;
-            });
-          } else {
-            setHeadingIndex((prev) => (prev + 1) % activeHeadings.length);
-          }
-        }
-
-        // background images
-        if (heroData?.backgroundImages?.length) {
-          if (deltaX > 0) {
-            setBgIndex((prev) => {
-              const newIndex = prev - 1;
-              return newIndex < 0 ? heroData.backgroundImages.length - 1 : newIndex;
-            });
-          } else {
-            setBgIndex((prev) => (prev + 1) % heroData.backgroundImages.length);
-          }
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd);
-  };
+  }, [heroData?.backgroundImages?.length, activeHeadings.length]);
 
   // Render control
   const shouldShowContent = mounted && !loading && heroData;
@@ -426,9 +269,6 @@ export default function Hero() {
       className="relative overflow-hidden bg-gradient-primary min-h-screen flex items-center justify-center hero-section-fixed"
       role="banner"
       aria-label="Hero section with business transformation solutions"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleTouchStart}
       style={{
         visibility: !mounted ? "hidden" : "visible",
       }}
@@ -484,17 +324,7 @@ export default function Hero() {
                 const nextIndex = (bgIndex + 1) % total;
                 const shouldRender = isActive || index === nextIndex || isFirstImage;
 
-                // Avoid rendering unless requested or already loaded. Always render index 0 for consistent SSR.
-                if (!shouldRender && !loadedImages.has(index) && index !== 0) {
-                  return null;
-                }
 
-                // Optimize image based on viewport and position
-                // First image gets higher quality, others get optimized quality
-                const imageQuality = isFirstImage ? 82 : 80;
-                const imageData = isCloudinary
-                  ? getHeroImageSrcSet(image, imageQuality, isFirstImage)
-                  : { src: image, srcSet: "", sizes: "100vw" };
 
                 return (
                   <motion.div
@@ -516,18 +346,12 @@ export default function Hero() {
                       ...(index === 0 ? {} : { visibility: shouldRender ? "visible" : "hidden" }),
                     }}
                   >
-                    {isCloudinary && imageData.srcSet ? (
+                    {isCloudinary ? (
                       // native img with srcset for Cloudinary - optimized for performance
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={imageData.src}
-                        srcSet={imageData.srcSet}
-                        sizes={imageData.sizes}
+                        src={image}
                         alt=""
-                        loading={isFirstImage ? "eager" : isActive ? "eager" : "lazy"}
-                        fetchPriority={isFirstImage ? "high" : isActive ? "high" : "low"}
-                        decoding={isFirstImage ? "sync" : "async"}
-                        onLoad={() => handleImageLoaded(index)}
                         className="object-cover w-full h-full hero-image"
                         style={{
                           // Optimize rendering performance
@@ -538,15 +362,10 @@ export default function Hero() {
                     ) : (
                       // Next/Image for non-cloudinary
                       <Image
-                        src={imageData.src}
+                        src={image}
                         alt=""
                         fill
                         priority={isFirstImage || isActive}
-                        fetchPriority={isFirstImage ? "high" : isActive ? "high" : "low"}
-                        sizes={imageData.sizes}
-                        quality={isFirstImage ? 82 : 80}
-                        loading={isFirstImage ? "eager" : isActive ? "eager" : "lazy"}
-                        onLoadingComplete={() => handleImageLoaded(index)}
                         className="object-cover hero-image"
                         style={{
                           contentVisibility: isActive ? "auto" : "hidden",
