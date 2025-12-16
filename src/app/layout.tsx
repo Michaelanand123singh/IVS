@@ -38,7 +38,7 @@ export default function RootLayout({
         <StructuredData type="Organization" />
         <StructuredData type="WebSite" />
         <StructuredData type="LocalBusiness" />
-        {/* Preconnect to external resources for faster loading */}
+        {/* Preconnect to external resources for faster ldsjnsgit oading */}
         <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         {/* Prefetch critical resources - unified endpoint for faster loading */}
